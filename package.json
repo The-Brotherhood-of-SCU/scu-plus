@@ -1,0 +1,34 @@
+{
+  "name": "scu-plus",
+  "displayName": "Scu plus",
+  "version": "0.0.1",
+  "description": "四川大学教务系统美化拓展插件",
+  "author": "jeanhua",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "plasmo": "0.90.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@types/chrome": "0.0.258",
+    "@types/node": "20.11.5",
+    "@types/react": "18.2.48",
+    "@types/react-dom": "18.2.18",
+    "prettier": "3.2.4",
+    "typescript": "5.3.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ],
+    "permissions": [
+      "tabs"
+    ]
+  }
+}
