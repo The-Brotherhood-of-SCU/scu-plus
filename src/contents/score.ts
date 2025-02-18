@@ -9,7 +9,7 @@ const $ = (css: string) => {
   return document.querySelector(css) as HTMLElement;
 };
 
-// 绩点转换函数
+
 function getGPA(score: number): number {
   if (score >= 90 && score <= 100) return 4.0;
   if (score >= 85 && score <= 89) return 3.7;
