@@ -5,10 +5,6 @@ export const config: PlasmoCSConfig = {
   all_frames: true,
 };
 
-const $ = (css: string) => {
-  return document.querySelector(css) as HTMLElement;
-};
-
 
 function getGPA(score: number): number {
   if (score >= 90 && score <= 100) return 4.0;
@@ -60,7 +56,7 @@ function calculateWeightedAverage(
 }
 
 window.addEventListener("load", () => {
-  let container = $("#page-content-template > div > div");
+  let container = document.querySelector("#page-content-template > div > div") as HTMLElement;
   if (container) {
     let div_new = document.createElement("div");
     div_new.innerHTML = `
@@ -73,7 +69,8 @@ window.addEventListener("load", () => {
       </div>
     `;
     container.insertBefore(div_new, container.children[0]);
-
+    let cptext = document.querySelector("#page-content-template > div > div > div:nth-child(1) > div > span")as HTMLElement;
+    if(cptext)cptext.innerText+="🎯";
     // 绑定按钮点击事件
     const button = div_new.querySelector("#calculate-stats") as HTMLButtonElement;
     const resultParagraph = div_new.querySelector("#stats-result") as HTMLParagraphElement;
@@ -132,7 +129,7 @@ window.addEventListener("load", () => {
 
       // 显示结果
       resultParagraph.innerHTML = `
-      <span>注：过滤不及格科目</span><br>
+      <span>注：学分和绩点过滤不及格科目</span><br>
         <strong>总学分:</strong> ${totalCredits.toFixed(2)}<br>
         <strong>平均绩点:</strong> ${averageGPA.toFixed(2)}<br>
         <strong>平均成绩:</strong> ${averageScore.toFixed(2)}<br>

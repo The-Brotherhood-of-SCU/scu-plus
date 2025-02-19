@@ -23,4 +23,4 @@ function IndexPopup() {
   )
 }
 
-export default IndexPopup
+export default IndexPopup;
