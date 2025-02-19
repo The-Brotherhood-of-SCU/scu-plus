@@ -50,4 +50,3 @@ const dailySentence = async () => {
     }
     return null;
 }
-

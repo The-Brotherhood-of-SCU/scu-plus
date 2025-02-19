@@ -22,8 +22,9 @@ function updateCookie(key, value) {
 }
 
 updateCookie("selectionBar", "");
-
+const savedSettings = JSON.parse(localStorage.getItem('settings') || '{}');
 window.addEventListener("load", () => {
+    if(savedSettings.dailyQuoteSwitch != false)
     showModal();
 });
 
