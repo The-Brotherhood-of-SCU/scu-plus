@@ -1,7 +1,7 @@
 {
   "name": "scu-plus",
   "displayName": "Scu plus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "四川大学教务系统美化拓展插件",
   "author": "jeanhua",
   "scripts": {

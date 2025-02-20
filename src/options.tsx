@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { checkVersion } from "~background"
+import { checkVersion } from "./script/utils"
 import packagejson from "package.json"
 
 function OptionsIndex() {

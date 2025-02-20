@@ -1,12 +1,11 @@
 import type { PlasmoCSConfig } from "plasmo";
-import { dailySentence } from "../background";
+import { dailySentence } from "../script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: ["http://zhjw.scu.edu.cn/", "http://zhjw.scu.edu.cn/index", "http://zhjw.scu.edu.cn/index.*"],
     all_frames: true,
 };
 
-// 更新 Cookie 的函数
 function updateCookie(key, value) {
     const cookies = document.cookie
         .split("; ")
@@ -36,16 +35,16 @@ const showModal = async () => {
         modal.id = 'custom-modal';
         modal.style.position = 'fixed';
         modal.style.top = '120px';
-        modal.style.right = '-370px'; // 初始位置：隐藏在屏幕右侧
-        modal.style.backgroundColor = 'rgba(255, 255, 255, 0.6)'; // 半透明背景
-        modal.style.backdropFilter = 'blur(10px)'; // 毛玻璃效果
+        modal.style.right = '-370px';
+        modal.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+        modal.style.backdropFilter = 'blur(10px)';
         modal.style.padding = '20px';
         modal.style.borderRadius = '12px';
         modal.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
         modal.style.zIndex = '1000';
         modal.style.width = '350px';
         modal.style.fontFamily = 'Arial, sans-serif';
-        modal.style.transition = 'right 0.3s ease'; // 添加过渡动画
+        modal.style.transition = 'right 0.3s ease';
 
         // 创建关闭按钮
         const closeButton = document.createElement('button');
@@ -60,14 +59,14 @@ const showModal = async () => {
         closeButton.style.cursor = 'pointer';
         closeButton.style.transition = 'color 0.3s ease';
         closeButton.onmouseover = () => {
-            closeButton.style.color = '#ff4d4f'; // 鼠标悬停时变红
+            closeButton.style.color = '#ff4d4f';
         };
         closeButton.onmouseout = () => {
-            closeButton.style.color = '#333'; // 恢复默认颜色
+            closeButton.style.color = '#333';
         };
         closeButton.onclick = () => {
-            modal.style.right = '-370px'; // 关闭时向右滑动
-            setTimeout(() => modal.remove(), 300); // 等待动画完成后再移除元素
+            modal.style.right = '-370px';
+            setTimeout(() => modal.remove(), 300);
         };
 
         // 创建内容区域

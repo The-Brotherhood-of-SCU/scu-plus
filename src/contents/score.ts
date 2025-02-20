@@ -17,7 +17,7 @@ function getGPA(score: number): number {
   if (score >= 63 && score <= 65) return 1.7;
   if (score >= 62 && score <= 61) return 1.3;
   if (score === 60) return 1.0;
-  return 0.0; // 不及格
+  return 0.0;
 }
 
 // 提取数据
@@ -71,7 +71,6 @@ window.addEventListener("load", () => {
     container.insertBefore(div_new, container.children[0]);
     let cptext = document.querySelector("#page-content-template > div > div > div:nth-child(1) > div > span")as HTMLElement;
     if(cptext)cptext.innerText+="🎯";
-    // 绑定按钮点击事件
     const button = div_new.querySelector("#calculate-stats") as HTMLButtonElement;
     const resultParagraph = div_new.querySelector("#stats-result") as HTMLParagraphElement;
 
@@ -80,7 +79,7 @@ window.addEventListener("load", () => {
 
       if (data.length === 0) {
         resultParagraph.textContent = "未找到有效成绩数据";
-        resultParagraph.style.color = "#e74c3c"; // 错误提示颜色
+        resultParagraph.style.color = "#e74c3c";
         return;
       }
 
@@ -127,7 +126,6 @@ window.addEventListener("load", () => {
         }));
       const requiredAverageScore = calculateWeightedAverage(requiredScoreData);
 
-      // 显示结果
       resultParagraph.innerHTML = `
       <span>注：学分和绩点过滤不及格科目</span><br>
         <strong>总学分:</strong> ${totalCredits.toFixed(2)}<br>
@@ -139,10 +137,9 @@ window.addEventListener("load", () => {
         <strong>必修平均绩点:</strong> ${requiredGPA.toFixed(2)}<br>
         <strong>必修平均成绩:</strong> ${requiredAverageScore.toFixed(2)}
       `;
-      resultParagraph.style.color = "#2ecc71"; // 成功提示颜色
+      resultParagraph.style.color = "#2ecc71";
     });
 
-    // 鼠标悬停效果
     button.addEventListener("mouseenter", () => {
       button.style.backgroundColor = "#0056b3";
     });

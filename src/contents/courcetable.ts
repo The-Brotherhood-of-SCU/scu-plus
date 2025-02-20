@@ -1,4 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
+import { $ } from "~script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -7,10 +8,6 @@ export const config: PlasmoCSConfig = {
     ],
     all_frames: true
 }
-
-const $ = (css: string) => {
-    return document.querySelector(css) as HTMLElement;
-};
 
 function extractData(): { attribute: string; credit: number}[] {
     const rows = document.querySelectorAll("#tab10646 > table > tbody > tr");
@@ -38,13 +35,12 @@ window.addEventListener("load", () => {
 // 注入学分统计
 async function inject(){
     while(true){
-        let table = $("#tab10646 > table > tbody");
+        let table = document.querySelector("#tab10646 > table > tbody") as HTMLElement;
         if(table){
             break;
         }
         await sleep(1000);
     }
-    console.log("加载完成");
     let data = extractData();
     let requiredCredits = data.reduce((sum,cur)=>sum+(cur.attribute==="必修"?cur.credit:0),0);
     let n_requiredCredits = data.reduce((sum,cur)=>sum+(cur.attribute==="选修"?cur.credit:0),0);
@@ -52,7 +48,7 @@ async function inject(){
     let show_elememt = document.createElement("div");
     show_elememt.innerHTML = `
     <span style="font-size:1.3rem;color:red;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
-    `
-    $("#myTab > li").appendChild(show_elememt);
-    $("#myTab > li > div > span").innerText+=" 🎯by SCU+";
+    `;
+    show_elememt.querySelector("span").innerText += " 🎯by SCU+";
+    $("#myTab > li",(e)=>e.appendChild(show_elememt));
 }

@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { $, $all } from "../background"
+import { $, $all } from "../script/utils"
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -112,26 +112,22 @@ const injectMenu = async () => {
   peiyang.innerHTML = `
   <button id="peiyangBtn" style="width:100%;height:40px">培养方案查看</button>
   `
+  peiyang.querySelector("button").innerText += "🎯";
+  peiyang.onclick = () => {
+    window.location.replace("http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index");
+  }
   menus.appendChild(peiyang);
-  $("#peiyangBtn", (e) => {
-    e.innerText += "🎯";
-    e.onclick = () => {
-      window.location.replace("http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index");
-    }
-  });
   console.log("注入培养方案按钮成功");
   // 注入设置按钮
   let settingsBtn = document.createElement("div");
   settingsBtn.innerHTML = `
   <button id="SCUplusSettingsBtn" style="width:100%;height:40px">SCU+设置</button>
-  `
+  `;
+  settingsBtn.querySelector("button").innerText += "🎯";
+  settingsBtn.onclick = () => {
+    window.open("http://zhjw.scu.edu.cn/#/SCUplusSettings");
+  }
   menus.appendChild(settingsBtn);
-  $("#SCUplusSettingsBtn", (e) => {
-    e.innerText += "🎯";
-    e.onclick = () => {
-      window.open("http://zhjw.scu.edu.cn/#/SCUplusSettings");
-    }
-  });
   console.log("注入SCU+设置按钮成功");
 }
 
