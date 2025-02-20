@@ -138,7 +138,7 @@ const injectMenu = async () => {
 const closeFadeModal = async () => {
   while (true) {
     if (savedSettings.passwordPopupSwitch != false) {
-      $("body > div.modal-backdrop.fade.in", (e) => { e.style.display = "None"; });
+      $("body > div.modal-backdrop.fade.in", (e) => { e.remove(); });
     }
     await sleep(1000);
   }
