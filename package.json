@@ -26,12 +26,13 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://*/*","http://*/*"
     ],
     "permissions": [
       "tabs",
       "scripting",
-      "storage"
+      "storage",
+      "nativeMessaging"
     ]
   }
 }

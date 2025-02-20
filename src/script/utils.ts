@@ -42,9 +42,10 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
 }
 
 const dailySentence = async () => {
-    const response = await chrome.runtime.sendMessage({action:"request",url:"http://zj.v.api.aa1.cn/api/wenan-zl/?type=json"})
-    if(response){
-        return JSON.parse(response)['msg'];
+    const response = await chrome.runtime.sendMessage({action:"request",url:"http://zj.v.api.aa1.cn/api/wenan-zl/?type=json"});
+    console.log(response);
+    if(response.success){
+        return JSON.parse(response.data)['msg'];
     }
     return null;
 }

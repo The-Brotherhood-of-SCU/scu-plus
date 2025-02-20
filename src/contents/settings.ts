@@ -255,8 +255,6 @@ window.addEventListener("load", () => {
         const settingsPanel = new SettingsPanel();
         settingsPanel.injectToPage();
         console.log("设置注入成功!");
-    } else {
-        console.log(window.location.href);
     }
 });
 
