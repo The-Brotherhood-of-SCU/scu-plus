@@ -1,7 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo";
 
-export { Jump2Settings };
-
 export const config: PlasmoCSConfig = {
     matches: ["http://zhjw.scu.edu.cn/*"],
     all_frames: true,
@@ -257,8 +255,3 @@ window.addEventListener("load", () => {
         console.log("设置注入成功!");
     }
 });
-
-const Jump2Settings = () => {
-    window.location.href = "http://zhjw.scu.edu.cn/#/SCUplusSettings";
-    window.location.reload();
-};

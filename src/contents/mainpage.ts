@@ -125,7 +125,8 @@ const injectMenu = async () => {
   `;
   settingsBtn.querySelector("button").innerText += "🎯";
   settingsBtn.onclick = () => {
-    window.open("http://zhjw.scu.edu.cn/#/SCUplusSettings");
+    window.location.hash = '#/SCUplusSettings';
+    window.location.reload();
   }
   menus.appendChild(settingsBtn);
   console.log("注入SCU+设置按钮成功");

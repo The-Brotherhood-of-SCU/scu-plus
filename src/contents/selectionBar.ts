@@ -29,64 +29,99 @@ window.addEventListener("load", () => {
 
 const showModal = async () => {
     const word = await dailySentence();
-    if (word) {
-        // 创建弹窗容器
-        const modal = document.createElement('div');
-        modal.id = 'custom-modal';
-        modal.style.position = 'fixed';
-        modal.style.top = '120px';
-        modal.style.right = '-370px';
-        modal.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
-        modal.style.backdropFilter = 'blur(10px)';
-        modal.style.padding = '20px';
-        modal.style.borderRadius = '12px';
-        modal.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
-        modal.style.zIndex = '1000';
-        modal.style.width = '350px';
-        modal.style.fontFamily = 'Arial, sans-serif';
-        modal.style.transition = 'right 0.3s ease';
+    if (!word) return;
 
-        // 创建关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.innerText = '×';
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '10px';
-        closeButton.style.right = '10px';
-        closeButton.style.background = 'none';
-        closeButton.style.border = 'none';
-        closeButton.style.fontSize = '20px';
-        closeButton.style.color = '#333';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.transition = 'color 0.3s ease';
-        closeButton.onmouseover = () => {
-            closeButton.style.color = '#ff4d4f';
-        };
-        closeButton.onmouseout = () => {
-            closeButton.style.color = '#333';
-        };
-        closeButton.onclick = () => {
-            modal.style.right = '-370px';
-            setTimeout(() => modal.remove(), 300);
-        };
+    const modal = document.createElement('div');
+    modal.id = 'custom-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: -400px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.96) 0%, rgba(245,247,250,0.96) 100%);
+        backdrop-filter: blur(12px);
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.08);
+        z-index: 9999;
+        width: 380px;
+        font-family: 'Segoe UI', 'PingFang SC', system-ui;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        border: 1px solid rgba(255,255,255,0.3);
+        transform-origin: 95% 0;
+        opacity: 0;
+    `;
 
-        // 创建内容区域
-        const content = document.createElement('div');
-        content.innerHTML = `
-            <p style="margin: 0; font-size: 16px; color: #333;"><strong>每日一句:</strong></p>
-            <p style="margin-top: 8px; font-size: 14px; color: #555; line-height: 1.6;">${word}</p>
-        `;
-        content.style.marginTop = '10px';
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '×';
+    closeButton.style.cssText = `
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0,0,0,0.08);
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 20px;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
 
-        // 将关闭按钮和内容添加到弹窗中
-        modal.appendChild(closeButton);
-        modal.appendChild(content);
+    closeButton.onmouseover = () => {
+        closeButton.style.background = 'rgba(255,80,80,0.15)';
+        closeButton.style.color = '#ff5050';
+    };
 
-        // 将弹窗添加到页面中
-        document.body.appendChild(modal);
+    closeButton.onmouseout = () => {
+        closeButton.style.background = 'rgba(0,0,0,0.08)';
+        closeButton.style.color = '#666';
+    };
 
-        // 弹窗显示动画
-        setTimeout(() => {
-            modal.style.right = '20px'; // 弹窗从右侧滑入
-        }, 10);
-    }
+    closeButton.onclick = () => {
+        modal.style.transform = 'scale(0.95)';
+        modal.style.opacity = '0';
+        modal.style.right = '-400px';
+        setTimeout(() => modal.remove(), 400);
+    };
+
+    const content = document.createElement('div');
+    content.innerHTML = `
+        <div style="display: flex; align-items: center; margin-bottom: 16px;">
+            <svg style="width: 24px; height: 24px; margin-right: 12px; color: #4a90e2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
+            </svg>
+            <h3 style="margin:0; font-size: 18px; color: #2c3e50; font-weight: 600;">每日一句</h3>
+        </div>
+        <div style="padding-left: 36px;">
+            <p style="margin:0; font-size: 15px; color: #34495e; line-height: 1.7; 
+               position: relative; padding-left: 20px;">
+                <span style="position: absolute; left: 0; color: #4a90e2; font-weight: bold;">“</span>
+                ${word}
+            </p>
+        </div>
+    `;
+
+    modal.appendChild(closeButton);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    requestAnimationFrame(() => {
+        modal.style.right = '24px';
+        modal.style.opacity = '1';
+        modal.style.transform = 'scale(1)';
+    });
+
+    setTimeout(() => {
+        modal.style.transform = 'scale(0.98)';
+        modal.style.opacity = '0.8';
+    }, 5000);
+    setTimeout(() => {
+        modal.style.opacity = '0';
+        modal.style.right = '-400px';
+        setTimeout(() => modal.remove(), 400);
+    }, 8000);
 };
