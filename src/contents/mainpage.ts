@@ -25,6 +25,8 @@ window.addEventListener("load", () => {
   beautify();
   // 关闭打开通知时的黑屏
   closeFadeModal();
+  // 注入css
+  injectCss();
 })
 
 const navBarinject = () => {
@@ -125,6 +127,7 @@ const injectMenu = async () => {
   `;
   settingsBtn.querySelector("button").innerText += "🎯";
   settingsBtn.onclick = () => {
+    window.location.hash = '';
     window.location.hash = '#/SCUplusSettings';
     window.location.reload();
   }
@@ -157,4 +160,18 @@ const initial = () => {
     };
     localStorage.setItem('settings', JSON.stringify(settings));
   }
+}
+
+const injectCss = ()=>{
+  const css = document.createElement("style");
+  css.setAttribute("type","text/css");
+  css.innerHTML = `
+  .table-striped>tbody>tr:nth-child(odd)>td,.table-striped>tbody>tr:nth-child(odd)>th {
+    background-color: #00000000 !important;
+}
+    .table-hover>tbody>tr:hover>td,.table-hover>tbody>tr:hover>th {
+    background-color: #00000000 !important;
+}
+  `;
+  document.head.appendChild(css);
 }
