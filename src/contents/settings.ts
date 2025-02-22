@@ -7,7 +7,7 @@ export const config: PlasmoCSConfig = {
 
 interface Settings {
     beautifySwitch: boolean;
-    beautifyColor: string; // 新增：存储颜色选择
+    beautifyColor: string;
     avatarSwitch: boolean;
     avatarSource: string;
     avatarInfo: string;
@@ -24,7 +24,7 @@ class SettingsPanel {
     constructor() {
         this.container = document.createElement('div');
         this.container.className = 'settings-container';
-        this.injectStyles(); // 动态注入样式
+        this.injectStyles();
         this.render();
         this.loadSettings();
     }
