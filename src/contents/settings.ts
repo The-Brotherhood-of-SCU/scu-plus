@@ -212,10 +212,18 @@ class SettingsPanel {
           background-color: #4caf50;
           border-color: #4caf50;
         }
-        .setting-item input[type="text"], .setting-item input[type="color"] {
+        .setting-item input[type="text"]{
           width: 100%;
           padding: 8px;
           border: 1px solid #ccc;
+          border-radius: 4px;
+          margin-top: 5px;
+          box-sizing: border-box;
+        }
+        .setting-item input[type="color"]{
+          width:100%;
+          border: 1px solid #ccc;
+          padding: 0;
           border-radius: 4px;
           margin-top: 5px;
           box-sizing: border-box;
@@ -249,7 +257,8 @@ class SettingsPanel {
 }
 
 window.addEventListener("load", () => {
-    if (window.location.href === "http://zhjw.scu.edu.cn/#/SCUplusSettings") {
+  const url = new URL(window.location.href);
+    if (url.searchParams.get("redirectTo")==="scu settings") {
         const settingsPanel = new SettingsPanel();
         settingsPanel.injectToPage();
         console.log("设置注入成功!");

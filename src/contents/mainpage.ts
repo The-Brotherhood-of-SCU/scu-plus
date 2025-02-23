@@ -21,12 +21,14 @@ window.addEventListener("load", () => {
   notpass();
   // 注入培养方案和设置按钮
   injectMenu();
-  // 美化
-  beautify();
-  // 关闭打开通知时的黑屏
-  closeFadeModal();
-  // 注入css
-  injectCss();
+  if (savedSettings.beautifySwitch != false) {
+    // 美化
+    beautify();
+    // 注入校历
+    injectSchoolSchedule();
+    // 注入css
+    injectCss();
+  }
 })
 
 const navBarinject = () => {
@@ -83,17 +85,14 @@ const notpass = () => {
 }
 
 const beautify = () => {
-  // 主窗口圆角
-  if (savedSettings.beautifySwitch != false) {
-    $all(".page-content", (widgetBox) => {
-      widgetBox.style.borderRadius = "20px";
-      widgetBox.style.border = `2px solid #96e6a1`;
-      widgetBox.style.overflow = "hidden";
-      widgetBox.style.backdropFilter = "blur(50px)";
-      widgetBox.style.backgroundColor = savedSettings.beautifyColor || '#caeae3';
-      widgetBox.style.minHeight = "80vh";
-    });
-  }
+  $("#page-content-template", (widgetBox) => {
+    widgetBox.style.borderRadius = "20px";
+    widgetBox.style.border = `2px solid #96e6a1`;
+    widgetBox.style.overflow = "hidden";
+    widgetBox.style.backgroundColor = savedSettings.beautifyColor || '#caeae3';
+    widgetBox.style.minHeight = "80vh";
+    widgetBox.style.margin = "15px";
+  });
 }
 
 function sleep(ms) {
@@ -109,13 +108,14 @@ const injectMenu = async () => {
     await sleep(1000);
   }
   // 插入培养方案查看
+  document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
   let menus = document.querySelector("#sidebar > div:nth-child(2) > div.nav-wrap > div") as HTMLElement;
   let peiyang = document.createElement("div");
   peiyang.innerHTML = `
   <button id="peiyangBtn" style="width:100%;height:40px">培养方案查看</button>
   `
   peiyang.querySelector("button").innerText += "🎯";
-  peiyang.onclick = () => {
+  peiyang.querySelector("button").onclick = () => {
     window.location.replace("http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index");
   }
   menus.appendChild(peiyang);
@@ -126,23 +126,14 @@ const injectMenu = async () => {
   <button id="SCUplusSettingsBtn" style="width:100%;height:40px">SCU+设置</button>
   `;
   settingsBtn.querySelector("button").innerText += "🎯";
-  settingsBtn.onclick = () => {
-    window.location.hash = '';
-    window.location.hash = '#/SCUplusSettings';
-    window.location.reload();
+  settingsBtn.querySelector("button").onclick = () => {
+    window.location.href = "http://zhjw.scu.edu.cn?redirectTo=scu+settings"
   }
   menus.appendChild(settingsBtn);
   console.log("注入SCU+设置按钮成功");
 }
 
-const closeFadeModal = async () => {
-  while (true) {
-    if (savedSettings.passwordPopupSwitch != false) {
-      $("body > div.modal-backdrop.fade.in", (e) => { e.remove(); });
-    }
-    await sleep(1000);
-  }
-}
+
 
 const initial = () => {
   if (localStorage.getItem('settings') == null) {
@@ -162,9 +153,46 @@ const initial = () => {
   }
 }
 
-const injectCss = ()=>{
+const injectSchoolSchedule = async () => {
+  const scheduleHtml = await chrome.runtime.sendMessage({ action: "request", url: "https://jwc.scu.edu.cn/cdxl.htm" });
+  const scheduleList = new Array();
+  if (scheduleHtml.success) {
+    const _text = scheduleHtml.data as string;
+    const listDivText = _text.substring(_text.indexOf("<div class=\"list\">"), _text.indexOf("</div>", _text.indexOf("<div class=\"list\">")) + "</div>".length);
+    const listDiv = document.createElement("div");
+    listDiv.innerHTML = listDivText;
+    const lis = listDiv.querySelectorAll("li");
+    for (const li of lis) {
+      const a = li.querySelector("a");
+      scheduleList.push({ name: a.innerText, link: "https://jwc.scu.edu.cn/" + a.getAttribute("href") });
+    }
+    let injectHtml = "";
+    for (const schedule of scheduleList) {
+      injectHtml += `<li><a href="${schedule.link}" target="_blank" style="color:#333;padding:8px 20px;">${schedule.name}</a></li>`;
+    }
+
+    const fullHtml = `
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          <i class="icon-calendar"></i>
+          <span>校历查看${"🎯"}</span>
+        </a>
+        <ul class="dropdown-menu" style="min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          ${injectHtml}
+        </ul>
+      </li>
+    `;
+    const injectPosition = document.querySelector("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.green.cdsj");
+    if (injectPosition) {
+      injectPosition.outerHTML = fullHtml;
+    }
+
+  }
+}
+
+const injectCss = () => {
   const css = document.createElement("style");
-  css.setAttribute("type","text/css");
+  css.setAttribute("type", "text/css");
   css.innerHTML = `
   .table-striped>tbody>tr:nth-child(odd)>td,.table-striped>tbody>tr:nth-child(odd)>th {
     background-color: #00000000 !important;
@@ -174,4 +202,10 @@ const injectCss = ()=>{
 }
   `;
   document.head.appendChild(css);
+  if (window.location.href.match("/student/integratedQuery/scoreQuery/schemeScores/index")) {
+    const styles = document.getElementsByTagName("style");
+    for (const s of styles) {
+      s.innerHTML = s.innerHTML.replaceAll("#d4f0c6", "#00000000");
+    }
+  }
 }
