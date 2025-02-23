@@ -175,13 +175,13 @@ const injectSchoolSchedule = async () => {
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           <i class="icon-calendar"></i>
-          <span>校历查看${"🎯"}</span>
+          <span>校历查看${"emoji"}</span>
         </a>
         <ul class="dropdown-menu" style="min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
           ${injectHtml}
         </ul>
       </li>
-    `;
+    `.replace("emoji","🎯");
     const injectPosition = document.querySelector("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.green.cdsj");
     if (injectPosition) {
       injectPosition.outerHTML = fullHtml;
