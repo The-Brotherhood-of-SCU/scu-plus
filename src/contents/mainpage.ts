@@ -29,6 +29,8 @@ window.addEventListener("load", () => {
     // 注入css
     injectCss();
   }
+  // 注入资源站
+  injectResourceWeb();
 })
 
 const navBarinject = () => {
@@ -181,7 +183,7 @@ const injectSchoolSchedule = async () => {
           ${injectHtml}
         </ul>
       </li>
-    `.replace("emoji","🎯");
+    `.replace("emoji", "🎯");
     const injectPosition = document.querySelector("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.green.cdsj");
     if (injectPosition) {
       injectPosition.outerHTML = fullHtml;
@@ -208,4 +210,21 @@ const injectCss = () => {
       s.innerHTML = s.innerHTML.replaceAll("#d4f0c6", "#00000000");
     }
   }
+}
+
+
+const injectResourceWeb = async() => {
+  const link = document.createElement("a");
+  link.title = "学习资源站";
+  link.href = "https://www.res.jeanhua.cn";
+  link.target = "_blank";
+  link.className = "btn btn-app btn-info";
+  link.setAttribute("style", "font-size: 14px; padding: 7px 0; height: 100px; margin-right: 20px;");
+  link.innerHTML = `<i class="ace-icon fa fa-book bigger-230"></i><span style="margin-top: 10px; display: inline-block;">学习资料下载emoji</span>`.replace("emoji","🎯");
+  while(!document.querySelector(" #personalApplication > a:nth-child(1)")){
+    await sleep(300);
+  }
+  const container = document.getElementById("personalApplication") as HTMLElement;
+  container.appendChild(link);
+  console.log("注入资源站成功");
 }
