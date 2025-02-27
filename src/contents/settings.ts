@@ -72,6 +72,10 @@ class SettingsPanel {
           <label>输入隐藏名字的替代文字：</label>
           <input type="text" id="nameHideText" placeholder="请输入替代文字">
         </div>
+        <div class="setting-item" id="ocrProvider" style="display: block;">
+          <label>输入OCR服务提供者：</label>
+          <input type="text" id="ocrProviderText" placeholder="请输入API地址">
+        </div>
         <button class="save-button">保存设置</button>
       `;
 
@@ -120,6 +124,7 @@ class SettingsPanel {
         const passwordPopupSwitch = this.container.querySelector('#passwordPopupSwitch') as HTMLInputElement;
         const nameHideSwitch = this.container.querySelector('#nameHideSwitch') as HTMLInputElement;
         const nameHideText = this.container.querySelector('#nameHideText') as HTMLInputElement;
+        const ocrProviderText = this.container.querySelector('#ocrProviderText') as HTMLInputElement;
 
         beautifySwitch.checked = savedSettings.beautifySwitch || false;
         beautifyColor.value = savedSettings.beautifyColor || '#caeae3';
@@ -131,6 +136,11 @@ class SettingsPanel {
         passwordPopupSwitch.checked = savedSettings.passwordPopupSwitch || false;
         nameHideSwitch.checked = savedSettings.nameHideSwitch || false;
         nameHideText.value = savedSettings.nameHideText || '';
+        chrome.storage.local.get(["ocrProvider"], (result)=> {
+          if (result.ocrProvider) {
+            ocrProviderText.value = result.ocrProvider;
+          }
+        })
 
         const beautifyColorOptions = this.container.querySelector('#beautifyColorOptions') as HTMLDivElement;
         const avatarOptions = this.container.querySelector('#avatarOptions') as HTMLDivElement;
@@ -152,6 +162,7 @@ class SettingsPanel {
         const passwordPopupSwitch = this.container.querySelector('#passwordPopupSwitch') as HTMLInputElement;
         const nameHideSwitch = this.container.querySelector('#nameHideSwitch') as HTMLInputElement;
         const nameHideText = this.container.querySelector('#nameHideText') as HTMLInputElement;
+        const ocrProviderText = this.container.querySelector('#ocrProviderText') as HTMLInputElement;
 
         const settings: Settings = {
             beautifySwitch: beautifySwitch.checked,
@@ -165,6 +176,9 @@ class SettingsPanel {
             nameHideSwitch: nameHideSwitch.checked,
             nameHideText: nameHideText.value,
         };
+        chrome.storage.local.set({
+            'ocrProvider': ocrProviderText.value, 
+        })
 
         localStorage.setItem('settings', JSON.stringify(settings));
         alert('设置已保存！');
