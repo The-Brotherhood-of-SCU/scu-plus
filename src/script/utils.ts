@@ -1,5 +1,5 @@
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence }
+export { checkVersion, $, $all, dailySentence,xpath_query }
 
 const checkVersion = async () => {
     let newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://gitee.com/jeanhua/scu-plus/raw/main/package.json" });
@@ -57,4 +57,11 @@ const dailySentence = async () => {
         return JSON.parse(response.data)['msg'];
     }
     return null;
+}
+
+const xpath_query = (xpath_expression:string,resolve = (element:HTMLElement)=>{})=>{
+    const result = document.evaluate(xpath_expression,document).iterateNext() as HTMLElement;
+    if(result){
+        resolve(result);
+    }
 }

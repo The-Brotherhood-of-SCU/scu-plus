@@ -77,6 +77,7 @@ class SettingsPanel {
           <input type="text" id="ocrProviderText" placeholder="请输入API地址">
         </div>
         <button class="save-button">保存设置</button>
+        <button class="clear-button">恢复默认</button>
       `;
 
         const beautifySwitch = this.container.querySelector('#beautifySwitch') as HTMLInputElement;
@@ -84,6 +85,7 @@ class SettingsPanel {
         const avatarSwitch = this.container.querySelector('#avatarSwitch') as HTMLInputElement;
         const avatarOptions = this.container.querySelector('#avatarOptions') as HTMLDivElement;
         const saveButton = this.container.querySelector('.save-button') as HTMLButtonElement;
+        const clearButton = this.container.querySelector('.clear-button') as HTMLButtonElement;
         const avatarSource = this.container.querySelector('#avatarSource') as HTMLSelectElement;
         const avatarInfo = this.container.querySelector("#avatarInfo") as HTMLInputElement;
         const nameHideSwitch = this.container.querySelector('#nameHideSwitch') as HTMLInputElement;
@@ -110,6 +112,7 @@ class SettingsPanel {
         });
 
         saveButton.addEventListener('click', () => this.saveSettings());
+        clearButton.addEventListener('click',()=>{localStorage.removeItem("settings");window.location.href = "http://zhjw.scu.edu.cn/"});
     }
 
     private loadSettings(): void {
@@ -242,10 +245,11 @@ class SettingsPanel {
           margin-top: 5px;
           box-sizing: border-box;
         }
-        .save-button {
+        .save-button,.clear-button {
           display: block;
           width: 100%;
           padding: 10px;
+          margin:5px;
           background-color: #4caf50;
           color: white;
           font-size: 16px;
@@ -253,6 +257,9 @@ class SettingsPanel {
           border-radius: 4px;
           cursor: pointer;
           transition: background-color 0.3s ease;
+        }
+        .clear-button{
+          background-color:rgb(193, 67, 162);
         }
         .save-button:hover {
           background-color: #45a049;
