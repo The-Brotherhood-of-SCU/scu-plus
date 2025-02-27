@@ -23,8 +23,9 @@ function updateCookie(key, value) {
 updateCookie("selectionBar", "");
 const savedSettings = JSON.parse(localStorage.getItem('settings') || '{}');
 window.addEventListener("load", () => {
-    if(savedSettings.dailyQuoteSwitch != false)
-    showModal();
+    if (savedSettings.dailyQuoteSwitch != false) {
+        setTimeout(()=>showModal(),1000)
+    }
 });
 
 const showModal = async () => {
@@ -65,7 +66,7 @@ const showModal = async () => {
         font-size: 20px;
         color: #666;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.5s ease;
         display: flex;
         align-items: center;
         justify-content: center;

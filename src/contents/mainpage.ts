@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { $, $all } from "../script/utils"
+import { $, $all, xpath_query } from "../script/utils"
+import { Children } from "react";
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -116,6 +117,8 @@ const injectMenu = async () => {
   peiyang.innerHTML = `
   <button id="peiyangBtn" style="width:100%;height:40px">培养方案查看</button>
   `
+  xpath_query(`//*[@id="1007000000"]/a/span`,(e)=>{e.innerText+="🎯"})
+  //xpath_query(`//*[@id="1007001000"]/a`,(e)=>{e.innerHTML = e.innerHTML.replace("成绩查询","成绩查询🎯")});
   peiyang.querySelector("button").innerText += "🎯";
   peiyang.querySelector("button").onclick = () => {
     window.location.replace("http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index");
@@ -220,7 +223,8 @@ const injectResourceWeb = async() => {
   link.target = "_blank";
   link.className = "btn btn-app btn-info";
   link.setAttribute("style", "font-size: 14px; padding: 7px 0; height: 100px; margin-right: 20px;");
-  link.innerHTML = `<i class="ace-icon fa fa-book bigger-230"></i><span style="margin-top: 10px; display: inline-block;">学习资料下载emoji</span>`.replace("emoji","🎯");
+  link.style.border = "pink solid 2px"
+  link.innerHTML = `<i class="ace-icon fa fa-book bigger-230"></i><span style="margin-top: 10px; display: inline-block;"><strong>学习资料下载</strong>emoji</span>`.replace("emoji","🎯");
   while(!document.querySelector(" #personalApplication > a:nth-child(1)")){
     await sleep(300);
   }
