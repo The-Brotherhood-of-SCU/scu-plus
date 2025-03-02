@@ -13,7 +13,7 @@ img.onload=()=>{
   chrome.storage.local.get(["ocrProvider"], (result)=> {
     if (result.ocrProvider) {
       let provider = result.ocrProvider;
-      console.log(provider)
+      //console.log(provider)
       process(provider);
     }
   })
