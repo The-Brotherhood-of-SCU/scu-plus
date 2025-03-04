@@ -21,6 +21,7 @@ function IndexPopup() {
       </h1>
       <a href={login_link} target="_blank">登陆教务处（统一登陆）</a>
       <hr style={{ border: '1px solid #ccc', width: '100%' }}/>
+      <a href={`chrome-extension://${chrome.runtime.id}/tabs/setting.html`} target="_blank">插件设置</a>
       <p>项目主页:<a href={project_link} target="_blank">{project_link}</a></p>
       <span>当前版本{packagejson.version}</span>
       <MainButton/>
