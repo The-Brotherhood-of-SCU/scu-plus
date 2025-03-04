@@ -34,7 +34,8 @@
       "tabs",
       "scripting",
       "storage",
-      "nativeMessaging"
+      "nativeMessaging",
+      "declarativeNetRequestWithHostAccess"
     ]
   }
 }

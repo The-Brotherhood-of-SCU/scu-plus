@@ -41,21 +41,6 @@ const navBarinject = () => {
       title.style.color = "black";
       title.innerText = "四川大学教务管理系统(SCU+)🎯";
     });
-    if (savedSettings.avatarSwitch === true) {
-      if (savedSettings.avatarSource === "qq") {
-        if (savedSettings.avatarInfo != null && savedSettings.avatarInfo != "") {
-          $(".nav-user-photo", (avatar) => {
-            avatar.setAttribute("src", `https://q1.qlogo.cn/g?b=qq&nk=${savedSettings.avatarInfo}&src_uin=www.jlwz.cn&s=0`);
-          });
-        }
-      } else {
-        if (savedSettings.avatarInfo != null && savedSettings.avatarInfo != "") {
-          $(".nav-user-photo", (avatar) => {
-            avatar.setAttribute("src", savedSettings.avatarInfo);
-          });
-        }
-      }
-    }
     if (savedSettings.nameHideSwitch) {
       $("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.light-blue > a > span", (e) => e.innerHTML = `
     <small>欢迎您，</small>

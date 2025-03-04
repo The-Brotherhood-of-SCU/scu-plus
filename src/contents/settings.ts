@@ -182,7 +182,17 @@ class SettingsPanel {
         chrome.storage.local.set({
             'ocrProvider': ocrProviderText.value, 
         })
-
+        if(avatarSwitch.checked){
+          if(avatarSource.value === 'qq'){
+            chrome.runtime.sendMessage({action:'updateAvatar',url:`https://q1.qlogo.cn/g?b=qq&nk=${avatarInfo.value}&src_uin=www.jlwz.cn&s=0`});
+          }
+          else{
+            chrome.runtime.sendMessage({action:'updateAvatar',url:avatarInfo.value});
+          }
+        }
+        else{
+          chrome.runtime.sendMessage({action:'removeAvatarRedirection'})
+        }
         localStorage.setItem('settings', JSON.stringify(settings));
         alert('设置已保存！');
         window.location.href = "http://zhjw.scu.edu.cn/";
