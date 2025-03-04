@@ -18,4 +18,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         })();
         return true;
     }
+    else if(message.action=='updateAvatar'){
+        updateAvatarRedirectRules(message.url)
+        return false;
+    }
+    else if(message.action=='removeAvatarRedirection'){
+        removeAvatarRedirectRules()
+        return false;
+    }
 });
+
+
+async function updateAvatarRedirectRules(redirectUrl) {
+    // 构建动态规则
+    const newRule = {
+        id: 1,
+        priority: 1,
+        action: {
+            type: 'redirect',
+            redirect: {
+                url: redirectUrl
+            }
+        },
+        condition: {
+            urlFilter: 'http://zhjw.scu.edu.cn/main/queryStudent/img',
+            resourceTypes: ['image']
+        }
+    };
+    // 更新规则
+    chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: [1],
+        addRules: [newRule as any]
+    });
+}
+
+function removeAvatarRedirectRules(){
+    chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: [1],
+    });
+}
