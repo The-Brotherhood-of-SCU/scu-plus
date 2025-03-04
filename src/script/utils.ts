@@ -2,13 +2,10 @@ import pkgMessage from '../../package.json';
 export { checkVersion, $, $all, dailySentence,xpath_query }
 
 const checkVersion = async () => {
-    let newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://gitee.com/jeanhua/scu-plus/raw/main/package.json" });
+    let newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://raw.githubusercontent.com/The-Brotherhood-of-SCU/scu-plus/refs/heads/main/package.json" });
     if (!newest_config.success) {
-        newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://raw.githubusercontent.com/jeanhua/scu-plus/refs/heads/main/package.json" });
-        if (!newest_config.success) {
-            alert("无法获取更新，请检查网络问题！");
-            return;
-        }
+        alert("无法获取更新，请检查网络问题！");
+        return;
     }
     const json = JSON.parse(newest_config.data);
     if (pkgMessage.version != json.version && json.version != null) {
