@@ -46,7 +46,7 @@ async function updateAvatarRedirectRules(redirectUrl) {
         }
     };
     // 更新规则
-    chrome.declarativeNetRequest.updateDynamicRules({
+    (chrome.declarativeNetRequest as any).updateDynamicRules({
         removeRuleIds: [1],
         addRules: [newRule as any]
     });
