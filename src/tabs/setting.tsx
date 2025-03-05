@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { Form, Switch, Input, Button, Spin, Select, } from 'antd';
+import { Form, Switch, Input, Button, Spin, Select, message, } from 'antd';
 import { getSetting, saveSetting, SettingItem } from "~script/config";
+import { Modal } from 'antd';
 
 
 
@@ -16,10 +17,17 @@ function SettingPage() {
 }
 
 function DataSettingFragment() {
+  const [messageApi, contextHolder] = message.useMessage();
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
-
+  const success = () => {
+    messageApi.open({
+      type: 'success',
+      content: '保存成功',
+      duration: 1
+    });
+  };
   useEffect(() => {
     const loadSettings = async () => {
       const savedSettings = await getSetting();
@@ -36,28 +44,44 @@ function DataSettingFragment() {
       return newConfig;
     });
 
-    if(newConfig.avatarSwitch){
-      if(newConfig.avatarSource === 'qq'){
-        chrome.runtime.sendMessage({action:'updateAvatar',url:`https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0`});
+    if (newConfig.avatarSwitch) {
+      if (newConfig.avatarSource === 'qq') {
+        chrome.runtime.sendMessage({ action: 'updateAvatar', url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
       }
-      else{
-        chrome.runtime.sendMessage({action:'updateAvatar',url:newConfig.avatarInfo});
+      else {
+        chrome.runtime.sendMessage({ action: 'updateAvatar', url: newConfig.avatarInfo });
       }
     }
-    else{
-      chrome.runtime.sendMessage({action:'removeAvatarRedirection'})
+    else {
+      chrome.runtime.sendMessage({ action: 'removeAvatarRedirection' })
     }
   };
 
   if (loading) {
     return <LoadingFragment />;
   }
+  const handleReset = () => {
+    Modal.confirm({
+      title: '确认恢复默认设置？',
+      content: '这将重置所有设置为默认值，且无法撤销。',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        const data = new SettingItem();
+        saveSetting(data);
+        setSetting(data);
+        form.setFieldsValue(data);
+        messageApi.success('已恢复默认设置');
+      }
+    });
+  };
   return (
     <Form
       form={form}
       initialValues={setting}
       onValuesChange={handleFormChange}
     >
+      {contextHolder}
       <Form.Item
         label="美化开关"
         name="beautifySwitch"
@@ -66,7 +90,7 @@ function DataSettingFragment() {
         <Switch />
       </Form.Item>
       <Form.Item
-        label="头像隐藏开关"
+        label="头像隐藏开关（开启后会用如下的设置替换）"
         name="avatarSwitch"
         valuePropName="checked"
       >
@@ -85,7 +109,7 @@ function DataSettingFragment() {
         label="头像来源"
         name="avatarInfo"
       >
-        <Input placeholder={setting.avatarSource=="qq"?"输入QQ号":"头像URL地址"}/>
+        <Input placeholder={setting.avatarSource == "qq" ? "输入QQ号" : "头像URL地址"} />
       </Form.Item>
       <Form.Item
         label="每日一句开关"
@@ -125,25 +149,32 @@ function DataSettingFragment() {
         label="输入OCR服务提供者"
         name="ocrProvider"
       >
-        <Input />
+        <Input placeholder="eg. https://example.com/ocr" />
       </Form.Item>
       <Form.Item
         label="美化颜色"
         name="beautifyColor"
       >
-        <Input />
+        <Input placeholder="eg. #caeae3" />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" onClick={() => saveSetting(setting)} style={{ marginRight: '10px' }}>
+        <Button type="primary" onClick={() => { saveSetting(setting); success(); }} style={{ marginRight: '10px' }}>
           保存
         </Button>
-        <Button onClick={() => {
-          const data = new SettingItem();
-          saveSetting(data);
-          window.location.reload();
-        }}>
+        <Button onClick={handleReset} style={{ marginRight: '10px' }}>
           恢复默认
         </Button>
+         美化颜色：
+        <div
+          style={{
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            backgroundColor: setting?.beautifyColor || 'transparent',
+            display: 'inline-block',
+            marginLeft: '10px'
+          }}
+        />
       </Form.Item>
     </Form>
   );
