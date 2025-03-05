@@ -39,11 +39,8 @@
 • **AI验证码识别**  
   基于OCR技术实现统一认证自动登录  
 
-  ```python
-  # OCR服务部署示例
-  # 详见 ./ocr_server 目录
-  API_ENDPOINT = "https://your-domain.com/ocr"
-  ```
+  详见 ./ocr_server 目录，实现的服务器会监听`/ocr`路径
+
 
 ### 🌟 人文关怀
 • **每日箴言**  

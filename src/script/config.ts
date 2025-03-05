@@ -44,7 +44,7 @@ class SettingItem {
       this.avatarInfo = "";
       this.dailyQuoteSwitch = false;
       this.failSwitch = true;
-      this.passwordPopupSwitch = false;
+      this.passwordPopupSwitch = true;
       this.nameHideSwitch = false;
       this.nameHideText = "";
       this.ocrProvider = "";
