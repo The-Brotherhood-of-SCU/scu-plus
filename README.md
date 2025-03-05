@@ -1,49 +1,79 @@
-# SCU+🎯
+# SCU+ 🎯 —— 四川大学教务系统增强插件
 
-## 四川大学教务系统美化拓展插件
+![GitHub](https://img.shields.io/badge/License-GPL3.0-green) ![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)
 
-插件功能：
+> 🌈 一款为四川大学教务系统量身打造的颜值与实用兼具的浏览器插件
 
-1. 主页美化
+---
 
-   ![image](./showImage/5.png)
+## ✨ 功能特性
 
-2. 在方案成绩页面添加平均成绩、绩点、学分等计算功能
+### 🎨 视觉优化
+• **焕新主页设计**  
+• **隐私保护模式**  
+  智能隐藏姓名与学生证照片  
+  ![隐私保护效果](./showImage/4.png)
+• **通知栏缺陷修复**  
+  解决遮罩层异常、搜索结果页高度错误等系统问题  
 
-   ![image](./showImage/2.png)
+### 📊 数据增强
+• **学业数据看板**  
+  自动计算平均成绩、GPA、总学分等核心指标  
+  ![成绩分析效果](./showImage/2.png)
+• **课程统计模块**  
+  实时显示本学期课时总量与选课学分汇总  
+  ![课表统计效果](./showImage/1.png)
+• **成绩过滤系统**  
+  智能隐藏未及格科目提示  
+  ![成绩过滤效果](./showImage/3.png)
 
-3. 在主页隐藏姓名和丑陋的学生证照片
+### 🚀 效率工具
+• **培养方案直通车**  
+  一键跳转培养方案查询页面  
 
-   ![image](./showImage/4.png)
+• **AI验证码识别**  
+  基于OCR技术实现统一认证自动登录  
 
-4. 隐藏暂未及格科目数
+  ```python
+  # OCR服务部署示例
+  # 详见 ./ocr_server 目录
+  API_ENDPOINT = "https://your-domain.com/ocr"
+  ```
 
-   ![image](./showImage/3.png)
+### 🌟 人文关怀
+• **每日箴言**  
+  在教务系统内展示精选的好句  
+  ![每日一言效果](./showImage/7.png)
 
-5. 在本学期课表和选课结果页面添加统计
+---
 
-   ![image](./showImage/1.png)
+## 📸 截图预览
 
-6. 添加培养方案查看入口
+| 功能展示 | 界面效果 |
+|---------|----------|
+| 课表统计 | ![课表统计](./showImage/1.png) |
+| 成绩分析 | ![成绩分析](./showImage/2.png) |
+| 主页美化 | ![主页美化](./showImage/5.png) |
 
-   ![image](./showImage/6.png)
+---
 
-7. 每日一言
+## 🛠️ 安装指南
 
-   ![image](./showImage/7.png)
+### 浏览器安装
+1. 启用开发者模式：
+   • Chrome: 访问 `chrome://extensions` → 开启「开发者模式」
+   • Edge: 访问 `edge://extensions` → 开启「开发人员模式」
+2. 拖拽安装：
+   • 下载项目ZIP包 → 解压后拖入浏览器扩展页面
 
-8. 修复了教务系统的一些bug问题，比如查看通知的遮罩问题和搜索结果少导致窗口高度不够的问题……
+### OCR服务配置
+1. 部署OCR服务器（[服务器代码](./ocr_server)）
+2. 插件设置 → 输入API端点地址（如 `https://your-api.com/ocr`）
 
-   ![image](./showImage/8.png)
+---
 
-9. 四川大学统一身份认证自动验证码OCR
-    
-    需要在插件设置中设置API地址，API服务器需要自己部署。
-    
-    服务器代码位于`./ocr_server`目录下，服务器的OCR API地址为`/ocr`，例如`https://example.com/ocr`
+## 🤝 参与贡献
+欢迎通过 Issue 提交建议或 Fork 项目发起 Pull Request！
 
-
-### 使用方法
-
-1. 先在浏览器中启用`开发者人员模式`
-2. 下载zip压缩包，在浏览器插件拓展页面，将zip包拖入，即可安装
+## 📜 开源协议
+本项目基于 [GPL-3.0](./LICENSE) 开源。
