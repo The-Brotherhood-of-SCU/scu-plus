@@ -4,6 +4,7 @@ import { getSetting, saveSetting, SettingItem } from "~script/config";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
+import type { promises } from "dns";
 
 
 
@@ -20,7 +21,7 @@ function SettingPage() {
 
 function DataSettingFragment() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [api, contextHolder2] = notification.useNotification();
+  const [notificationApi, contextHolder2] = notification.useNotification();
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -32,12 +33,28 @@ function DataSettingFragment() {
     });
   };
   const openNotification = (title: string, content: string, location: NotificationPlacement) => {
-    api.info({
+    notificationApi.info({
       message: title,
       description: content,
       placement: location,
     });
   };
+  const testOcr=async()=>{
+    if(await testOcrUrl(setting.ocrProvider)){
+      notificationApi.success({
+        message: '测试成功',
+        description: 'OCR服务可用',
+        placement: 'topRight',
+      });
+    }else{
+      notificationApi.error({
+        message: '测试失败',
+        description: 'OCR服务不可用',
+        placement: 'topRight',
+      });
+    }
+  }
+
   useEffect(() => {
     const loadSettings = async () => {
       const savedSettings = await getSetting();
@@ -203,6 +220,9 @@ function DataSettingFragment() {
           <Button onClick={handleReset} style={{ marginRight: '10px' }}>
             恢复默认
           </Button>
+          <Button style={{ marginRight: '10px' }} onClick={testOcr}>
+            测试OCR服务
+          </Button>
           <Button style={{ marginRight: '10px' }} onClick={() => {
             const jsonData = JSON.stringify(setting, null, 2);
             const blob = new Blob([jsonData], { type: 'application/json' });
@@ -261,6 +281,26 @@ function TitleFragment() {
   );
 }
 
+async function testOcrUrl(url: string): Promise<boolean> {
+  try {
+    const base64 = "iVBORw0KGgoAAAANSUhEUgAAAFAAAAAaCAIAAACvsEzwAAABRklEQVR42uXY0QkCMQwG4IC+inP4pFu4jYhvzuAKTuJyWjgoJUnTv2k9Wq5UODws+S5tLkiP2/27pUHhsylzT/AUD476xjq+mboHOriZWKB2uOfnRZ1TgpGIEXAY+9dOznHBVVlqAR/fhzCL34dg5PSdsnBBjUdRaiO4uMICk+bcg2ivLK1gNb0OMOPlwNfPaZluswUGC5h6K+5he4WVwYUMIwUsdys9tMYKEcaEKjhSpRk/0mVwbjkjvWrR+iu4ykxVVQ5JrwNsXINg3ExVVQ5JL9vSRjS5xEowQ7aYVwKr0XQHx1LcARwjLmpzYKTxyNVtHJw2Kq3gZa31wfFtJGfRLNl1YHC4wWr75QCne5vJ/wIGB9hLqzakA2EZLndaIwwDhiRZFktPlZ4FnJo9W3rS//qYmRw/ntTsLFozmpvASDczsvkHRcX3dhTbFZ0AAAAASUVORK5CYII=";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ img: base64 }),
+    });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
+    const data = await response.json();
+    return !!data; // Return true if we get a valid response
+  } catch (error) {
+    console.error('OCR test failed:', error);
+    return false;
+  }
+}
 export default SettingPage
