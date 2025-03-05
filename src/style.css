@@ -13,3 +13,9 @@
   text-decoration: none;
   width: 100%;
 }
+@media (prefers-color-scheme: dark) {
+  body {
+    color: white;
+    background-color: #191919;
+  }
+}
