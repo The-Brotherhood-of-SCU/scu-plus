@@ -32,7 +32,6 @@
       "http://*/*"
     ],
     "permissions": [
-      "tabs",
       "scripting",
       "storage",
       "nativeMessaging",
