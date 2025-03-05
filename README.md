@@ -69,7 +69,7 @@
    • Chrome: 访问 `chrome://extensions` → 开启「开发者模式」
    • Edge: 访问 `edge://extensions` → 开启「开发人员模式」
 2. 拖拽安装：
-   • 下载项目ZIP包 → 解压后拖入浏览器扩展页面
+   • 下载项目ZIP包 → 拖入浏览器扩展页面
 
 ### OCR服务配置
 1. 部署OCR服务器（[服务器代码](./ocr_server)）
