@@ -25,6 +25,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     else if(message.action=='removeAvatarRedirection'){
         removeAvatarRedirectRules()
         return false;
+    }else if(message.action=='open-settings'){
+        chrome.tabs.create({ url: `chrome-extension://${chrome.runtime.id}/tabs/setting.html` });
     }
 });
 
