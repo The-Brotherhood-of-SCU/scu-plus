@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react"
 import { Form, Switch, Input, Button, Spin, Select, } from 'antd';
-import { Storage } from "@plasmohq/storage"
+import { getSetting, saveSetting, SettingItem } from "~script/config";
 
-const storage = new Storage();
 
-function saveSetting(setting: SettingItem) {
-  storage.set("setting", setting)
-}
-async function getSetting(): Promise<SettingItem> {
-  return (await storage.get("setting")) || new SettingItem();
-}
+
 function SettingPage() {
   return (
     <div>
@@ -29,14 +23,30 @@ function DataSettingFragment() {
   useEffect(() => {
     const loadSettings = async () => {
       const savedSettings = await getSetting();
-      setSetting(savedSettings || new SettingItem());
+      setSetting(savedSettings);
       setLoading(false);
     };
     loadSettings();
   }, []);
 
   const handleFormChange = (changedValues: Partial<SettingItem>) => {
-    setSetting(prev => ({ ...prev, ...changedValues }));
+    let newConfig;
+    setSetting(prev => {
+      newConfig = { ...prev, ...changedValues };
+      return newConfig;
+    });
+
+    if(newConfig.avatarSwitch){
+      if(newConfig.avatarSource === 'qq'){
+        chrome.runtime.sendMessage({action:'updateAvatar',url:`https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0`});
+      }
+      else{
+        chrome.runtime.sendMessage({action:'updateAvatar',url:newConfig.avatarInfo});
+      }
+    }
+    else{
+      chrome.runtime.sendMessage({action:'removeAvatarRedirection'})
+    }
   };
 
   if (loading) {
@@ -75,7 +85,7 @@ function DataSettingFragment() {
         label="头像来源"
         name="avatarInfo"
       >
-        <Input />
+        <Input placeholder={setting.avatarSource=="qq"?"输入QQ号":"头像URL地址"}/>
       </Form.Item>
       <Form.Item
         label="每日一句开关"
@@ -163,32 +173,7 @@ function TitleFragment() {
     </div>
   );
 }
-class SettingItem {
-  beautifySwitch: boolean;
-  beautifyColor: string;
-  avatarSwitch: boolean;
-  avatarSource: string;
-  avatarInfo: string;
-  dailyQuoteSwitch: boolean;
-  failSwitch: boolean;
-  passwordPopupSwitch: boolean;
-  nameHideSwitch: boolean;
-  nameHideText: string;
-  ocrProvider: string;
-  constructor() {
-    this.beautifySwitch = true;
-    this.beautifyColor = "#caeae3";
-    this.avatarSwitch = false;
-    this.avatarSource = "qq";
-    this.avatarInfo = "";
-    this.dailyQuoteSwitch = false;
-    this.failSwitch = true;
-    this.passwordPopupSwitch = false;
-    this.nameHideSwitch = false;
-    this.nameHideText = "";
-    this.ocrProvider = "";
-  }
-}
+
 
 
 export default SettingPage

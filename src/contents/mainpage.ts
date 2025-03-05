@@ -1,6 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { $, $all, xpath_query } from "../script/utils"
 import { Children } from "react";
+import { getSetting, type SettingItem } from "~script/config";
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -9,9 +10,14 @@ export const config: PlasmoCSConfig = {
   all_frames: true
 }
 
-const savedSettings = JSON.parse(localStorage.getItem('settings') || '{}');
-
-window.addEventListener("load", () => {
+let savedSettings:SettingItem;
+(async () => {
+  savedSettings = await getSetting();
+})();
+window.addEventListener("load", async() => {
+  if(savedSettings==null){
+    savedSettings = await getSetting();
+  }
   console.log("SCU+插件加载成功🎯");
   initial();
   // 去掉修改密码
