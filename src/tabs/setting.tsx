@@ -18,7 +18,23 @@ function SettingPage() {
     </div>
   )
 }
-
+function saveSettingWithUpdates(data: SettingItem) {
+  saveSetting(data);
+  UpdateRedirect(data);
+}
+function UpdateRedirect(newConfig: SettingItem) {
+  if (newConfig.avatarSwitch) {
+    if (newConfig.avatarSource === 'qq') {
+      chrome.runtime.sendMessage({ action: 'updateAvatar', url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
+    }
+    else {
+      chrome.runtime.sendMessage({ action: 'updateAvatar', url: newConfig.avatarInfo });
+    }
+  }
+  else {
+    chrome.runtime.sendMessage({ action: 'removeAvatarRedirection' })
+  }
+}
 function DataSettingFragment() {
   const [messageApi, contextHolder] = message.useMessage();
   const [notificationApi, contextHolder2] = notification.useNotification();
@@ -39,14 +55,14 @@ function DataSettingFragment() {
       placement: location,
     });
   };
-  const testOcr=async()=>{
-    if(await testOcrUrl(setting.ocrProvider)){
+  const testOcr = async () => {
+    if (await testOcrUrl(setting.ocrProvider)) {
       notificationApi.success({
         message: '测试成功',
         description: 'OCR服务可用',
         placement: 'topRight',
       });
-    }else{
+    } else {
       notificationApi.error({
         message: '测试失败',
         description: 'OCR服务不可用',
@@ -71,17 +87,7 @@ function DataSettingFragment() {
       return newConfig;
     });
 
-    if (newConfig.avatarSwitch) {
-      if (newConfig.avatarSource === 'qq') {
-        chrome.runtime.sendMessage({ action: 'updateAvatar', url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
-      }
-      else {
-        chrome.runtime.sendMessage({ action: 'updateAvatar', url: newConfig.avatarInfo });
-      }
-    }
-    else {
-      chrome.runtime.sendMessage({ action: 'removeAvatarRedirection' })
-    }
+
   };
 
   if (loading) {
@@ -95,7 +101,7 @@ function DataSettingFragment() {
       cancelText: '取消',
       onOk: () => {
         const data = new SettingItem();
-        saveSetting(data);
+        saveSettingWithUpdates(data);
         setSetting(data);
         form.setFieldsValue(data);
         messageApi.success('已恢复默认设置');
@@ -116,7 +122,7 @@ function DataSettingFragment() {
             reader.onload = (event) => {
               try {
                 const jsonData = JSON.parse(event.target?.result as string);
-                saveSetting(jsonData);
+                saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
                 messageApi.success('配置文件导入成功');
@@ -214,7 +220,7 @@ function DataSettingFragment() {
           <Input placeholder="eg. #caeae3" />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={() => { saveSetting(setting); success(); }} style={{ marginRight: '10px' }}>
+          <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); }} style={{ marginRight: '10px' }}>
             保存
           </Button>
           <Button onClick={handleReset} style={{ marginRight: '10px' }}>
