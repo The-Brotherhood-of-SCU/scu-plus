@@ -37,7 +37,7 @@ class SettingItem {
     nameHideText: string;
     ocrProvider: string;
     constructor() {
-      this.beautifySwitch = true;
+      this.beautifySwitch = false;
       this.beautifyColor = "#caeae3";
       this.avatarSwitch = false;
       this.avatarSource = "qq";
