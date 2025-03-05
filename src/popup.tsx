@@ -26,13 +26,15 @@ function IndexPopup() {
       <h2>
         欢迎使用SCU+插件😘
       </h2>
-      <HorizontalLine text="便捷操作"/>
+      <HorizontalLine text="便捷操作" />
       <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务处 (统一身份验证)</Button>
 
-      <HorizontalLine text="设置"/>
+      <HorizontalLine text="设置" />
 
-      <Button onClick={gotoSettingPage} > 插件设置</Button>
-      <MainButton />
+      <div style={{ display: 'flex', justifyContent: 'space-between',paddingBottom:"10px" }}>
+        <Button onClick={gotoSettingPage} style={{ width: '50%', marginRight: '5px' }}> 插件设置</Button>
+        <div style={{ width: '50%', marginLeft: '5px' }}><MainButton /></div>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>当前版本{packagejson.version}</div>
         <a href={project_link} target="_blank">项目主页</a>
@@ -82,10 +84,10 @@ function MainButton() {
   const mainButtonStyleManger = () => {
     return {
       color: 'white',
-      margin: "5px 0px 5px 0px",
       fontWeight: 'bold',
       transition: 'background-color 0.3s ease',
-      backgroundColor: updateCheckStateColor[updateCheckState]
+      backgroundColor: updateCheckStateColor[updateCheckState],
+      width: "100%"
     };
   }
   return <Button style={mainButtonStyleManger()} onClick={mainButtonFunctionManager}>{updateCheckStateText[updateCheckState]}</Button>
