@@ -123,7 +123,8 @@ const injectMenu = async () => {
   `;
   settingsBtn.querySelector("button").innerText += "🎯";
   settingsBtn.querySelector("button").onclick = () => {
-    window.location.href = "http://zhjw.scu.edu.cn?redirectTo=scu+settings"
+    // window.location.href = "http://zhjw.scu.edu.cn?redirectTo=scu+settings"
+    chrome.runtime.sendMessage({action:'open-settings'})
   }
   menus.appendChild(settingsBtn);
   console.log("注入SCU+设置按钮成功");
