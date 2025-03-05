@@ -1,4 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
+import { getSetting, SettingItem } from "~script/config";
 
 export const config: PlasmoCSConfig = {
   matches: ["*://id.scu.edu.cn/*"],
@@ -9,16 +10,17 @@ export const config: PlasmoCSConfig = {
 var img=document.getElementsByClassName("captcha-img")[0]as HTMLImageElement;
 var input=document.getElementsByClassName("ivu-input ivu-input-default")[2] as HTMLInputElement;
 
-img.onload=()=>{
-  chrome.storage.local.get(["ocrProvider"], (result)=> {
-    if (result.ocrProvider) {
-      let provider = result.ocrProvider;
-      //console.log(provider)
-      process(provider);
-    }
-  })
-
-
+let savedSettings: SettingItem=null;
+(async () => {
+  savedSettings = await getSetting();
+})();
+img.onload=async()=>{
+  if(savedSettings!=null){
+    savedSettings = await getSetting();
+  }
+  if(savedSettings.ocrProvider!=""){
+    process(savedSettings.ocrProvider);
+  }
 }
 
 
