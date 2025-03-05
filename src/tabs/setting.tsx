@@ -125,7 +125,7 @@ function DataSettingFragment() {
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
-                messageApi.success('配置文件导入成功');
+                messageApi.success('配置文件导入成功（已保存）');
               } catch (error) {
                 messageApi.error('配置文件格式错误');
               }

@@ -10,16 +10,17 @@ export const config: PlasmoCSConfig = {
   all_frames: true
 }
 
-let savedSettings:SettingItem;
+let savedSettings: SettingItem;
+let savedSettingsAsync: Promise<SettingItem>;
 (async () => {
-  savedSettings = await getSetting();
+    savedSettingsAsync= getSetting();
+    savedSettings=await savedSettingsAsync;
 })();
 window.addEventListener("load", async() => {
   if(savedSettings==null){
-    savedSettings = await getSetting();
+    savedSettings=await savedSettingsAsync
   }
   console.log("SCU+插件加载成功🎯");
-  initial();
   // 去掉修改密码
   $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
   // 导航栏
@@ -130,25 +131,6 @@ const injectMenu = async () => {
   console.log("注入SCU+设置按钮成功");
 }
 
-
-
-const initial = () => {
-  if (localStorage.getItem('settings') == null) {
-    const settings = {
-      beautifySwitch: true,
-      beautifyColor: "#caeae3",
-      avatarSwitch: false,
-      avatarSource: 'url',
-      avatarInfo: '',
-      dailyQuoteSwitch: true,
-      failSwitch: true,
-      passwordPopupSwitch: true,
-      nameHideSwitch: false,
-      nameHideText: '',
-    };
-    localStorage.setItem('settings', JSON.stringify(settings));
-  }
-}
 
 const injectSchoolSchedule = async () => {
   const scheduleHtml = await chrome.runtime.sendMessage({ action: "request", url: "https://jwc.scu.edu.cn/cdxl.htm" });

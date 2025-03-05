@@ -7,35 +7,37 @@ export const config: PlasmoCSConfig = {
 }
 
 
-var img=document.getElementsByClassName("captcha-img")[0]as HTMLImageElement;
-var input=document.getElementsByClassName("ivu-input ivu-input-default")[2] as HTMLInputElement;
+var img = document.getElementsByClassName("captcha-img")[0] as HTMLImageElement;
+var input = document.getElementsByClassName("ivu-input ivu-input-default")[2] as HTMLInputElement;
 
-let savedSettings: SettingItem=null;
+let savedSettings: SettingItem;
+let savedSettingsAsync: Promise<SettingItem>;
 (async () => {
-  savedSettings = await getSetting();
+  savedSettingsAsync = getSetting();
+  savedSettings = await savedSettingsAsync;
 })();
-img.onload=async()=>{
-  if(savedSettings!=null){
-    savedSettings = await getSetting();
+img.onload = async () => {
+  if (savedSettings == null) {
+    savedSettings = await savedSettingsAsync;
   }
-  if(savedSettings.ocrProvider!=""){
+  if (savedSettings.ocrProvider != "") {
     process(savedSettings.ocrProvider);
   }
 }
 
 
-async function process(provider:string):Promise<void>{
-  try{ 
-    var result=await ocr_external(img,provider);
-    console.log("ocr: "+result)
-    input.value=result;
+async function process(provider: string): Promise<void> {
+  try {
+    var result = await ocr_external(img, provider);
+    console.log("ocr: " + result)
+    input.value = result;
     input.dispatchEvent(new Event('input'));
-  }catch(e){
+  } catch (e) {
     console.error(e)
   }
 }
 
-export async function ocr_external(imageElement: HTMLImageElement,provider:string): Promise<string> {
+export async function ocr_external(imageElement: HTMLImageElement, provider: string): Promise<string> {
   // 获取图片的base64编码
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
