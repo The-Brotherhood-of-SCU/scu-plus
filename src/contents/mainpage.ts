@@ -29,7 +29,7 @@ window.addEventListener("load", async() => {
   notpass();
   // 注入培养方案和设置按钮
   injectMenu();
-  if (savedSettings.beautifySwitch != false) {
+  if (savedSettings.beautifySwitch) {
     // 美化
     beautify();
     // 注入校历
@@ -37,10 +37,18 @@ window.addEventListener("load", async() => {
     // 注入css
     injectCss();
   }
+  if(savedSettings.gpaCustomText!=""){
+    customGpaText(savedSettings.gpaCustomText);
+  }
   // 注入资源站
   injectResourceWeb();
 })
-
+const customGpaText=(text:string)=>{
+  $("#gpa",(e)=>{
+    e.innerText=text;
+    console.log("修改GPA文本成功🎯");
+  })
+}
 const navBarinject = () => {
   $("#navbar", (navBar) => {
     navBar.style.backgroundImage = "linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)";
