@@ -121,8 +121,7 @@ function DataSettingFragment() {
             const reader = new FileReader();
             reader.onload = (event) => {
               try {
-                const defaultData = new SettingItem();
-                const jsonData = {...defaultData,...JSON.parse(event.target?.result as string)};
+                const jsonData = {...setting,...JSON.parse(event.target?.result as string)};
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
