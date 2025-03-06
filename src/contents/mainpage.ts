@@ -29,11 +29,11 @@ window.addEventListener("load", async() => {
   notpass();
   // 注入培养方案和设置按钮
   injectMenu();
+  // 注入校历
+  injectSchoolSchedule();
   if (savedSettings.beautifySwitch) {
     // 美化
     beautify();
-    // 注入校历
-    injectSchoolSchedule();
     // 注入css
     injectCss();
   }
@@ -51,7 +51,12 @@ const customGpaText=(text:string)=>{
 }
 const navBarinject = () => {
   $("#navbar", (navBar) => {
-    navBar.style.backgroundImage = "linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)";
+    // Updated the background image to a more vibrant and gradient-rich design
+    navBar.style.backgroundImage = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+    // Added a box shadow to give the navigation bar a more elevated look
+    navBar.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+    // Rounded the corners of the navigation bar for a softer appearance
+    navBar.style.borderRadius = "4px";
     $("#navbar-container > div.navbar-header.pull-left > a > small", (title) => {
       title.style.color = "black";
       title.innerText = "四川大学教务管理系统(SCU+)🎯";
