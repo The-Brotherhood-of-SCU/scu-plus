@@ -37,6 +37,7 @@ class SettingItem {
     nameHideText: string;
     ocrProvider: string;
     gpaCustomText: string;
+    failedCourseCustomText: string;
     constructor() {
       this.beautifySwitch = false;
       this.beautifyColor = "#caeae3";
@@ -50,5 +51,6 @@ class SettingItem {
       this.nameHideText = "";
       this.ocrProvider = "";
       this.gpaCustomText = "";
+      this.failedCourseCustomText = "";
     }
   }

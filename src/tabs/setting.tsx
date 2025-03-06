@@ -226,6 +226,12 @@ function DataSettingFragment() {
         >
           <Input placeholder="eg. 3.98" />
         </Form.Item>
+        <Form.Item
+          label="自定义首页'不及格课程门数'处显示的值（为空则忽略）"
+          name="failedCourseCustomText"
+        >
+          <Input placeholder="eg. 114514" />
+        </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); }} style={{ marginRight: '10px' }}>
             保存

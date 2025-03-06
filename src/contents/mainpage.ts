@@ -38,15 +38,18 @@ window.addEventListener("load", async() => {
     injectCss();
   }
   if(savedSettings.gpaCustomText!=""){
-    customGpaText(savedSettings.gpaCustomText);
+    customText("#gpa",savedSettings.gpaCustomText);
+  }
+  if(savedSettings.failedCourseCustomText!=""){
+    customText("#coursePas",savedSettings.failedCourseCustomText);
   }
   // 注入资源站
   injectResourceWeb();
 })
-const customGpaText=(text:string)=>{
-  $("#gpa",(e)=>{
+const customText=(id:string,text:string)=>{
+  $(id,(e)=>{
     e.innerText=text;
-    console.log("修改GPA文本成功🎯");
+    console.log(`修改${id}文本成功🎯`);
   })
 }
 const navBarinject = () => {
