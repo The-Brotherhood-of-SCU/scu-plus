@@ -36,6 +36,7 @@ class SettingItem {
     nameHideSwitch: boolean;
     nameHideText: string;
     ocrProvider: string;
+    gpaCustomText: string;
     constructor() {
       this.beautifySwitch = false;
       this.beautifyColor = "#caeae3";
@@ -48,5 +49,6 @@ class SettingItem {
       this.nameHideSwitch = false;
       this.nameHideText = "";
       this.ocrProvider = "";
+      this.gpaCustomText = "";
     }
   }
