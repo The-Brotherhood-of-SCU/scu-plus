@@ -21,22 +21,32 @@ window.addEventListener("load", async() => {
     savedSettings=await savedSettingsAsync
   }
   console.log("SCU+插件加载成功🎯");
-  // 去掉修改密码
-  $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
+  if(savedSettings.passwordPopupSwitch){
+     // 去掉修改密码
+    $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
+  }
+ 
   // 导航栏
   navBarinject();
-  // 去掉不及格显示
-  notpass();
-  // 注入培养方案和设置按钮
-  injectMenu();
-  // 注入校历
-  injectSchoolSchedule();
   if (savedSettings.beautifySwitch) {
     // 美化
     beautify();
     // 注入css
     injectCss();
   }
+  // 注入校历
+  injectSchoolSchedule();
+  // 注入培养方案和设置按钮
+  injectMenu();
+  const isHomePage = window.location.pathname === '' || window.location.pathname === '/';
+  if(!isHomePage){
+    console.log("不是主页，不注入主页特定内容");
+    return;
+  }
+  //以下是主页特定内容
+  // 去掉不及格显示
+  notpass();
+
   if(savedSettings.gpaCustomText!=""){
     customText("#gpa",savedSettings.gpaCustomText);
   }
@@ -49,7 +59,7 @@ window.addEventListener("load", async() => {
 const customText=(id:string,text:string)=>{
   $(id,(e)=>{
     e.innerText=text;
-    console.log(`修改${id}文本成功🎯`);
+    console.log(`修改${id}文本成功`);
   })
 }
 const navBarinject = () => {
