@@ -184,6 +184,7 @@ function DataSettingFragment() {
           label="挂科隐藏开关"
           name="failSwitch"
           valuePropName="checked"
+          tooltip="开启后将隐藏首页的不及格课程数"
         >
           <Switch />
         </Form.Item>
@@ -191,6 +192,7 @@ function DataSettingFragment() {
           label="禁止修改密码弹窗开关"
           name="passwordPopupSwitch"
           valuePropName="checked"
+          tooltip="开启后将自动关闭讨厌的修改密码弹窗"
         >
           <Switch />
         </Form.Item>
@@ -230,6 +232,13 @@ function DataSettingFragment() {
           name="failedCourseCustomText"
         >
           <Input placeholder="eg. 114514" />
+        </Form.Item>
+        <Form.Item
+          label="将 '四川大学教务管理系统登录' 重定向到 '统一登陆'"
+          name="redirectLoginSwitch"
+          tooltip="统一登陆的有效期更长，建议开启"
+        >
+          <Switch />
         </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); }} style={{ marginRight: '10px' }}>
