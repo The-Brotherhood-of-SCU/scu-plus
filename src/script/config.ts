@@ -38,6 +38,7 @@ class SettingItem {
     ocrProvider: string;
     gpaCustomText: string;
     failedCourseCustomText: string;
+    redirectLoginSwitch: boolean;
     constructor() {
       this.beautifySwitch = false;
       this.beautifyColor = "#caeae3";
@@ -52,5 +53,6 @@ class SettingItem {
       this.ocrProvider = "";
       this.gpaCustomText = "";
       this.failedCourseCustomText = "";
+      this.redirectLoginSwitch = false;
     }
   }
