@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Form, Switch, Input, Button, Spin, Select, message, notification, } from 'antd';
+import { Form, Switch, Input, Button, Spin, Select, message, notification, ColorPicker, } from 'antd';
 import { getSetting, saveSetting, SettingItem } from "~script/config";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
@@ -256,18 +256,16 @@ function DataSettingFragment() {
           <Button onClick={() => openNotification('导入配置文件', '将配置文件拖入本窗口中，即可实现导入', 'topRight')} style={{ marginRight: '10px' }}>
             导入配置文件
           </Button>
-
-          美化颜色：
-          <div
-            style={{
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              backgroundColor: setting?.beautifyColor || 'transparent',
-              display: 'inline-block',
-              marginLeft: '10px'
-            }}
-          />
+          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+            美化颜色：
+            <ColorPicker value={setting.beautifyColor} onChangeComplete={
+              (color)=>{
+                const newColor = color.toHexString();
+                handleFormChange({beautifyColor:newColor})
+                form.setFieldsValue({beautifyColor:newColor})
+              }}
+               showText />
+          </div>
         </Form.Item>
       </Form></div>
 
