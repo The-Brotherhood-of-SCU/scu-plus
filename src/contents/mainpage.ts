@@ -47,10 +47,11 @@ window.addEventListener("load", async() => {
   // 去掉不及格显示
   notpass();
 
-  if(savedSettings.gpaCustomText!=""){
+  if(savedSettings.gpaCustomText!="" && savedSettings.gpaCustomText){
+    console.log(savedSettings.gpaCustomText)
     customText("#gpa",savedSettings.gpaCustomText);
   }
-  if(savedSettings.failedCourseCustomText!=""){
+  if(savedSettings.failedCourseCustomText!="" && savedSettings.failedCourseCustomText){
     customText("#coursePas",savedSettings.failedCourseCustomText);
   }
   // 注入资源站
