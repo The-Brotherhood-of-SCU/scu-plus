@@ -38,7 +38,9 @@ window.addEventListener("load", async() => {
   injectSchoolSchedule();
   // 注入培养方案和设置按钮
   injectMenu();
-  const isHomePage = window.location.pathname === '' || window.location.pathname === '/';
+  const isHomePage = ()=>{const pathname = window.location.pathname;
+    return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);}
+    
   if(!isHomePage){
     console.log("不是主页，不注入主页特定内容");
     return;
