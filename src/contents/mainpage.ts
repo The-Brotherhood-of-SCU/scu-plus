@@ -13,19 +13,19 @@ export const config: PlasmoCSConfig = {
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
 (async () => {
-    savedSettingsAsync= getSetting();
-    savedSettings=await savedSettingsAsync;
+  savedSettingsAsync = getSetting();
+  savedSettings = await savedSettingsAsync;
 })();
-window.addEventListener("load", async() => {
-  if(savedSettings==null){
-    savedSettings=await savedSettingsAsync
+window.addEventListener("load", async () => {
+  if (savedSettings == null) {
+    savedSettings = await savedSettingsAsync
   }
   console.log("SCU+插件加载成功🎯");
-  if(savedSettings.passwordPopupSwitch){
-     // 去掉修改密码
+  if (savedSettings.passwordPopupSwitch) {
+    // 去掉修改密码
     $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
   }
- 
+
   // 导航栏
   navBarinject();
   if (savedSettings.beautifySwitch) {
@@ -38,10 +38,12 @@ window.addEventListener("load", async() => {
   injectSchoolSchedule();
   // 注入培养方案和设置按钮
   injectMenu();
-  const isHomePage = ()=>{const pathname = window.location.pathname;
-    return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);}
-    
-  if(!isHomePage){
+  const isHomePage = () => {
+    const pathname = window.location.pathname;
+    return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);
+  }
+
+  if (!isHomePage) {
     console.log("不是主页，不注入主页特定内容");
     return;
   }
@@ -49,19 +51,17 @@ window.addEventListener("load", async() => {
   // 去掉不及格显示
   notpass();
 
-  if(savedSettings.gpaCustomText!="" && savedSettings.gpaCustomText){
+  if (savedSettings.gpaCustomText != "" && savedSettings.gpaCustomText) {
     console.log(savedSettings.gpaCustomText)
-    customText("#gpa",savedSettings.gpaCustomText);
+    customText("#gpa", savedSettings.gpaCustomText);
   }
-  if(savedSettings.failedCourseCustomText!="" && savedSettings.failedCourseCustomText){
-    customText("#coursePas",savedSettings.failedCourseCustomText);
+  if (savedSettings.failedCourseCustomText != "" && savedSettings.failedCourseCustomText) {
+    customText("#coursePas", savedSettings.failedCourseCustomText);
   }
-  // 注入资源站
-  injectResourceWeb();
 })
-const customText=(id:string,text:string)=>{
-  $(id,(e)=>{
-    e.innerText=text;
+const customText = (id: string, text: string) => {
+  $(id, (e) => {
+    e.innerText = text;
     console.log(`修改${id}文本成功`);
   })
 }
@@ -125,39 +125,109 @@ function sleep(ms) {
 
 const injectMenu = async () => {
   while (true) {
-    let menus = document.querySelector("#sidebar > div:nth-child(2) > div.nav-wrap > div") as HTMLElement;
+    let menus = document.querySelector("#menus") as HTMLElement;
     if (menus) {
       break;
     }
     await sleep(1000);
   }
-  // 插入培养方案查看
+  xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
-  let menus = document.querySelector("#sidebar > div:nth-child(2) > div.nav-wrap > div") as HTMLElement;
-  let peiyang = document.createElement("div");
-  peiyang.innerHTML = `
-  <button id="peiyangBtn" style="width:100%;height:40px">培养方案查看</button>
-  `
-  xpath_query(`//*[@id="1007000000"]/a/span`,(e)=>{e.innerText+="🎯"})
-  //xpath_query(`//*[@id="1007001000"]/a`,(e)=>{e.innerHTML = e.innerHTML.replace("成绩查询","成绩查询🎯")});
-  peiyang.querySelector("button").innerText += "🎯";
-  peiyang.querySelector("button").onclick = () => {
-    window.location.replace("http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index");
-  }
+
+  // 插入培养方案查看
+  let menus = document.querySelector("#menus") as HTMLElement;
+  let peiyang = document.createElement("li");
+  peiyang.setAttribute('id', '1145140');
+  peiyang.setAttribute('onclick', "rootMenuClick(this);");
+  peiyang.innerHTML = `<a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-picture-o"></i>
+                    <span class="menu-text"> 培养方案emoji </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            培养方案
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a href="http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index">&nbsp;&nbsp;
+                                    培养方案查看
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>`.replace('emoji', "🎯");
   menus.appendChild(peiyang);
   console.log("注入培养方案按钮成功");
+
   // 注入设置按钮
-  let settingsBtn = document.createElement("div");
-  settingsBtn.innerHTML = `
-  <button id="SCUplusSettingsBtn" style="width:100%;height:40px">SCU+设置</button>
-  `;
-  settingsBtn.querySelector("button").innerText += "🎯";
-  settingsBtn.querySelector("button").onclick = () => {
-    // window.location.href = "http://zhjw.scu.edu.cn?redirectTo=scu+settings"
-    chrome.runtime.sendMessage({action:'open-settings'})
-  }
+  let settingsBtn = document.createElement("li");
+  settingsBtn.setAttribute('id', '1145141');
+  settingsBtn.setAttribute('onclick', "rootMenuClick(this);");
+  settingsBtn.innerHTML = `<a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-pencil-square-o"></i>
+                    <span class="menu-text"> 设置emoji </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            设置
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a href="#" id="settingsBtn">&nbsp;&nbsp;
+                                    SCU+ 设置
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>`.replace('emoji', "🎯");
+  (settingsBtn.querySelector("#settingsBtn") as HTMLElement).onclick = () => chrome.runtime.sendMessage({ action: 'open-settings' });
   menus.appendChild(settingsBtn);
   console.log("注入SCU+设置按钮成功");
+
+  // 注入资源站
+  let res = document.createElement("li");
+  res.setAttribute('id', '1145142');
+  settingsBtn.setAttribute('onclick', "rootMenuClick(this);");
+  res.innerHTML = `<a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-calendar"></i>
+                    <span class="menu-text"> 学习资料emoji </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            学习资料
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a href="https://www.res.jeanhua.cn/" target="_blank">&nbsp;&nbsp;
+                                    学习资料下载
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>`.replace('emoji', "🎯");
+  menus.appendChild(res);
+  console.log("注入资源站成功");
 }
 
 
@@ -216,22 +286,4 @@ const injectCss = () => {
       s.innerHTML = s.innerHTML.replaceAll("#d4f0c6", "#00000000");
     }
   }
-}
-
-
-const injectResourceWeb = async() => {
-  const link = document.createElement("a");
-  link.title = "学习资源站";
-  link.href = "https://www.res.jeanhua.cn";
-  link.target = "_blank";
-  link.className = "btn btn-app btn-info";
-  link.setAttribute("style", "font-size: 14px; padding: 7px 0; height: 100px; margin-right: 20px;");
-  link.style.border = "pink solid 2px"
-  link.innerHTML = `<i class="ace-icon fa fa-book bigger-230"></i><span style="margin-top: 10px; display: inline-block;"><strong>学习资料下载</strong>emoji</span>`.replace("emoji","🎯");
-  while(!document.querySelector(" #personalApplication > a:nth-child(1)")){
-    await sleep(300);
-  }
-  const container = document.getElementById("personalApplication") as HTMLElement;
-  container.appendChild(link);
-  console.log("注入资源站成功");
 }
