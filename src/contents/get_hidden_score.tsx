@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { $, createSecondPageElement } from "~script/utils";
 import { Alert } from 'antd';
 import React from "react";
@@ -9,7 +9,7 @@ export const config: PlasmoCSConfig = {
         "http://zhjw.scu.edu.cn/student/integratedQuery/scoreQuery/thisTermScores/*",
     ],
     all_frames: true,
-    run_at: "document_idle",
+    run_at: "document_end",
 }
 
 get_hidden_score();
@@ -53,16 +53,22 @@ function getScoreRange(scoreValue: string) {
 }
 
 function doReplace(data: any) {
-    const warningHtml = `<p style="text-indent: 2em;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color: red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
-           <p style="text-indent: 2em;">并且，此处显示的成绩<span style="color: red;">并不是最终成绩</span>。因此，请<span style="color: red;">不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
-           <p style="text-indent: 2em;">否则，老师一旦和教务处反映，这些冗余信息就有<span style="color: red;">被移除</span>的风险！</p>`
+    const warningContent = (
+        <>
+            <p style={{ textIndent: '2em' }}>该页面展示的'成绩估计'使用了综合教务系统返回的<span style={{ color: 'red' }}>【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
+            <p style={{ textIndent: '2em' }}>并且，此处显示的成绩<span style={{ color: 'red' }}>并不是最终成绩</span>。因此，请<span style={{ color: 'red' }}>不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
+            <p style={{ textIndent: '2em' }}>否则，老师一旦和教务处反映，这些冗余信息就有<span style={{ color: 'red' }}>被移除</span>的风险！</p>
+        </>
+    );
 
     const warnElement = <Alert
         message="SCU+ 警告"
-        description={<div dangerouslySetInnerHTML={{ __html: warningHtml }} />}
+        description={warningContent}
         type="warning"
         showIcon />;
-    ReactDOM.render(warnElement, createSecondPageElement());
+    const root = ReactDOM.createRoot(createSecondPageElement());
+    root.render(warnElement);
+
 
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
         header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计emoji</th><th>成绩状态emoji</th></tr>".replaceAll('emoji', "🎯");
@@ -70,12 +76,40 @@ function doReplace(data: any) {
     const body = document.getElementById("scoretbody")
     body.setAttribute("id", "scoretbody_changed");
     const scoreList = data[0]["list"]
-    if (body) {
-        let children = body.childNodes;
-        for (let i = 0; i < children.length; i++) {
-            const elem = (children[i] as HTMLElement)
-            const courseData = scoreList[i]
-            elem.innerHTML += `<td>${getScoreRange(courseData.levlePoint)}</td><td>${courseData.inputStatusExplain}</td>`
+    let contentHtml = generateInnerHtml(scoreList);
+    body.innerHTML = contentHtml;
+}
+
+function generateInnerHtml(list: any[]): string {
+    let tContent = "";
+    list.forEach(function (v) {
+        tContent += "<tr>";
+        tContent += `<td>${v.id.courseNumber}</td>`;
+        tContent += "<td >" + (v.coureSequenceNumber == null ? "" : (v.coureSequenceNumber == 'NONE' ? "" : v.coureSequenceNumber)) + "</td>";
+        tContent += `<td >${v.courseName}</td>`;
+        tContent += `<td >${v.credit}</td>`;
+        tContent += `<td >${v.coursePropertyName}</td>`;
+        if (v.inputStatusCode == "05") {
+            if (v.courseScore == "-999.999") {
+                tContent += "<td>未评估</td>";
+            } else {
+                if (v.inputMethodCode == "002") {
+                    tContent += `<td ${v.courseScore < 60 ? "class='red_background'" : "green_background"}>${v.levelName}</td>`;
+                } else {
+                    tContent += `<td ${v.courseScore < 60 ? "class='red_background'" : "class='green_background'"}>${v.courseScore}</td>`;
+                }
+            }
+            if (v.courseScore == "-999.999") {
+                tContent += "<td>未评估</td>";
+            } else {
+                tContent += `<td>${v.unpassedReasonExplain}</td>`;
+            }
+        } else {
+            tContent += "<td></td><td></td>";
         }
-    }
+        tContent += `<td>${v.englishCourseName}</td>`;
+        tContent += `<td>${getScoreRange(v.levlePoint)}</td><td>${v.inputStatusExplain}</td>`;
+        tContent += "</tr>";
+    });
+    return tContent;
 }
