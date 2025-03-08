@@ -14,6 +14,7 @@
     "@plasmohq/storage": "^1.15.0",
     "antd": "^5.24.2",
     "chart.js": "^4.4.8",
+    "decimal.js": "^10.5.0",
     "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
