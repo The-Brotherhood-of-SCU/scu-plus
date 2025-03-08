@@ -1,5 +1,5 @@
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult }
+export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement}
 
 enum UpdateCheckResult{
     NEW_VERSION_AVAILABLE,
@@ -71,4 +71,18 @@ const xpath_query = (xpath_expression:string,resolve = (element:HTMLElement)=>{}
     if(result){
         resolve(result);
     }
+}
+/**
+ * 在子页面的顶部创建一个div元素，并返回该元素
+ * @param innerHTML 元素的innerHTML 内容 (可选)
+ * @returns div元素
+ */
+function createSecondPageElement(innerHTML:string=""):HTMLElement{
+    
+    const container = document.querySelector("#page-content-template > div > div");
+    if (!container) return;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = innerHTML;
+    container.insertBefore(wrapper, container.firstChild);
+    return wrapper;
 }
