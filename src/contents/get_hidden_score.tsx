@@ -1,4 +1,4 @@
-import type { PlasmoCSConfig } from "plasmo";
+import type { PlasmoCSConfig, PlasmoGetOverlayAnchor } from "plasmo";
 import ReactDOM from "react-dom/client";
 import { $, createSecondPageElement } from "~script/utils";
 import { Alert } from 'antd';
@@ -9,8 +9,13 @@ export const config: PlasmoCSConfig = {
         "http://zhjw.scu.edu.cn/student/integratedQuery/scoreQuery/thisTermScores/*",
     ],
     all_frames: true,
-    run_at: "document_end",
 }
+
+// 使用tsx好像必须返回一个ReactNode，不然控制台会报错.(for plasmo)
+export const getOverlayAnchor: PlasmoGetOverlayAnchor = () =>document.querySelector("#page-content-template > div > div");
+// Use this to optimize unmount lookups
+export const getShadowHostId = () => "plasmo-inline-example-unique-id"
+export default ()=><></>
 
 get_hidden_score();
 async function get_hidden_score() {
@@ -51,8 +56,7 @@ function getScoreRange(scoreValue: string) {
     }
 
 }
-
-function doReplace(data: any) {
+function WarnUi(){
     const warningContent = (
         <>
             <p style={{ textIndent: '2em' }}>该页面展示的'成绩估计'使用了综合教务系统返回的<span style={{ color: 'red' }}>【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
@@ -61,15 +65,15 @@ function doReplace(data: any) {
         </>
     );
 
-    const warnElement = <Alert
+    return <Alert
         message="SCU+ 警告"
         description={warningContent}
         type="warning"
         showIcon />;
+}
+function doReplace(data: any) {
     const root = ReactDOM.createRoot(createSecondPageElement());
-    root.render(warnElement);
-
-
+    root.render(<WarnUi/>);
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
         header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计emoji</th><th>成绩状态emoji</th></tr>".replaceAll('emoji', "🎯");
     })
