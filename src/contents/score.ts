@@ -1,4 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo";
+import { Decimal } from "decimal.js";
 import {
   Chart,
   LinearScale,
@@ -57,7 +58,7 @@ function extractData() {
 function calculateWeightedAverage(data: { credit: number; value: number }[]) {
   const total = data.reduce((acc, cur) => acc + cur.credit * cur.value, 0);
   const totalCredit = data.reduce((acc, cur) => acc + cur.credit, 0);
-  return totalCredit ? total / totalCredit : 0;
+  return totalCredit ? Decimal.div(total, totalCredit) : 0;
 }
 
 window.addEventListener("load", () => {
