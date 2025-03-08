@@ -1,5 +1,8 @@
 import type { PlasmoCSConfig } from "plasmo";
+import ReactDOM from "react-dom";
 import { $, createSecondPageElement } from "~script/utils";
+import { Alert } from 'antd';
+import React from "react";
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -48,11 +51,18 @@ function getScoreRange(scoreValue: string) {
     }
 
 }
+
 function doReplace(data: any) {
-    createSecondPageElement(`<p style="font-weight: 700; color: red;">警告：</p>
-           <p style="text-indent: 2em;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color: red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
+    const warningHtml=`<p style="text-indent: 2em;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color: red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
            <p style="text-indent: 2em;">并且，此处显示的成绩<span style="color: red;">并不是最终成绩</span>。因此，请<span style="color: red;">不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
-           <p style="text-indent: 2em;">否则，老师一旦和教务处反映，这些冗余信息就有<span style="color: red;">被移除</span>的风险！</p>`)
+           <p style="text-indent: 2em;">否则，老师一旦和教务处反映，这些冗余信息就有<span style="color: red;">被移除</span>的风险！</p>`
+
+    const warnElement =React.createElement(Alert, {
+        message:"SCU+ 警告",
+        description:React.createElement("div",{dangerouslySetInnerHTML:{__html:warningHtml}}),
+        type:"warning",
+        showIcon:true})
+    ReactDOM.render(warnElement,createSecondPageElement());
 
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
         header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计emoji</th><th>成绩状态emoji</th></tr>".replaceAll('emoji', "🎯");
