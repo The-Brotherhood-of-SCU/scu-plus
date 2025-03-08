@@ -50,8 +50,8 @@ function getScoreRange(scoreValue:string){
 }
 function doReplace(data: any) {
     createSecondPageElement(`<p style="font-weight: 700; color: red;">警告：</p>
-           <p style="text-indent: 2em;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color: red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些教务系统屏蔽的数据！</p>
-           <p style="text-indent: 2em;">因此，如果您要用本页面展示的这些'成绩估计'和您的任课老师沟通，我希望您可以<span style="color: red;">不要透露该插件的存在</span>，只是说这些敏感数据是您私下联系同学们询问成绩，从而获得的调查结果！</p>
+           <p style="text-indent: 2em;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color: red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
+           <p style="text-indent: 2em;">并且，此处显示的成绩<span style="color: red;">并不是最终成绩</span>。因此，请<span style="color: red;">不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
            <p style="text-indent: 2em;">否则，老师一旦和教务处反映，这些冗余信息就有<span style="color: red;">被移除</span>的风险！</p>`)
 
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
