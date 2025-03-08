@@ -204,12 +204,31 @@ window.addEventListener("load", () => {
     const totalCredits = passed.reduce((sum, item) => sum + item.credit, 0);
     const requiredCredits = required.reduce((sum, item) => sum + item.credit, 0);
 
+
+    // 平均成绩
+    const scoreData = passed.map((item) => ({
+      credit: item.credit,
+      value: item.score,
+    }));
+    const averageScore = calculateWeightedAverage(scoreData);
+
+    // 必修平均成绩
+    const requiredScoreData = data
+      .filter((item) => item.attribute === "必修")
+      .map((item) => ({
+        credit: item.credit,
+        value: item.score,
+      }));
+    const requiredAverageScore = calculateWeightedAverage(requiredScoreData);
+
     // 更新界面
     updateStatsDisplay({
       averageGPA,
       totalCredits,
       requiredGPA,
-      requiredCredits
+      requiredCredits,
+      averageScore,
+      requiredAverageScore
     });
 
     renderCharts({
@@ -221,7 +240,7 @@ window.addEventListener("load", () => {
     document.getElementById('charts-section').style.display = 'block';
   };
 
-  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits }) => {
+  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits,averageScore,requiredAverageScore }) => {
     const grid = document.getElementById('stats-grid');
     grid.innerHTML = `
       <div class="stat-card">
@@ -229,16 +248,24 @@ window.addEventListener("load", () => {
         <div class="stat-label">平均绩点</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">${totalCredits.toFixed(1)}</div>
-        <div class="stat-label">总学分</div>
-      </div>
-      <div class="stat-card">
         <div class="stat-value">${requiredGPA.toFixed(2)}</div>
         <div class="stat-label">必修绩点</div>
       </div>
       <div class="stat-card">
+        <div class="stat-value">${totalCredits.toFixed(1)}</div>
+        <div class="stat-label">总学分</div>
+      </div>
+      <div class="stat-card">
         <div class="stat-value">${requiredCredits.toFixed(1)}</div>
         <div class="stat-label">必修学分</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${averageScore.toFixed(1)}</div>
+        <div class="stat-label">平均成绩</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${requiredAverageScore.toFixed(1)}</div>
+        <div class="stat-label">必修平均成绩</div>
       </div>
     `;
   };
