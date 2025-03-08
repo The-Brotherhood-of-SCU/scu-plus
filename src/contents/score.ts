@@ -115,10 +115,24 @@ window.addEventListener("load", () => {
       color: #64748b;
       font-size: 0.9rem;
     }
-    .chart-container {
+    .charts-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
       margin: 2rem 0;
+    }
+    .chart-container {
       position: relative;
       height: 300px;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    @media (max-width: 768px) {
+      .charts-container {
+        grid-template-columns: 1fr;
+      }
     }
     .disclaimer {
       color: #94a3b8;
@@ -135,7 +149,8 @@ window.addEventListener("load", () => {
         <button id="calculate-btn">emoji 生成学业报告</button>
         <span style="color: #6366f1; font-weight: 600;">SCU+ 学业分析系统</span>
       </div>
-      <div id="charts-section" style="display: none;">
+          <div id="charts-section" style="display: none;">
+      <div class="charts-container">
         <div class="chart-container">
           <canvas id="gpaChart"></canvas>
         </div>
@@ -143,6 +158,7 @@ window.addEventListener("load", () => {
           <canvas id="creditChart"></canvas>
         </div>
       </div>
+    </div>
       <div id="stats-grid" class="stats-grid"></div>
       <div class="disclaimer">
         * 数据仅供参考，准确信息请以教务系统为准
