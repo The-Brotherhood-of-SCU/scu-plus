@@ -62,6 +62,7 @@ window.addEventListener("load", async () => {
 const customText = (id: string, text: string) => {
   $(id, (e) => {
     e.innerText = text;
+    e.setAttribute("id",id+"_changed");
     console.log(`修改${id}文本成功`);
   })
 }
