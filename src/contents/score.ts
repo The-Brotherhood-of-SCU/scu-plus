@@ -275,7 +275,7 @@ window.addEventListener("load", () => {
       options: {
         responsive: true,
         plugins: {
-          legend: { 
+          legend: {
             position: 'bottom'
           },
           tooltip: {
