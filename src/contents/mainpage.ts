@@ -52,7 +52,6 @@ window.addEventListener("load", async () => {
   notpass();
 
   if (savedSettings.gpaCustomText != "" && savedSettings.gpaCustomText) {
-    console.log(savedSettings.gpaCustomText)
     customText("#gpa", savedSettings.gpaCustomText);
   }
   if (savedSettings.failedCourseCustomText != "" && savedSettings.failedCourseCustomText) {
@@ -134,6 +133,9 @@ const injectMenu = async () => {
   }
   xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
+  $("#\\31 007001005 > a",(e)=>{
+    e.innerHTML=e.innerHTML.replace("本学期成绩", "本学期成绩🎯");
+  })
 
   // 插入培养方案查看
   let menus = document.querySelector("#menus") as HTMLElement;
