@@ -1,7 +1,7 @@
 {
   "name": "scu-plus",
   "displayName": "Scu plus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "四川大学教务系统增强插件",
   "author": "jeanhua",
   "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@plasmohq/storage": "^1.15.0",
     "antd": "^5.24.2",
+    "chart.js": "^4.4.8",
     "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
