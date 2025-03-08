@@ -29,6 +29,8 @@ export const config: PlasmoCSConfig = {
   all_frames: true
 };
 
+let canvasIsOpen = false;
+
 function getGPA(score: number): number {
   if (score >= 90) return 4.0;
   if (score >= 85) return 3.7;
@@ -184,6 +186,8 @@ window.addEventListener("load", () => {
   };
 
   const analyzeGrades = () => {
+    if(canvasIsOpen)return;
+    canvasIsOpen = true;
     const data = extractData();
     const passed = data.filter(item => item.score >= 60);
 
