@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo";
 import { Decimal } from "decimal.js";
+import { $ } from "~script/utils";
 import {
   Chart,
   LinearScale,
@@ -30,6 +31,10 @@ export const config: PlasmoCSConfig = {
 };
 
 let canvasIsOpen = false;
+let wrapper: HTMLDivElement;
+let style: HTMLStyleElement;
+let gpaChartInstance: Chart = null;
+let creditChartInstance: Chart = null;
 
 function getGPA(score: number): number {
   if (score >= 90) return 4.0;
@@ -82,8 +87,10 @@ window.addEventListener("load", () => {
       align-items: center;
       gap: 1rem;
       margin-bottom: 1.5rem;
+      flex-direction:row;
+      justify-content:space-between;
     }
-    #calculate-btn {
+    #calculate-btn,#close-btn{
       background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
       border: none;
       padding: 0.75rem 1.5rem;
@@ -149,8 +156,11 @@ window.addEventListener("load", () => {
   const template = `
     <div class="scu-plus-container">
       <div class="analysis-header">
-        <button id="calculate-btn">emoji 生成学业报告</button>
-        <span style="color: #6366f1; font-weight: 600;">SCU+ 学业分析系统</span>
+        <div>
+          <button id="calculate-btn">emoji 生成学业报告</button>
+          <span style="color: #6366f1; font-weight: 600;">SCU+ 学业分析系统</span>
+        </div>
+          <button id="close-btn">关闭</button>
       </div>
           <div id="charts-section" style="display: none;">
       <div class="charts-container">
@@ -167,15 +177,16 @@ window.addEventListener("load", () => {
         * 数据仅供参考，准确信息请以教务系统为准
         <br>
         * 平均计算已自动过滤不及格科目
+        <br>
+        * 成绩计算皆为学分加权计算结果
       </div>
     </div>
   `.replace('emoji', "📊");
 
-  const wrapper = document.createElement("div");
+  wrapper = document.createElement("div");
   wrapper.innerHTML = template;
   container.insertBefore(wrapper, container.firstChild);
   container.insertBefore(style, container.firstChild);
-
   const loadChartJS = () => {
     initApp();
   };
@@ -183,6 +194,20 @@ window.addEventListener("load", () => {
   const initApp = () => {
     const btn = document.getElementById('calculate-btn');
     btn.addEventListener('click', analyzeGrades);
+    document.getElementById('close-btn').addEventListener("click",()=>{
+      //wrapper.style.display = "none";
+    canvasIsOpen = false;
+    if (gpaChartInstance) {
+      gpaChartInstance.destroy();
+      gpaChartInstance = null;
+    }
+    if (creditChartInstance) {
+      creditChartInstance.destroy();
+      creditChartInstance = null;
+    }
+    $("#charts-section",(e)=>e.style.display = 'none');
+    $('#stats-grid',(e)=>e.innerHTML = '');
+    });
   };
 
   const analyzeGrades = () => {
@@ -240,7 +265,7 @@ window.addEventListener("load", () => {
       requiredCredits,
       totalCredits
     });
-
+    wrapper.style.display = "block";
     document.getElementById('charts-section').style.display = 'block';
   };
 
@@ -275,9 +300,11 @@ window.addEventListener("load", () => {
   };
 
   const renderCharts = ({ passed, requiredCredits, totalCredits }) => {
+    if (gpaChartInstance) gpaChartInstance.destroy();
+    if (creditChartInstance) creditChartInstance.destroy();
     // GPA 分布图表
     const gpaCtx = (document.getElementById('gpaChart') as HTMLCanvasElement).getContext('2d');
-    new Chart(gpaCtx, {
+    gpaChartInstance = new Chart(gpaCtx, {
       type: 'bar',
       data: {
         labels: ['4.0', '3.7', '3.3', '3.0', '2.7', '2.3', '2.0', '1.7', '1.3', '1.0'],
@@ -310,7 +337,7 @@ window.addEventListener("load", () => {
 
     // 学分构成图表
     const creditCtx = (document.getElementById('creditChart') as HTMLCanvasElement).getContext('2d');
-    new Chart(creditCtx, {
+    creditChartInstance = new Chart(creditCtx, {
       type: 'doughnut',
       data: {
         labels: ['必修学分', '选修学分'],
