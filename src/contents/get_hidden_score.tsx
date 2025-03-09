@@ -12,9 +12,6 @@ export const config: PlasmoCSConfig = {
 }
 
 // 使用tsx好像必须返回一个ReactNode，不然控制台会报错.(for plasmo)
-export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => document.querySelector("#page-content-template > div > div");
-// Use this to optimize unmount lookups
-export const getShadowHostId = () => "plasmo-inline-example-unique-id"
 export default () => <></>
 
 get_hidden_score();
