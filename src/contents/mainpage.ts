@@ -133,6 +133,9 @@ const injectMenu = async () => {
   }
   xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
+  $("#\\31 007001005 > a",(e)=>{
+    e.innerHTML="&nbsp;&nbsp;本学期成绩🎯";
+  })
   xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期课表🎯');
 
   // 插入培养方案查看
