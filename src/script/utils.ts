@@ -1,5 +1,5 @@
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement}
+export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas}
 
 enum UpdateCheckResult{
     NEW_VERSION_AVAILABLE,
@@ -86,3 +86,31 @@ function createSecondPageElement(innerHTML:string=""):HTMLElement{
     container.insertBefore(wrapper, container.firstChild);
     return wrapper;
 }
+
+function downloadCanvas(canvas, fileName, mimeType = 'image/png', quality) {
+    try {
+      const getExtension = (mime) => {
+        switch (mime) {
+          case 'image/jpeg': return 'jpg';
+          case 'image/png': return 'png';
+          case 'image/webp': return 'webp';
+          default: return mime.split('/')[1]?.split('+')[0] || 'png';
+        }
+      };
+      const ext = getExtension(mimeType);
+      const name = fileName || `canvas.${ext}`;
+      const dataUrl = canvas.toDataURL(mimeType, quality);
+  
+      const link = document.createElement('a');
+      link.download = name;
+      link.href = dataUrl;
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Canvas下载失败:', error);
+      throw new Error('无法导出Canvas数据');
+    }
+  }
