@@ -15,6 +15,7 @@
     "antd": "^5.24.2",
     "chart.js": "^4.4.8",
     "decimal.js": "^10.5.0",
+    "html2canvas": "^1.4.1",
     "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"

@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { $ } from "~script/utils";
+import { $,downloadCanvas } from "~script/utils";
+import html2canvas from 'html2canvas';
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -30,6 +31,7 @@ function sleep(ms) {
 
 window.addEventListener("load", () => {
     inject();
+    injectExportFunc();
 })
 
 // 注入学分统计
@@ -51,4 +53,18 @@ async function inject(){
     `;
     show_elememt.querySelector("span").innerText += " 🎯by SCU+";
     $("#myTab > li",(e)=>e.appendChild(show_elememt));
+}
+
+const injectExportFunc = ()=>{
+    $('.right_top_oper',(e)=>{
+        let btn = document.createElement("button");
+        btn.setAttribute('class','btn btn-info btn-xs btn-round');
+        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji',"🎯");
+        e.appendChild(btn);
+        btn.addEventListener('click',()=>{
+            html2canvas(document.getElementById('mycoursetable')).then((canvas)=>{
+                downloadCanvas(canvas,'课程表.png',"image/png",1.0);
+            });
+        });
+    })
 }
