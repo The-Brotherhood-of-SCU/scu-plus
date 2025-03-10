@@ -96,7 +96,7 @@ python app.py
 ## 🤝 参与贡献
 
 我们欢迎任何形式的贡献！您可以通过以下方式参与：
-1. 提交功能建议 → [新建Issue](https://github.com/your-repo/scu-plus/issues)
+1. 提交功能建议 → [新建Issue](https://github.com/The-Brotherhood-of-SCU/scu-plus/issues)
 2. 开发新功能 → Fork项目后提交Pull Request
 3. 文档改进 → 直接编辑README.md文件
 
