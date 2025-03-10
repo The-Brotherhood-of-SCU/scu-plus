@@ -110,6 +110,7 @@ python app.py
 
 <details>
 <summary>📌 常见问题解答</summary>
+
 **Q：为什么需要OCR服务？**  
 
 - A：用于自动识别统一认证登录的验证码，服务端代码已包含在`ocr_server`目录
