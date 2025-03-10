@@ -365,7 +365,7 @@ window.addEventListener("load", () => {
                   const value = context.raw || 0;
                   const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
                   const percentage = ((value as number / total) * 100).toFixed(2) + '%';
-                  return `${label}: ${percentage}`;
+                  return `${label}(${value}): ${percentage}`;
               }
             }
           }
