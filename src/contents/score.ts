@@ -72,7 +72,7 @@ window.addEventListener("load", () => {
   const container = document.querySelector("#page-content-template > div > div");
   if (!container) return;
 
-  const style = document.createElement("style");
+  style = document.createElement("style");
   style.textContent = `
     .scu-plus-container {
       margin: 2rem 0;
@@ -224,14 +224,17 @@ window.addEventListener("load", () => {
     const averageGPA = calculateWeightedAverage(gpaData);
 
     // 必修课统计
-    const required = data.filter(item => item.attribute === '必修');
+    const required = passed.filter(item => item.attribute === '必修');
     const requiredGPA = calculateWeightedAverage(
       required.map(item => ({ credit: item.credit, value: getGPA(item.score) }))
     );
+    // 任选学分
+    const optional = passed.filter(item => item.attribute === '任选');
 
     // 学分统计
     const totalCredits = passed.reduce((sum, item) => sum + item.credit, 0);
     const requiredCredits = required.reduce((sum, item) => sum + item.credit, 0);
+    const optionalCredits = optional.reduce((sum, item) => sum + item.credit, 0);
 
 
     // 平均成绩
@@ -263,13 +266,14 @@ window.addEventListener("load", () => {
     renderCharts({
       passed,
       requiredCredits,
-      totalCredits
+      totalCredits,
+      optionalCredits
     });
     wrapper.style.display = "block";
     document.getElementById('charts-section').style.display = 'block';
   };
 
-  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits,averageScore,requiredAverageScore }) => {
+  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits,averageScore,requiredAverageScore}) => {
     const grid = document.getElementById('stats-grid');
     grid.innerHTML = `
       <div class="stat-card">
@@ -282,7 +286,7 @@ window.addEventListener("load", () => {
       </div>
       <div class="stat-card">
         <div class="stat-value">${totalCredits.toFixed(1)}</div>
-        <div class="stat-label">总学分</div>
+        <div class="stat-label">获得总学分</div>
       </div>
       <div class="stat-card">
         <div class="stat-value">${requiredCredits.toFixed(1)}</div>
@@ -294,12 +298,12 @@ window.addEventListener("load", () => {
       </div>
       <div class="stat-card">
         <div class="stat-value">${requiredAverageScore.toFixed(1)}</div>
-        <div class="stat-label">必修平均成绩</div>
+        <div class="stat-label">必修平均成绩(含不及格科目)</div>
       </div>
     `;
   };
 
-  const renderCharts = ({ passed, requiredCredits, totalCredits }) => {
+  const renderCharts = ({ passed, requiredCredits, totalCredits,optionalCredits }) => {
     if (gpaChartInstance) gpaChartInstance.destroy();
     if (creditChartInstance) creditChartInstance.destroy();
     // GPA 分布图表
@@ -340,10 +344,10 @@ window.addEventListener("load", () => {
     creditChartInstance = new Chart(creditCtx, {
       type: 'doughnut',
       data: {
-        labels: ['必修学分', '选修学分'],
+        labels: ['必修学分', '选修学分','任选学分'],
         datasets: [{
-          data: [requiredCredits, totalCredits - requiredCredits],
-          backgroundColor: ['#6366f1', '#c7d2fe'],
+          data: [requiredCredits, totalCredits - requiredCredits - optionalCredits,optionalCredits],
+          backgroundColor: ['#90EE90', '#ADD8E6','#FFB6C1'],
           hoverOffset: 4
         }]
       },
@@ -354,7 +358,16 @@ window.addEventListener("load", () => {
             position: 'bottom'
           },
           tooltip: {
-            enabled: true
+            enabled: true,
+            callbacks: {
+              label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                  const percentage = ((value as number / total) * 100).toFixed(2) + '%';
+                  return `${label}: ${percentage}`;
+              }
+            }
           }
         }
       }
