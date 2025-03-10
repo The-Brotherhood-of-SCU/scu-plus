@@ -13,6 +13,8 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
+
 Chart.register(
   LinearScale,
   CategoryScale,
@@ -22,7 +24,8 @@ Chart.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  annotationPlugin
 );
 
 export const config: PlasmoCSConfig = {
@@ -194,24 +197,24 @@ window.addEventListener("load", () => {
   const initApp = () => {
     const btn = document.getElementById('calculate-btn');
     btn.addEventListener('click', analyzeGrades);
-    document.getElementById('close-btn').addEventListener("click",()=>{
+    document.getElementById('close-btn').addEventListener("click", () => {
       //wrapper.style.display = "none";
-    canvasIsOpen = false;
-    if (gpaChartInstance) {
-      gpaChartInstance.destroy();
-      gpaChartInstance = null;
-    }
-    if (creditChartInstance) {
-      creditChartInstance.destroy();
-      creditChartInstance = null;
-    }
-    $("#charts-section",(e)=>e.style.display = 'none');
-    $('#stats-grid',(e)=>e.innerHTML = '');
+      canvasIsOpen = false;
+      if (gpaChartInstance) {
+        gpaChartInstance.destroy();
+        gpaChartInstance = null;
+      }
+      if (creditChartInstance) {
+        creditChartInstance.destroy();
+        creditChartInstance = null;
+      }
+      $("#charts-section", (e) => e.style.display = 'none');
+      $('#stats-grid', (e) => e.innerHTML = '');
     });
   };
 
   const analyzeGrades = () => {
-    if(canvasIsOpen)return;
+    if (canvasIsOpen) return;
     canvasIsOpen = true;
     const data = extractData();
     const passed = data.filter(item => item.score >= 60);
@@ -267,13 +270,14 @@ window.addEventListener("load", () => {
       passed,
       requiredCredits,
       totalCredits,
-      optionalCredits
+      optionalCredits,
+      averageGPA,
     });
     wrapper.style.display = "block";
     document.getElementById('charts-section').style.display = 'block';
   };
 
-  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits,averageScore,requiredAverageScore}) => {
+  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits, averageScore, requiredAverageScore }) => {
     const grid = document.getElementById('stats-grid');
     grid.innerHTML = `
       <div class="stat-card">
@@ -303,7 +307,7 @@ window.addEventListener("load", () => {
     `;
   };
 
-  const renderCharts = ({ passed, requiredCredits, totalCredits,optionalCredits }) => {
+  const renderCharts = ({ passed, requiredCredits, totalCredits, optionalCredits, averageGPA }) => {
     if (gpaChartInstance) gpaChartInstance.destroy();
     if (creditChartInstance) creditChartInstance.destroy();
     // GPA 分布图表
@@ -325,6 +329,26 @@ window.addEventListener("load", () => {
           title: {
             display: true,
             text: '成绩分布统计'
+          },
+          annotation: {
+            annotations: {
+              //平均绩点
+              averageLine: {
+                type: 'line',
+                xMin: averageGPA,
+                xMax: averageGPA,
+                borderColor: 'green',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                  display: true,
+                  content: `平均值: ${averageGPA.toFixed(2)}`,
+                  position: 'end',
+                  backgroundColor: 'rgba(25, 234, 63, 0.8)',
+                  color: '#fff'
+                }
+              }
+            }
           }
         },
         scales: {
@@ -344,10 +368,10 @@ window.addEventListener("load", () => {
     creditChartInstance = new Chart(creditCtx, {
       type: 'doughnut',
       data: {
-        labels: ['必修学分', '选修学分','任选学分'],
+        labels: ['必修学分', '选修学分', '任选学分'],
         datasets: [{
-          data: [requiredCredits, totalCredits - requiredCredits - optionalCredits,optionalCredits],
-          backgroundColor: ['#90EE90', '#ADD8E6','#FFB6C1'],
+          data: [requiredCredits, totalCredits - requiredCredits - optionalCredits, optionalCredits],
+          backgroundColor: ['#90EE90', '#ADD8E6', '#FFB6C1'],
           hoverOffset: 4
         }]
       },
@@ -360,12 +384,12 @@ window.addEventListener("load", () => {
           tooltip: {
             enabled: true,
             callbacks: {
-              label: function(context) {
-                  const label = context.label || '';
-                  const value = context.raw || 0;
-                  const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                  const percentage = ((value as number / total) * 100).toFixed(2) + '%';
-                  return `${label}(${value}): ${percentage}`;
+              label: function (context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                const percentage = ((value as number / total) * 100).toFixed(2) + '%';
+                return `${label}(${value}): ${percentage}`;
               }
             }
           }
