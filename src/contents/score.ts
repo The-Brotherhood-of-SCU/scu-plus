@@ -311,16 +311,23 @@ window.addEventListener("load", () => {
     if (gpaChartInstance) gpaChartInstance.destroy();
     if (creditChartInstance) creditChartInstance.destroy();
     // GPA 分布图表
+    const labelsNumerical = [4.0, 3.7, 3.3, 3.0, 2.7, 2.3, 2.0, 1.7, 1.3, 1.0]; // 数值标签
+
     const gpaCtx = (document.getElementById('gpaChart') as HTMLCanvasElement).getContext('2d');
     gpaChartInstance = new Chart(gpaCtx, {
       type: 'bar',
       data: {
-        labels: ['4.0', '3.7', '3.3', '3.0', '2.7', '2.3', '2.0', '1.7', '1.3', '1.0'],
+        labels: labelsNumerical.map(String),
         datasets: [{
           label: '课程数量',
-          data: getGradeDistribution(passed),
+          data: getGradeDistribution(passed).map((count, index) => ({
+            x: labelsNumerical[index],
+            y: count
+          })),
           backgroundColor: 'rgba(99, 102, 241, 0.8)',
-          borderRadius: 5
+          borderRadius: 5,
+          categoryPercentage: 1.0,
+          barPercentage: 0.8
         }]
       },
       options: {
@@ -332,7 +339,6 @@ window.addEventListener("load", () => {
           },
           annotation: {
             annotations: {
-              //平均绩点
               averageLine: {
                 type: 'line',
                 xMin: averageGPA,
@@ -357,7 +363,12 @@ window.addEventListener("load", () => {
             beginAtZero: true
           },
           x: {
-            type: 'category'
+            type: 'linear',
+            ticks: {
+              callback: (value) => (value as number).toFixed(1)
+            },
+            min: 1.0,
+            max: 4.0
           }
         }
       }
