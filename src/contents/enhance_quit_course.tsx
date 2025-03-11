@@ -1,6 +1,7 @@
 import { notification } from "antd";
 import type { NotificationInstance, NotificationPlacement } from "antd/es/notification/interface";
 import type { PlasmoCSConfig } from "plasmo";
+import { createSecondPageElement } from "~script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -24,6 +25,7 @@ const openNotification = (title: string, content: string, location: Notification
 };
 
 window.addEventListener("load", () => {
+    createSecondPageElement("退课时，SCU+会提示退课的课程名，防止退课退错");
     document.addEventListener('click', function (event) {
         const element = event.target as HTMLElement;
         if (element.tagName === "I") {

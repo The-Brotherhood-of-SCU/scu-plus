@@ -137,6 +137,7 @@ const injectMenu = async () => {
   xpath_query('//*[@id="1002002000"]/a',(e)=>e.innerHTML = e.innerHTML.replace('本学期课表','本学期课表🎯'));
   xpath_query('//*[@id="1002000000"]/a/span',(e)=>e.innerText+='🎯');
   xpath_query('//*[@id="1007001005"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期成绩🎯')
+  xpath_query('//*[@id="1002001004"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;退课🎯')
   // 插入培养方案查看
   let menus = document.querySelector("#menus") as HTMLElement;
   let peiyang = document.createElement("li");
