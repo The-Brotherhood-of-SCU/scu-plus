@@ -133,11 +133,13 @@ const injectMenu = async () => {
   }
   xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
-  xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期课表🎯');
-  xpath_query('//*[@id="1002002000"]/a',(e)=>e.innerHTML = e.innerHTML.replace('本学期课表','本学期课表🎯'));
-  xpath_query('//*[@id="1002000000"]/a/span',(e)=>e.innerText+='🎯');
-  xpath_query('//*[@id="1007001005"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期成绩🎯')
-  xpath_query('//*[@id="1002001004"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;退课🎯')
+  //xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期课表🎯');
+  xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML = e.innerHTML.replace('本学期课表','本学期课表🎯'));
+  xpath_query('//*[@id="1002000000"]/a/span',(e)=>e.innerText+='🎯');//选课管理
+  xpath_query('//*[@id="1007001005"]/a',(e)=>e.innerHTML=e.innerHTML.replace('本学期成绩','本学期成绩🎯'));
+  xpath_query('//*[@id="1002001003"]/a',(e)=>e.innerHTML=e.innerHTML.replace('选课结果','选课结果🎯'));
+  xpath_query('//*[@id="1002001004"]/a',(e)=>e.innerHTML=e.innerHTML.replace('退课','退课🎯'));
+  xpath_query('//*[@id="1002002002"]/a',(e)=>e.innerHTML= e.innerHTML.replace('历年学期课表','历年学期课表🎯'));
   // 插入培养方案查看
   let menus = document.querySelector("#menus") as HTMLElement;
   let peiyang = document.createElement("li");

@@ -5,7 +5,8 @@ import html2canvas from 'html2canvas';
 export const config: PlasmoCSConfig = {
     matches: [
         "http://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/*",
-        "http://zhjw.scu.edu.cn/student/courseSelect/courseSelectResult/*"
+        "http://zhjw.scu.edu.cn/student/courseSelect/courseSelectResult/*",
+        "http://zhjw.scu.edu.cn/student/courseSelect/calendarSemesterCurriculum/*"
     ],
     all_frames: true
 }
@@ -57,6 +58,17 @@ async function inject(){
 
 const injectExportFunc = ()=>{
     $('.right_top_oper',(e)=>{
+        let btn = document.createElement("button");
+        btn.setAttribute('class','btn btn-info btn-xs btn-round');
+        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji',"🎯");
+        e.appendChild(btn);
+        btn.addEventListener('click',()=>{
+            html2canvas(document.getElementById('mycoursetable')).then((canvas)=>{
+                downloadCanvas(canvas,'课程表.png',"image/png",1.0);
+            });
+        });
+    });
+    $("#mainDIV > h4:nth-child(3)",(e)=>{
         let btn = document.createElement("button");
         btn.setAttribute('class','btn btn-info btn-xs btn-round');
         btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji',"🎯");
