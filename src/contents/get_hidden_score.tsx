@@ -13,17 +13,28 @@ export const config: PlasmoCSConfig = {
 
 // 使用tsx好像必须返回一个ReactNode，不然控制台会报错.(for plasmo)
 export default () => <></>
-
+const pattern = /student\/integratedQuery\/scoreQuery\/.{10}\/thisTermScores\/data/;
 get_hidden_score();
 async function get_hidden_score() {
     //get scripts
-    const s1 = document.querySelector("head > script:nth-child(73)");
-    const s2 = document.querySelector("head > script:nth-child(71)");
-    const script = s1?.innerHTML + s2?.innerHTML;
-    const pattern = /student\/integratedQuery\/scoreQuery\/.{10}\/thisTermScores\/data/;
-    const match = script.match(pattern);
+    const scripts = document.head.querySelectorAll('script');
+    let match:string=null;
+    // 遍历所有 script 标签
+    for(const i of scripts){
+        if(i.type!=="text/javascript"){
+            continue
+        }
+        if(!i.innerHTML.startsWith(`\n\t\t$(function ()`)){
+            continue
+        }
+        const result=i.innerHTML.match(pattern);
+        if(result){
+            match=result[0];
+            break
+        }
+    }
     if (match) {
-        const firstMatch = `http://zhjw.scu.edu.cn/${match[0].toString()}`;
+        const firstMatch = `http://zhjw.scu.edu.cn/${match.toString()}`;
         console.log(`get score url: ${firstMatch}`);
         const data = await (await fetch(firstMatch)).json();
         console.log("获取成绩数据成功");
