@@ -1,0 +1,18 @@
+[package]
+name = "ocr_server_rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hyper = {version = "1.6.0",features = ["full"]}
+tokio = {version = "1.44.0",features = ["full"]}
+hyper-util = {version = "0.1.10",features = ["full"]}
+http-body-util = {version = "0.1.3", features = ["full"]}
+serde = {version = "1.0.219", features = ["derive"]}
+serde_json = "1.0.140"
+ocrs = "0.10.0"
+lazy_static = "1.5.0"
+rten = "0.16.0"
+rten-tensor = "0.16.0"
+image = "0.25.5"
+base64 = "0.22.1"
