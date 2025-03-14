@@ -43,7 +43,7 @@ macro_rules! create_error_response {
 
 #[tokio::main]
 async fn main() {
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8497));
     let listener = TcpListener::bind(addr).await.unwrap();
     #[allow(unused_mut)]
     let mut http_server = http1::Builder::new();
