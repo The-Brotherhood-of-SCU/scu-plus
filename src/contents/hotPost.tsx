@@ -1,4 +1,3 @@
-import { color } from "html2canvas/dist/types/css/types/color";
 import type { PlasmoCSConfig } from "plasmo";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
@@ -22,26 +21,29 @@ window.addEventListener('load', () => {
     })
 })
 
-async function getPost(set:Function,loading:Function) {
-    loading(true);
-    const result = await chrome.runtime.sendMessage({ action: 'request', url: 'https://u.xiaouni.com/user-api/content/article/list?reading=1' })
-    if(result.success){
-        let posts:post[] = [];
-        const lists = JSON.parse(result.data).data.list;
-        lists.forEach(element => {
-            posts.push({title:element.title,id:element.id as number})
-        });
-        posts = posts.filter((_e,index)=>index<10)
-        set(posts)
+async function getPost(set: Function, loading: Function) {
+    for (let i = 0; i < 5; i++) {
+        loading(true);
+        const result = await chrome.runtime.sendMessage({ action: 'request', url: 'https://u.xiaouni.com/user-api/content/article/list?reading=1' })
+        if (result.success) {
+            let posts: post[] = [];
+            const lists = JSON.parse(result.data).data.list;
+            lists.forEach(element => {
+                posts.push({ title: element.title, id: element.id as number })
+            });
+            posts = posts.filter((_e, index) => index < 10)
+            set(posts)
+            loading(false)
+            break;
+        }
     }
-    loading(false)
 }
 
 function HotPost() {
     const [posts, setposts] = useState<post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    useEffect(()=>{getPost(setposts,setIsLoading)},[])
-    
+    useEffect(() => { getPost(setposts, setIsLoading) }, [])
+
     const getRankColor = (index: number) => {
         if (index === 0) return '#ffd700'; // 金牌
         if (index === 1) return '#c0c0c0'; // 银牌
@@ -57,14 +59,14 @@ function HotPost() {
         margin: '20px auto',
         transition: 'transform 0.2s ease',
     };
-    
+
     const headerStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
         marginBottom: '24px',
         position: 'relative',
     };
-    
+
     const decorativeLine: React.CSSProperties = {
         width: '4px',
         height: '28px',
@@ -72,20 +74,20 @@ function HotPost() {
         borderRadius: '2px',
         marginRight: '12px',
     };
-    
+
     const titleStyle: React.CSSProperties = {
         color: '#2a2543',
         fontSize: '28px',
         fontWeight: 600,
         margin: 0,
     };
-    
+
     const listContainer: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
     };
-    
+
     const listItemStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
@@ -95,7 +97,7 @@ function HotPost() {
         cursor: 'pointer',
         transition: 'all 0.2s ease',
     };
-    
+
     const rankStyle: React.CSSProperties = {
         fontWeight: 'bold',
         fontSize: '18px',
@@ -103,7 +105,7 @@ function HotPost() {
         textAlign: 'center',
         marginRight: '16px',
     };
-    
+
     const titleTextStyle: React.CSSProperties = {
         fontSize: '16px',
         color: '#444',
@@ -112,7 +114,7 @@ function HotPost() {
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
     };
-    
+
     const loadingStyle: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
@@ -153,7 +155,7 @@ function HotPost() {
     );
 }
 
-interface post{
-    title:string,
-    id:number
+interface post {
+    title: string,
+    id: number
 }
