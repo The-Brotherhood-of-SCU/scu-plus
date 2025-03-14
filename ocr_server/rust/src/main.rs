@@ -96,7 +96,7 @@ async fn handle_ocr(
         (&Method::GET, _) => Ok(Response::builder()
             .status(200)
             .header("Content-type", "application/json")
-            .body(make_body(String::from("57U makes SCU great again!")))
+            .body(make_body(String::from("hanfeng makes SCU great again!")))
             .unwrap()),
         (&Method::POST, "/ocr") => {
             let content_length = match request.headers()["Content-Length"].to_str() {
