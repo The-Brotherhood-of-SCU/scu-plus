@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo";
-import { xpath_query } from "~script/utils";
+import { $, $all, sleep, xpath_query } from "~script/utils";
 export const config: PlasmoCSConfig = {
     matches: ["https://u.xiaouni.com/mobile/pages/pd/*"],
     all_frames: true,
@@ -25,4 +25,20 @@ window.addEventListener('load',(e)=>{
         scuPlusWarm.style.fontSize = '2rem'
         e.parentNode.insertBefore(scuPlusWarm,e);
     })
+    closeAd();    
 })
+
+async function closeAd(){
+    while(true){
+        const ad = document.querySelectorAll('.advert');
+        if(ad.length>0){
+            ad.forEach(e=>{
+                e.remove();
+                console.log("成功关闭一个广告")
+            });
+        }
+        console.log("广告检测中……");
+        await sleep(1000)
+    }
+
+}
