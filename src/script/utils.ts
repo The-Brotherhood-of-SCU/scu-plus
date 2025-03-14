@@ -1,5 +1,5 @@
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas}
+export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas,sleep}
 
 enum UpdateCheckResult{
     NEW_VERSION_AVAILABLE,
@@ -113,4 +113,8 @@ function downloadCanvas(canvas, fileName, mimeType = 'image/png', quality) {
       console.error('Canvas下载失败:', error);
       throw new Error('无法导出Canvas数据');
     }
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
