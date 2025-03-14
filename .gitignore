@@ -39,3 +39,6 @@ keys.json
 .tsbuildinfo
 
 .idea
+
+# log
+*.log
