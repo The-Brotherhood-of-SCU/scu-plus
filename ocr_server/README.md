@@ -1,6 +1,10 @@
 # ocr服务有多种实现
-- python: 由ddddocr提供OCR能力
-- rust: 由rten提供OCR能力
+
+|名称|OCR库|Note|
+|:---:|:---:|:---|
+|python|ddddocr||
+|rust|rten|速度慢，效果差，不推荐|
+|rust2|ddddocr-rust||
 
 # HTTP协议
 客户端发起POST请求

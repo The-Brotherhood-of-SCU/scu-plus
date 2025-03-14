@@ -1,0 +1,12 @@
+[package]
+name = "ocr-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ddddocr = {git = "https://github.com/86maid/ddddocr.git", branch = "master"} #ocr
+serde = { version = "1.0", features = ["derive"] }  # JSON序列化
+serde_json = "1.0"  # JSON操作
+tokio = { version = "1", features = ["full"] }
+warp =  { version = "0.3", features = ["tls"] }
+base64= "0.22"
