@@ -1,11 +1,5 @@
-import type { PlasmoCSConfig } from "plasmo";
 import { dailySentence } from "../script/utils";
 import { getSetting, SettingItem } from "~script/config";
-
-export const config: PlasmoCSConfig = {
-    matches: ["http://zhjw.scu.edu.cn/", "http://zhjw.scu.edu.cn/index", "http://zhjw.scu.edu.cn/index.*"],
-    all_frames: true,
-};
 
 function updateCookie(key, value) {
     const cookies = document.cookie
@@ -21,22 +15,13 @@ function updateCookie(key, value) {
     }
 }
 
-updateCookie("selectionBar", "");
-
-let savedSettings: SettingItem;
-let savedSettingsAsync: Promise<SettingItem>;
-(async () => {
-    savedSettingsAsync= getSetting();
-    savedSettings=await savedSettingsAsync;
-})();
-window.addEventListener("load", async () => {
-    if (savedSettings == null) {
-        savedSettings=await savedSettingsAsync;
-    }
-    if (savedSettings.dailyQuoteSwitch != false) {
+export default (dailyQuoteSwitch: boolean) => {
+    updateCookie("selectionBar", "");
+    if (dailyQuoteSwitch) {
         setTimeout(() => showModal(), 1000)
     }
-});
+
+}
 
 const showModal = async () => {
     const word = await dailySentence();

@@ -1,16 +1,9 @@
-import type { PlasmoCSConfig } from "plasmo";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { xpath_query } from "~script/utils";
 
-export const config: PlasmoCSConfig = {
-    matches: ["http://zhjw.scu.edu.cn/", "http://zhjw.scu.edu.cn/index", "http://zhjw.scu.edu.cn/index.*"],
-    all_frames: true,
-};
 
-export default () => <></>
-
-window.addEventListener('load', () => {
+export default function injectHotPost() {
     xpath_query('//*[@id="page-content-template"]/div[1]/div/div[3]/div[1]', (e) => {
         const app = document.createElement('div')
         app.setAttribute('id', 'hotPost')
@@ -19,7 +12,7 @@ window.addEventListener('load', () => {
         const root = ReactDOM.createRoot(app);
         root.render(<HotPost />)
     })
-})
+}
 
 async function getPost(set: Function, loading: Function) {
     for (let i = 0; i < 5; i++) {

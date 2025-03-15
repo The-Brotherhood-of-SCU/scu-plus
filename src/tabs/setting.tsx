@@ -240,6 +240,12 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
+        <Form.Item
+          label="在首页显示校园集市热榜"
+          name="showHotPostSwitch"
+        >
+          <Switch />
+        </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); }} style={{ marginRight: '10px' }}>
             保存
