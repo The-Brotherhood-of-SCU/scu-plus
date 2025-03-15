@@ -39,6 +39,7 @@ class SettingItem {
     gpaCustomText: string;
     failedCourseCustomText: string;
     redirectLoginSwitch: boolean;
+    showHotPostSwitch: boolean;
     constructor() {
       this.beautifySwitch = false;
       this.beautifyColor = "#caeae3";
@@ -54,5 +55,6 @@ class SettingItem {
       this.gpaCustomText = "";
       this.failedCourseCustomText = "";
       this.redirectLoginSwitch = false;
+      this.showHotPostSwitch = true;
     }
   }
