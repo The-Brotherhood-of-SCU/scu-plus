@@ -2,6 +2,8 @@ import type { PlasmoCSConfig } from "plasmo"
 import { $, $all, xpath_query } from "../script/utils"
 import { Children } from "react";
 import { getSetting, type SettingItem } from "~script/config";
+import injectHotPost from "../mainpageContents/hotPost";
+import selectionBar from "../mainpageContents/selectionBar";
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -48,6 +50,8 @@ window.addEventListener("load", async () => {
     return;
   }
   //以下是主页特定内容
+  selectionBar(savedSettings.dailyQuoteSwitch);
+
   // 去掉不及格显示
   notpass();
 
@@ -56,6 +60,10 @@ window.addEventListener("load", async () => {
   }
   if (savedSettings.failedCourseCustomText != "" && savedSettings.failedCourseCustomText) {
     customText("#coursePas", savedSettings.failedCourseCustomText);
+  }
+  if(savedSettings.showHotPostSwitch){
+    console.log("注入热帖");  
+    injectHotPost();
   }
 })
 const customText = (id: string, text: string) => {
