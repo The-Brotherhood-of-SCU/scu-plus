@@ -19,7 +19,7 @@ try:
         config = json.load(f)
 except:
     config = {}
-    config['port'] = 80
+    config['port'] = 8033
     config['host'] = "0.0.0.0"
     config['https_enable'] = False
     config['https_cert'] = ""
