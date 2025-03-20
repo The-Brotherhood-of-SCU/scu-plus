@@ -68,12 +68,13 @@
 ## 🛠️ 快速安装
 
 ### 浏览器扩展安装
-1. 访问扩展页面  
+1. [点击下载](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases)压缩包 (chrome-mv3-prod.zip)
+2. 访问扩展页面  
    `chrome://extensions` 或 `edge://extensions`
-2. 启用开发者模式  
+3. 启用开发者模式  
    <kbd>开发者模式开关</kbd> → 切换至开启状态
-3. 加载插件文件  
-   解压ZIP包 → 拖入扩展页面 → 确认安装
+4. 加载插件文件  
+   解压ZIP包 → 把文件夹拖入扩展页面 → 确认安装
 
 ### OCR服务配置
 ```bash
