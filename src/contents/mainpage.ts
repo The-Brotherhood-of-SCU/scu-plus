@@ -42,12 +42,14 @@ window.addEventListener("load", async () => {
   injectMenu();
   const isHomePage = () => {
     const pathname = window.location.pathname;
-    return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);
+    return pathname === '/' || pathname==='/index';
   }
 
-  if (!isHomePage) {
-    console.log("不是主页，不注入主页特定内容");
+  if (!isHomePage()) {
+    console.log(`不是主页:${window.location.pathname}，不注入主页特定内容`);
     return;
+  }else{
+    console.log(`主页:${window.location.pathname}，开始注入`);
   }
   //以下是主页特定内容
   selectionBar(savedSettings.dailyQuoteSwitch);
