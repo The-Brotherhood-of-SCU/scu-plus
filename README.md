@@ -68,7 +68,7 @@
 ## 🛠️ 快速安装
 
 ### 浏览器扩展安装
-1. [点击下载](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases)压缩包 (chrome-mv3-prod.zip)
+1. [点击下载](https://cnb.cool/The-Brotherhood-of-SCU/scu-plus/-/releases)压缩包 (chrome-mv3-prod.zip)
 2. 访问扩展页面  
    `chrome://extensions` 或 `edge://extensions`
 3. 启用开发者模式  
@@ -101,7 +101,7 @@ python server.py
 ## 🤝 参与贡献
 
 我们欢迎任何形式的贡献！您可以通过以下方式参与：
-1. 提交功能建议 → [新建Issue](https://github.com/The-Brotherhood-of-SCU/scu-plus/issues)
+1. 提交功能建议 → [新建Issue](https://cnb.cool/The-Brotherhood-of-SCU/scu-plus/-/issues)
 2. 开发新功能 → Fork项目后提交Pull Request
 3. 文档改进 → 直接编辑README.md文件
 
