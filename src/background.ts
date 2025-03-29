@@ -5,7 +5,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // 抽象写法，主要是chrome的api设计太狗屎了
         (async () => {
             try {
-                const response = await fetch(message.url);
+                const response = await fetch(message.url,{redirect:"follow",headers:{
+                    "accept":message.accept?message.accept:'*/*'
+                }});
                 if (response.ok) {
                     const text = await response.text();
                     sendResponse({ success: true, data: text });

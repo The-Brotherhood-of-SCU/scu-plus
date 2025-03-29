@@ -10,7 +10,7 @@ enum UpdateCheckResult{
 }
 
 async function checkVersion () : Promise<UpdateCheckResult>{
-    let newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://raw.githubusercontent.com/The-Brotherhood-of-SCU/scu-plus/refs/heads/main/package.json" });
+    let newest_config = await chrome.runtime.sendMessage({ action: "request", url: "https://cnb.cool/The-Brotherhood-of-SCU/scu-plus/-/git/raw/main/package.json",accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
     if (!newest_config.success) {
         // alert("无法获取更新，请检查网络问题！");
         return UpdateCheckResult.NETWORK_ERROR;

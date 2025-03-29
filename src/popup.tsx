@@ -5,7 +5,7 @@ import { Button } from 'antd';
 import "style.css"
 
 const login_link = "https://id.scu.edu.cn/enduser/sp/sso/scdxplugin_jwt23?enterpriseId=scdx&target_url=index"
-const project_link = "https://github.com/The-Brotherhood-of-SCU/scu-plus"
+const project_link = packagejson.projectLink
 const gotoSettingPage = () => {
   openLink(`chrome-extension://${chrome.runtime.id}/tabs/setting.html`)
 }
@@ -53,7 +53,7 @@ function MainButton() {
   const [updateCheckState, setUpdateCheckState] = useState(UpdateCheckResult.UNKNOWN)
 
   const gotoDownloadPage = () => {
-    window.open("https://github.com/The-Brotherhood-of-SCU/scu-plus/releases")
+    window.open(packagejson.download)
   }
   //根据updateCheckState状态决定调用的函数
   const mainButtonFunctionManager = async () => {

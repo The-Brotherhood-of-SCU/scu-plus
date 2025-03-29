@@ -45,7 +45,7 @@ window.addEventListener("load", async () => {
     return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);
   }
 
-  if (!isHomePage) {
+  if (!isHomePage()) {
     console.log("不是主页，不注入主页特定内容");
     return;
   }
