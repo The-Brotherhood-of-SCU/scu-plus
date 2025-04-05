@@ -1,8 +1,8 @@
 # SCU+ 🎯 —— 四川大学教务系统增强插件
 
-[![GitHub License](https://img.shields.io/badge/License-GPL3.0-green)](https://github.com/your-repo/scu-plus/blob/main/LICENSE) 
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)](https://github.com/your-repo/scu-plus/pulls) 
-[![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in-VSCode-blue?logo=visualstudiocode)](https://github.dev/your-repo/scu-plus)
+[![GitHub License](https://img.shields.io/badge/License-GPL3.0-green)](./LICENSE) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)](https://github.com/The-Brotherhood-of-SCU/scu-plus/pulls) 
+[![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in-VSCode-blue?logo=visualstudiocode)](https://github.dev/The-Brotherhood-of-SCU/scu-plus)
 
 > 🌈 为四川大学教务系统量身打造的浏览器插件，兼具高颜值设计与实用功能增强
 
