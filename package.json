@@ -4,8 +4,8 @@
   "version": "1.1.5",
   "description": "四川大学教务系统增强插件",
   "author": "jeanhua",
-  "download": "https://cnb.cool/The-Brotherhood-of-SCU/scu-plus/-/releases",
-  "projectLink":"https://cnb.cool/The-Brotherhood-of-SCU/scu-plus",
+  "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
+  "projectLink":"https://github.com/The-Brotherhood-of-SCU/scu-plus",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
