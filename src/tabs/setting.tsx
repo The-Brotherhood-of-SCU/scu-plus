@@ -121,7 +121,7 @@ function DataSettingFragment() {
             const reader = new FileReader();
             reader.onload = (event) => {
               try {
-                const jsonData = {...setting,...JSON.parse(event.target?.result as string)};
+                const jsonData = { ...setting, ...JSON.parse(event.target?.result as string) };
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
@@ -158,21 +158,25 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        <Form.Item
-          label="头像来源类型"
-          name="avatarSource"
-        >
-          <Select >
-            <Select.Option value="url">URL</Select.Option>
-            <Select.Option value="qq">QQ</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="头像来源"
-          name="avatarInfo"
-        >
-          <Input placeholder={setting.avatarSource == "qq" ? "输入QQ号" : "头像URL地址"} />
-        </Form.Item>
+        {form.getFieldValue('avatarSwitch') ? (
+          <>
+            <Form.Item
+              label="头像来源类型"
+              name="avatarSource"
+            >
+              <Select >
+                <Select.Option value="url">URL</Select.Option>
+                <Select.Option value="qq">QQ</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="头像来源"
+              name="avatarInfo"
+            >
+              <Input placeholder={setting.avatarSource == "qq" ? "输入QQ号" : "头像URL地址"} />
+            </Form.Item>
+          </>
+        ) : <></>}
         <Form.Item
           label="每日一句开关"
           name="dailyQuoteSwitch"
@@ -203,24 +207,30 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        <Form.Item
-          label="输入隐藏名字的替代文字"
-          name="nameHideText"
-        >
-          <Input />
-        </Form.Item>
+        {form.getFieldValue('nameHideSwitch') ? (
+          <>
+            <Form.Item
+              label="输入隐藏名字的替代文字"
+              name="nameHideText"
+            >
+              <Input />
+            </Form.Item>
+          </>
+        ) : <></>}
         <Form.Item
           label="输入OCR服务提供者"
           name="ocrProvider"
         >
           <Input placeholder="eg. https://example.com/ocr" />
         </Form.Item>
-        <Form.Item
-          label="美化颜色"
-          name="beautifyColor"
-        >
-          <Input placeholder="eg. #caeae3" />
-        </Form.Item>
+        {form.getFieldValue('beautifySwitch') ? (<>
+          <Form.Item
+            label="美化颜色"
+            name="beautifyColor"
+          >
+            <Input placeholder="eg. #caeae3" />
+          </Form.Item>
+        </>) : <></>}
         <Form.Item
           label="自定义首页GPA处显示的值（为空则忽略）"
           name="gpaCustomText"
@@ -274,12 +284,12 @@ function DataSettingFragment() {
           <div style={{ display: 'inline-flex', alignItems: 'center' }}>
             美化颜色：
             <ColorPicker value={setting.beautifyColor} onChangeComplete={
-              (color)=>{
+              (color) => {
                 const newColor = color.toHexString();
-                handleFormChange({beautifyColor:newColor})
-                form.setFieldsValue({beautifyColor:newColor})
+                handleFormChange({ beautifyColor: newColor })
+                form.setFieldsValue({ beautifyColor: newColor })
               }}
-               showText />
+              showText />
           </div>
         </Form.Item>
       </Form></div>
