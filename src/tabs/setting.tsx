@@ -158,7 +158,7 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        {form.getFieldValue('avatarSwitch') ? (
+        {form.getFieldValue('avatarSwitch')!=false ? (
           <>
             <Form.Item
               label="头像来源类型"
@@ -207,7 +207,7 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        {form.getFieldValue('nameHideSwitch') ? (
+        {form.getFieldValue('nameHideSwitch')!=false ? (
           <>
             <Form.Item
               label="输入隐藏名字的替代文字"
@@ -223,7 +223,7 @@ function DataSettingFragment() {
         >
           <Input placeholder="eg. https://example.com/ocr" />
         </Form.Item>
-        {form.getFieldValue('beautifySwitch') ? (<>
+        {form.getFieldValue('beautifySwitch')!=false ? (<>
           <Form.Item
             label="美化颜色"
             name="beautifyColor"
