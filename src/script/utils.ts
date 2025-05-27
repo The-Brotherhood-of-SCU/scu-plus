@@ -1,5 +1,5 @@
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas,sleep}
+export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas,sleep,randomInt}
 
 enum UpdateCheckResult{
     NEW_VERSION_AVAILABLE,
@@ -117,4 +117,8 @@ function downloadCanvas(canvas, fileName, mimeType = 'image/png', quality) {
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function randomInt(min:number,max:number){
+    return Math.floor(Math.random() * 100 % (max - min)) + min;
   }
