@@ -20,7 +20,7 @@ enum PageType {
 }
 
 
-let parameters={
+let parameters = {
     kid: "",
 }
 
@@ -38,12 +38,12 @@ function popupWindow() {
     wind.style.position = "absolute"
     wind.style.top = "100px"
     wind.style.zIndex = "10000"
-    
+
 
     wind.setAttribute("id", "course_score")
     document.body.appendChild(wind)
     const root = ReactDOM.createRoot(wind);
-    root.render(<PopUp/>)
+    root.render(<PopUp />)
 }
 
 function PopUp() {
@@ -54,7 +54,7 @@ function PopUp() {
 
     const handleMouseDown = (e) => {
         const target = e.target;
-        if (target.closest('#course_score_content')) {
+        if (target.closest('#popup-title')) {  
             const container = document.getElementById('course_score_content');
             const rect = container.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
@@ -79,24 +79,25 @@ function PopUp() {
     };
 
     useEffect(() => {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        const title=document.getElementById('popup-title')
+        title.addEventListener('mousemove', handleMouseMove);
+        title.addEventListener('mouseup', handleMouseUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            title.removeEventListener('mousemove', handleMouseMove);
+            title.removeEventListener('mouseup', handleMouseUp);
         };
     }, [dragging, offset]);
 
     const entry = () => {
         switch (page) {
-            case PageType.SearchPage: 
+            case PageType.SearchPage:
                 return <div key="114"><SearchPage setWebPage={setWebPage} /></div>;
-            case PageType.CourseStats: 
+            case PageType.CourseStats:
                 return <div key="514"><CourseStats setWebPage={setWebPage} /></div>;
         }
     }
-    
+
 
     const closePopup = () => {
         const popup = document.getElementById('course_score');
@@ -119,27 +120,32 @@ function PopUp() {
                 left: `${position[0]}px`,
                 top: `${position[1]}px`,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                padding: '10px'
             }}
             onMouseDown={handleMouseDown}
         >
             {/* 窗口标题栏 */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center', 
-                marginBottom: '16px'
-            }}>
-                <h2 style={{ 
+            <div
+                id="popup-title"
+                style={{
+                    padding: "8px 5px 5px 13px",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '16px',
+                    background: 'rgba(0, 0, 0, 0.1)', // 半透明灰色背景
+                }}>
+                <h2 style={{
                     margin: 0,
-                    lineHeight: '32px'  
+                    lineHeight: '32px',
+                    userSelect: 'none',
+                    fontWeight: 'bold'
                 }}>选课通</h2>
-                <Button 
-                    type="text" 
+                <Button
+                    type="text"
                     onClick={closePopup}
-                    style={{ 
+                    style={{
                         fontSize: '18px',
-                        height: '32px', 
+                        height: '32px',
                         display: 'flex',
                         alignItems: 'center'  // 确保×符号垂直居中
                     }}
@@ -251,7 +257,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                                 minWidth: '300px',
                                 flexGrow: 1
                             }}
-                            onClick={() =>{
+                            onClick={() => {
                                 parameters.kid = item.kid
                                 setWebPage(PageType.CourseStats)
                             }}
@@ -275,8 +281,8 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
             )}
 
             {loading && (
-                <div style={{ 
-                    textAlign: 'center', 
+                <div style={{
+                    textAlign: 'center',
                     padding: '16px 0',
                     position: 'absolute',
                     left: '50%',
@@ -347,7 +353,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
     if (loading) {
         return (
-            <div style={{ 
+            <div style={{
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
