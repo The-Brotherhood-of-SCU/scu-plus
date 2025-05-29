@@ -3,7 +3,7 @@ import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
 import { useEffect, useRef, useState } from "react"
 import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
-import { RollbackOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CloseOutlined, RollbackOutlined } from "@ant-design/icons";
 
 import { Column, Pie } from "@ant-design/charts";
 
@@ -144,7 +144,7 @@ function PopUp() {
         if (page === PageType.SearchPage && scrollContainer) {
             // 恢复滚动位置
             scrollContainer.scrollTo({ top: searchPageScrollTop });
-            scrollContainer.addEventListener('scroll',updateScrollValue)
+            scrollContainer.addEventListener('scroll', updateScrollValue)
             return () => {
                 if (scrollContainer) {
                     scrollContainer.removeEventListener('scroll', updateScrollValue);
@@ -152,6 +152,10 @@ function PopUp() {
             };
         }
     }, [page]);
+
+    const gotoSearchPage = () => {
+        setWebPage(PageType.SearchPage)
+    }
 
     return (
         <div
@@ -161,7 +165,7 @@ function PopUp() {
                 width: '500px',
                 height: '600px',
                 background: 'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
-                borderRadius: '30px',
+                borderRadius: '20px',
                 left: `${position[0]}px`,
                 top: `${position[1]}px`,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
@@ -174,7 +178,7 @@ function PopUp() {
             <div
                 id="popup-title"
                 style={{
-                    padding: "8px 5px 5px 13px",
+                    padding: "5px 5px 5px 13px",
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
@@ -183,12 +187,31 @@ function PopUp() {
                 }}
                 onMouseDown={handleMouseDown}
             >
-                <h2 style={{
-                    margin: 0,
-                    lineHeight: '32px',
-                    userSelect: 'none',
-                    fontWeight: 'bold'
-                }}>选课通</h2>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Button
+                        type="text"
+                        onClick={gotoSearchPage}
+                        style={{
+                            fontSize: '18px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: page === PageType.SearchPage ? 'rgba(0, 0, 0, 0.25)' : undefined,
+                            cursor: page === PageType.SearchPage ? 'not-allowed' : 'pointer',
+                            transition: 'color 0.3s ease-in-out'  // 添加颜色过渡动画
+                        }}
+                        disabled={page === PageType.SearchPage}
+                    >
+                        <span style={{ fontSize: '20px' }}><ArrowLeftOutlined /></span>
+                    </Button>
+                    <h2 style={{
+                        margin: 0,
+                        marginLeft: '8px', // Add some space between the button and the title
+                        lineHeight: '32px',
+                        userSelect: 'none',
+                        fontWeight: 'bold'
+                    }}>选课通</h2>
+                </div>
                 <Button
                     type="text"
                     onClick={closePopup}
@@ -199,7 +222,7 @@ function PopUp() {
                         alignItems: 'center'
                     }}
                 >
-                    <span style={{ fontSize: '24px' }}>×</span>
+                    <span style={{ fontSize: '20px' }}><CloseOutlined /></span>
                 </Button>
             </div>
 
@@ -263,27 +286,27 @@ function SearchPage({
 
             if (result.code === 200) {
                 if (reset) {
-                    setData(result.data);  // 使用props的setData
-                    setHasMore(result.data.length == 15);  // 使用props的setHasMore
+                    setData(result.data);
+                    setHasMore(result.data.length == 15);
                 } else {
-                    setData(result.data);  // 使用props的setData
-                    setHasMore(result.data.length == 15);  // 使用props的setHasMore
+                    setData(result.data);
+                    setHasMore(result.data.length == 15);
                 }
             } else {
                 message.error(result.msg || "搜索失败");
-                if (reset) setData([]);  // 使用props的setData
-                setHasMore(false);  // 使用props的setHasMore
+                if (reset) setData([]);
+                setHasMore(false);
             }
         } catch (err) {
             message.error("网络请求失败");
             console.error(err);
         } finally {
-            setLoading(false);  // 使用props的setLoading
+            setLoading(false);
         }
     };
 
     const loadNextPage = () => {
-        setPage(page + 1);  // 使用props的setPage
+        setPage(page + 1);
     };
 
     useEffect(() => {
@@ -533,16 +556,8 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
         height: 300,
     };
 
-
-    const backtohome = () => {
-        setWebPage(PageType.SearchPage)
-    }
-
     return (
         <div className="course-stats-container">
-            <Button onClick={backtohome}>
-                <RollbackOutlined />
-                返回</Button>
             <Card
                 title={data.kname}
 
