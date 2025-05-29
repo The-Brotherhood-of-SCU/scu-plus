@@ -1,12 +1,17 @@
 # SCU+ 🎯 —— 四川大学教务系统增强插件
 
-[![GitHub License](https://img.shields.io/badge/License-GPL3.0-green)](./LICENSE)  
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)](https://github.com/The-Brotherhood-of-SCU/scu-plus/pulls)  
-[![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in-VSCode-blue?logo=visualstudiocode)](https://github.dev/The-Brotherhood-of-SCU/scu-plus)
+<div style="display: flex; justify-content: left; gap: 10px;">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-GPL3.0-green" alt="GitHub License"></a>
+  <a href="https://github.com/The-Brotherhood-of-SCU/scu-plus/pulls"><img src="https://img.shields.io/badge/PRs-Welcome-brightgreen" alt="PRs Welcome"></a>
+  <a href="https://github.dev/The-Brotherhood-of-SCU/scu-plus"><img src="https://img.shields.io/badge/Open%20in-VSCode-blue?logo=visualstudiocode" alt="Open in Visual Studio Code"></a>
+</div>
+<br/>
 
 > 🌈 为四川大学教务系统量身打造的浏览器插件，兼具高颜值设计与实用功能增强
 
----
+快速访问: &emsp; [如何安装](#浏览器扩展安装) &emsp; [常见问题解答](#常见问题解答)
+
+
 
 ## 🖼 功能预览
 
@@ -28,30 +33,23 @@
 ![课表统计](./README/1.png)
 
 ### 功能细节组
-挂科过滤：
-![挂科过滤](./README/3.png)
-
-GPA/挂科数定制：
-![GPA定制](./README/9.png)
+| 功能 | 预览 |
+| --- | --- |
+| 挂科过滤 | ![挂科过滤](./README/3.png) |
+| GPA/挂科数定制 | ![GPA定制](./README/9.png) |
 
 ### 选课通
-基础信息：
-![选课通-基础信息](./README/xkt1.png)
+| 基础信息 | 历史记录 |
+| --- | --- |
+| ![选课通-基础信息](./README/xkt1.png) | ![选课通-历史记录](./README/xkt2.png) |
 
-历史记录：
-![选课通-历史记录](./README/xkt2.png)
-
----
 
 ## ✨ 核心功能
 
 ### 🛡️ 隐私与安全
-- **智能隐私保护**  
-  自动隐藏姓名、学号及证件照，支持一键切换模式
-- **登录简化**  
-  OCR验证码识别 + 统一认证重定向登录
-- **退课提醒**  
-  退课时，显示退课课程名，避免误退课
+- **智能隐私保护**   自动隐藏姓名、学号及证件照，支持一键切换模式
+- **登录简化**    OCR验证码识别 + 统一认证重定向登录
+- **退课提醒**   退课时，显示退课课程名，避免误退课
 
 ### 📊 学业数据可视化
 | 模块         | 功能亮点                            |
@@ -73,7 +71,6 @@ GPA/挂科数定制：
 - **每日箴言**  
   在登录页展示哲理语句与诗词精选
 
----
 
 ## 🛠️ 快速安装
 
@@ -86,27 +83,27 @@ GPA/挂科数定制：
 4. 加载插件文件  
    解压ZIP包 → 把文件夹拖入扩展页面 → 确认安装
 
-### OCR服务配置（可选）
-```bash
-# 启动OCR服务（需Python环境）
-cd ./ocr_server
-python server.py
-```
-1. 进入插件设置 → 网络设置
-2. 输入API地址：`http://localhost:[port]/ocr`
-3. 测试连接 → 保存配置
-
----
 
 ## 🌟 高阶功能
 
 | 功能           | 使用场景           | 操作指引               |
 |----------------|--------------------|------------------------|
 | 配置同步       | 多设备切换使用     | 设置页 → 导入/导出配置 |
-| 学期数据预加载 | 快速查看未开放成绩 | 成绩页 → 自动加载成绩  |
-| 教学日历修复   | 查看完整校历信息   | 校历页 → 自动加载补丁  |
+| 自动OCR服务 | 自动识别并填充验证码 | 设置页 → 输入OCR服务提供者 （详情如下） |
 
----
+### OCR服务配置（可选）
+```bash
+# 启动OCR服务（需Python环境）
+cd ./ocr_server/python
+python server.py
+```
+1. 进入插件设置 → 网络设置
+2. 输入API地址：`http://localhost:[port]/ocr`
+3. 测试连接 → 保存配置
+
+**：其实我们的OCR服务端有多种实现，如果有能力，我们更推荐使用[Rust版](https://github.com/The-Brotherhood-of-SCU/scu-plus/tree/main/ocr_server)*
+
+
 
 ## 🤝 参与贡献
 
@@ -115,13 +112,7 @@ python server.py
 2. 开发新功能 → Fork项目后提交Pull Request
 3. 文档改进 → 直接编辑README.md文件
 
----
 
-## 📜 开源协议
-
-本项目基于 **[GPL-3.0 License](./LICENSE)** 开源，任何二次开发请保持开源且注明原始出处。
-
----
 
 ## 📌 常见问题解答
 
@@ -133,3 +124,9 @@ A：所有数据处理均在本地完成，不存在数据上传行为。
 
 **Q：如何彻底卸载插件？**  
 A：浏览器扩展页面 → 移除插件 → 清除缓存数据。
+
+
+
+## 📜 开源协议
+
+本项目基于 **[GPL-3.0 License](./LICENSE)** 开源，任何二次开发请保持开源且注明原始出处。
