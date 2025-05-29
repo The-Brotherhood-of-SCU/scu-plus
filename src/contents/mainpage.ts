@@ -148,6 +148,8 @@ const injectMenu = async () => {
   xpath_query('//*[@id="1002001003"]/a',(e)=>e.innerHTML=e.innerHTML.replace('选课结果','选课结果🎯'));
   xpath_query('//*[@id="1002001004"]/a',(e)=>e.innerHTML=e.innerHTML.replace('退课','退课🎯'));
   xpath_query('//*[@id="1002002002"]/a',(e)=>e.innerHTML= e.innerHTML.replace('历年学期课表','历年学期课表🎯'));
+  xpath_query('//*[@id="1003000000"]/a/span',(e)=>e.innerHTML= e.innerHTML.replace('教师课堂评价','教师课堂评价🎯'));
+  xpath_query('//*[@id="1003001002"]/a',(e)=>e.innerHTML= e.innerHTML.replace('教学评估','教学评估🎯'))
   // 插入培养方案查看
   let menus = document.querySelector("#menus") as HTMLElement;
   let peiyang = document.createElement("li");
@@ -217,7 +219,7 @@ const injectMenu = async () => {
   res.setAttribute('id', '1145142');
   settingsBtn.setAttribute('onclick', "rootMenuClick(this);");
   res.innerHTML = `<a href="#" class="dropdown-toggle">
-                    <i class="menu-icon fa fa-calendar"></i>
+                    <i class="menu-icon fa fa-book"></i>
                     <span class="menu-text"> 学习资料emoji </span>
                     <b class="arrow fa fa-angle-down"></b>
                 </a>
@@ -242,6 +244,37 @@ const injectMenu = async () => {
                 </ul>`.replace('emoji', "🎯");
   menus.appendChild(res);
   console.log("注入资源站成功");
+
+  // 注入课程评分
+  let course_score = document.createElement("li");
+  course_score.setAttribute('id', '1145143');
+  settingsBtn.setAttribute('onclick', "rootMenuClick(this);");
+  course_score.innerHTML = `<a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-check-square"></i>
+                    <span class="menu-text"> 课程评分emoji </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            课程评分
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a>&nbsp;&nbsp;
+                                    课程评分统计
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>`.replace('emoji', "🎯");
+  menus.appendChild(course_score);
+  console.log("注入课程评分按钮");
 }
 
 
