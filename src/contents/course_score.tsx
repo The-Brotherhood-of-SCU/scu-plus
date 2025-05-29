@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react"
 import { Space, Input, Button, List, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
 import { RollbackOutlined } from "@ant-design/icons";
 
-import { createBrowserRouter, RouterProvider, useParams } from "react-router-dom"
 import { Column, Pie } from "@ant-design/charts";
 export default () => <></>
 
@@ -15,21 +14,15 @@ export const config: PlasmoCSConfig = {
     ],
     all_frames: true
 }
+enum PageType {
+    SearchPage,
+    CourseStats
+}
 
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <SearchPage />
-    },
-    {
-        path: '/index',
-        element: <SearchPage />
-    },
-    {
-        path: '/result/:kid',
-        element: <CourseStats />
-    }
-])
+
+let parameters={
+    kid: "",
+}
 
 window.addEventListener("load", () => {
     setTimeout(() => {
@@ -45,14 +38,16 @@ function popupWindow() {
     wind.style.position = "absolute"
     wind.style.top = "100px"
     wind.style.zIndex = "10000"
+    
 
     wind.setAttribute("id", "course_score")
     document.body.appendChild(wind)
     const root = ReactDOM.createRoot(wind);
-    root.render(<PopUp />)
+    root.render(<PopUp/>)
 }
 
 function PopUp() {
+    const [page, setWebPage] = useState(PageType.SearchPage)
     const [position, setPosition] = useState([100, 100]);
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState([0, 0]);
@@ -93,6 +88,23 @@ function PopUp() {
         };
     }, [dragging, offset]);
 
+    const entry = () => {
+        switch (page) {
+            case PageType.SearchPage: 
+                return <div key="114"><SearchPage setWebPage={setWebPage} /></div>;
+            case PageType.CourseStats: 
+                return <div key="514"><CourseStats setWebPage={setWebPage} /></div>;
+        }
+    }
+    
+
+    const closePopup = () => {
+        const popup = document.getElementById('course_score');
+        if (popup) {
+            popup.remove();
+        }
+    };
+
     return (
         <div
             id="course_score_content"
@@ -111,16 +123,36 @@ function PopUp() {
             }}
             onMouseDown={handleMouseDown}
         >
-            {/* 窗口内容 */}
-            <h2>选课通</h2>
-            <RouterProvider router={router}>
-
-            </RouterProvider>
+            {/* 窗口标题栏 */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center', 
+                marginBottom: '16px'
+            }}>
+                <h2 style={{ 
+                    margin: 0,
+                    lineHeight: '32px'  
+                }}>选课通</h2>
+                <Button 
+                    type="text" 
+                    onClick={closePopup}
+                    style={{ 
+                        fontSize: '18px',
+                        height: '32px', 
+                        display: 'flex',
+                        alignItems: 'center'  // 确保×符号垂直居中
+                    }}
+                >
+                    <span style={{ fontSize: '24px' }}>×</span>
+                </Button>
+            </div>
+            {entry()}
         </div>
     );
 }
 
-function SearchPage() {
+function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     const [keywords, setKeywords] = useState("");
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -187,6 +219,7 @@ function SearchPage() {
                     <Input
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
+                        onPressEnter={onSearch}
                         placeholder="请输入课程名"
                         allowClear
                     />
@@ -218,7 +251,10 @@ function SearchPage() {
                                 minWidth: '300px',
                                 flexGrow: 1
                             }}
-                            onClick={() => router.navigate("/result/" + item.kid)}
+                            onClick={() =>{
+                                parameters.kid = item.kid
+                                setWebPage(PageType.CourseStats)
+                            }}
                         >
                             <p><strong>教师：</strong>{item.tname}</p>
                             <p><strong>学分：</strong>{item.credit}</p>
@@ -239,8 +275,15 @@ function SearchPage() {
             )}
 
             {loading && (
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                    <Spin tip="加载中..." />
+                <div style={{ 
+                    textAlign: 'center', 
+                    padding: '16px 0',
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)'
+                }}>
+                    <Spin size="large" />
                 </div>
             )}
 
@@ -266,12 +309,11 @@ function SearchPage() {
     );
 }
 
-function CourseStats() {
+function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
-    const param = useParams()
-    const url = `https://duomi.chenyipeng.com/pennisetum/scu/score/getDetail?kid=${param.kid}`
+    const url = `https://duomi.chenyipeng.com/pennisetum/scu/score/getDetail?kid=${parameters.kid}`
 
     useEffect(() => {
         const fetchData = async () => {
@@ -305,8 +347,13 @@ function CourseStats() {
 
     if (loading) {
         return (
-            <div className="loading-container">
-                <Spin size="large" tip="加载中..." />
+            <div style={{ 
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+            }}>
+                <Spin size="large" />
             </div>
         );
     }
@@ -402,7 +449,7 @@ function CourseStats() {
 
 
     const backtohome = () => {
-        router.navigate("/")
+        setWebPage(PageType.SearchPage)
     }
 
     return (
