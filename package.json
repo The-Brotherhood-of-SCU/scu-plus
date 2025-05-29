@@ -1,7 +1,7 @@
 {
   "name": "scu-plus",
   "displayName": "Scu plus",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "四川大学教务系统增强插件",
   "author": "jeanhua",
   "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
@@ -20,10 +20,9 @@
     "chartjs-plugin-annotation": "^3.1.0",
     "decimal.js": "^10.5.0",
     "html2canvas": "^1.4.1",
-    "plasmo": "0.90.3",
+    "plasmo": "0.90.5",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-router-dom": "^7.6.1"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",

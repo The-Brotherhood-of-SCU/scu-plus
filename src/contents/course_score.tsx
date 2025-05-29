@@ -1,8 +1,8 @@
 import ReactDOM from "react-dom/client"
 import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
-import { useEffect, useState, useRef } from "react"
-import { Space, Input, Button, List, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
+import { useEffect, useState } from "react"
+import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
 import { RollbackOutlined } from "@ant-design/icons";
 
 import { Column, Pie } from "@ant-design/charts";
@@ -58,7 +58,7 @@ function PopUp() {
             const container = document.getElementById('course_score_content');
             const rect = container.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top + 100;
+            const offsetY = e.clientY - rect.top;
 
             setDragging(true);
             setOffset([offsetX, offsetY]);
@@ -109,15 +109,15 @@ function PopUp() {
         <div
             id="course_score_content"
             style={{
-                position: 'absolute',
-                minWidth: '500px',
+                position: 'fixed',
+                width: '500px',
                 height: '600px',
                 overflowY: "auto",
                 background: 'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
                 cursor: 'pointer',
                 borderRadius: '30px',
-                left: position[0],
-                top: position[1],
+                left: `${position[0]}px`,
+                top: `${position[1]}px`,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
                 padding: '10px'
             }}
@@ -377,7 +377,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
     // 历史数据柱状图
     const historyData = data.history.map(item => ({
-        examTime: item.examTime.toString(),
+        examTime: item.examTime?.toString() ?? '未知',
         avg: parseFloat(item.avg.toFixed(1)),
         max: item.max,
         min: item.min,
