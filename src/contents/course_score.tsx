@@ -53,6 +53,8 @@ function PopUp() {
     const [offset, setOffset] = useState([0, 0]);
 
     const handleMouseDown = (e) => {
+        if (e.button !== 0) return;  // 只响应左键点击(button 0)
+        
         const target = e.target;
         if (target.closest('#popup-title')) {  
             const container = document.getElementById('course_score_content');
@@ -79,13 +81,12 @@ function PopUp() {
     };
 
     useEffect(() => {
-        const title=document.getElementById('popup-title')
-        title.addEventListener('mousemove', handleMouseMove);
-        title.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
 
         return () => {
-            title.removeEventListener('mousemove', handleMouseMove);
-            title.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
         };
     }, [dragging, offset]);
 
@@ -113,15 +114,15 @@ function PopUp() {
                 position: 'fixed',
                 width: '500px',
                 height: '600px',
-                overflowY: "auto",
                 background: 'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
-                cursor: 'pointer',
                 borderRadius: '30px',
                 left: `${position[0]}px`,
                 top: `${position[1]}px`,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'  // 添加这行来裁剪超出圆角的内容
             }}
-            onMouseDown={handleMouseDown}
         >
             {/* 窗口标题栏 */}
             <div
@@ -131,9 +132,11 @@ function PopUp() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: '16px',
-                    background: 'rgba(0, 0, 0, 0.1)', // 半透明灰色背景
-                }}>
+                    background: 'rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer',
+                }}
+                onMouseDown={handleMouseDown}
+            >
                 <h2 style={{
                     margin: 0,
                     lineHeight: '32px',
@@ -147,13 +150,23 @@ function PopUp() {
                         fontSize: '18px',
                         height: '32px',
                         display: 'flex',
-                        alignItems: 'center'  // 确保×符号垂直居中
+                        alignItems: 'center'
                     }}
                 >
                     <span style={{ fontSize: '24px' }}>×</span>
                 </Button>
             </div>
-            {entry()}
+            
+            {/* 可滚动内容区域 */}
+            <div style={{
+                overflowY: "auto",
+                flex: 1,
+                padding: '16px',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+            }}>
+                {entry()}
+            </div>
         </div>
     );
 }
