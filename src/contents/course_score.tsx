@@ -1,11 +1,14 @@
 import ReactDOM from "react-dom/client"
 import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
 import { RollbackOutlined } from "@ant-design/icons";
 
 import { Column, Pie } from "@ant-design/charts";
+
+let searchPageScrollTop = 0;
+
 export default () => <></>
 
 export const config: PlasmoCSConfig = {
@@ -51,12 +54,28 @@ function PopUp() {
     const [position, setPosition] = useState([100, 100]);
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState([0, 0]);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // SearchPage页面的状态提升，防止返回后状态丢失
+    const [searchState, setSearchState] = useState({
+        keywords: "",
+        loading: false,
+        data: [],
+        page: 1,
+        hasMore: true
+    });
+    const { keywords, loading, data, page: currentPage, hasMore } = searchState;
+    const setKeywords = (val: string) => setSearchState(prev => ({ ...prev, keywords: val }));
+    const setLoading = (val: boolean) => setSearchState(prev => ({ ...prev, loading: val }));
+    const setData = (val: any[]) => setSearchState(prev => ({ ...prev, data: val }));
+    const setPage = (val: number) => setSearchState(prev => ({ ...prev, page: val }));
+    const setHasMore = (val: boolean) => setSearchState(prev => ({ ...prev, hasMore: val }));
 
     const handleMouseDown = (e) => {
         if (e.button !== 0) return;  // 只响应左键点击(button 0)
-        
+
         const target = e.target;
-        if (target.closest('#popup-title')) {  
+        if (target.closest('#popup-title')) {
             const container = document.getElementById('course_score_content');
             const rect = container.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
@@ -93,7 +112,15 @@ function PopUp() {
     const entry = () => {
         switch (page) {
             case PageType.SearchPage:
-                return <div key="114"><SearchPage setWebPage={setWebPage} /></div>;
+                return (
+                    <div key="114">
+                        <SearchPage
+                            setWebPage={setWebPage}
+                            searchState={{ keywords, loading, data, page: currentPage, hasMore }}
+                            setSearchState={{ setKeywords, setLoading, setData, setPage, setHasMore }}
+                        />
+                    </div>
+                );
             case PageType.CourseStats:
                 return <div key="514"><CourseStats setWebPage={setWebPage} /></div>;
         }
@@ -106,6 +133,25 @@ function PopUp() {
             popup.remove();
         }
     };
+    // 更新SearchPage的滚动位置
+    const updateScrollValue = (e: Event) => {
+        const target = e.target as HTMLDivElement;
+        searchPageScrollTop = target.scrollTop;
+    };
+    //监听页面切换，保存/恢复SearchPage滚动位置
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (page === PageType.SearchPage && scrollContainer) {
+            // 恢复滚动位置
+            scrollContainer.scrollTo({ top: searchPageScrollTop });
+            scrollContainer.addEventListener('scroll',updateScrollValue)
+            return () => {
+                if (scrollContainer) {
+                    scrollContainer.removeEventListener('scroll', updateScrollValue);
+                }
+            };
+        }
+    }, [page]);
 
     return (
         <div
@@ -156,27 +202,48 @@ function PopUp() {
                     <span style={{ fontSize: '24px' }}>×</span>
                 </Button>
             </div>
-            
+
             {/* 可滚动内容区域 */}
-            <div style={{
-                overflowY: "auto",
-                flex: 1,
-                padding: '16px',
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(0,0,0,0.2) transparent',
-            }}>
+            <div
+                ref={scrollContainerRef}
+                style={{
+                    overflowY: "auto",
+                    flex: 1,
+                    padding: '16px',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+                }}
+            >
                 {entry()}
             </div>
         </div>
     );
 }
 
-function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
-    const [keywords, setKeywords] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+function SearchPage({
+    setWebPage,
+    searchState,
+    setSearchState
+}: {
+    setWebPage: (page: PageType) => void;
+    searchState: {
+        keywords: string;
+        loading: boolean;
+        data: any[];
+        page: number;
+        hasMore: boolean;
+    };
+    setSearchState: {
+        setKeywords: (val: string) => void;
+        setLoading: (val: boolean) => void;
+        setData: (val: any[]) => void;
+        setPage: (val: number) => void;
+        setHasMore: (val: boolean) => void;
+    };
+}) {
+    // 从props获取状态和更新函数
+    const { keywords, loading, data, page, hasMore } = searchState;
+    const { setKeywords, setLoading, setData, setPage, setHasMore } = setSearchState;
 
     const search = async (reset = false) => {
         if (!keywords.trim()) {
@@ -184,7 +251,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
             return;
         }
 
-        setLoading(true);
+        setLoading(true);  // 使用props的setLoading
         try {
             const res = await chrome.runtime.sendMessage({
                 action: 'request',
@@ -196,27 +263,27 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
             if (result.code === 200) {
                 if (reset) {
-                    setData(result.data);
-                    setHasMore(result.data.length == 15);
+                    setData(result.data);  // 使用props的setData
+                    setHasMore(result.data.length == 15);  // 使用props的setHasMore
                 } else {
-                    setData(prev => [...prev, ...result.data]);
-                    setHasMore(result.data.length == 15);
+                    setData(result.data);  // 使用props的setData
+                    setHasMore(result.data.length == 15);  // 使用props的setHasMore
                 }
             } else {
                 message.error(result.msg || "搜索失败");
-                if (reset) setData([]);
-                setHasMore(false);
+                if (reset) setData([]);  // 使用props的setData
+                setHasMore(false);  // 使用props的setHasMore
             }
         } catch (err) {
             message.error("网络请求失败");
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoading(false);  // 使用props的setLoading
         }
     };
 
     const loadNextPage = () => {
-        setPage(prevPage => prevPage + 1);
+        setPage(page + 1);  // 使用props的setPage
     };
 
     useEffect(() => {
