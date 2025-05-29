@@ -1,11 +1,14 @@
 import ReactDOM from "react-dom/client"
 import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
-import { RollbackOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CloseOutlined, RollbackOutlined } from "@ant-design/icons";
 
 import { Column, Pie } from "@ant-design/charts";
+
+let searchPageScrollTop = 0;
+
 export default () => <></>
 
 export const config: PlasmoCSConfig = {
@@ -20,7 +23,7 @@ enum PageType {
 }
 
 
-let parameters={
+let parameters = {
     kid: "",
 }
 
@@ -38,12 +41,12 @@ function popupWindow() {
     wind.style.position = "absolute"
     wind.style.top = "100px"
     wind.style.zIndex = "10000"
-    
+
 
     wind.setAttribute("id", "course_score")
     document.body.appendChild(wind)
     const root = ReactDOM.createRoot(wind);
-    root.render(<PopUp/>)
+    root.render(<PopUp />)
 }
 
 function PopUp() {
@@ -51,10 +54,28 @@ function PopUp() {
     const [position, setPosition] = useState([100, 100]);
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState([0, 0]);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // SearchPage页面的状态提升，防止返回后状态丢失
+    const [searchState, setSearchState] = useState({
+        keywords: "",
+        loading: false,
+        data: [],
+        page: 1,
+        hasMore: true
+    });
+    const { keywords, loading, data, page: currentPage, hasMore } = searchState;
+    const setKeywords = (val: string) => setSearchState(prev => ({ ...prev, keywords: val }));
+    const setLoading = (val: boolean) => setSearchState(prev => ({ ...prev, loading: val }));
+    const setData = (val: any[]) => setSearchState(prev => ({ ...prev, data: val }));
+    const setPage = (val: number) => setSearchState(prev => ({ ...prev, page: val }));
+    const setHasMore = (val: boolean) => setSearchState(prev => ({ ...prev, hasMore: val }));
 
     const handleMouseDown = (e) => {
+        if (e.button !== 0) return;  // 只响应左键点击(button 0)
+
         const target = e.target;
-        if (target.closest('#course_score_content')) {
+        if (target.closest('#popup-title')) {
             const container = document.getElementById('course_score_content');
             const rect = container.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
@@ -90,13 +111,21 @@ function PopUp() {
 
     const entry = () => {
         switch (page) {
-            case PageType.SearchPage: 
-                return <div key="114"><SearchPage setWebPage={setWebPage} /></div>;
-            case PageType.CourseStats: 
+            case PageType.SearchPage:
+                return (
+                    <div key="114">
+                        <SearchPage
+                            setWebPage={setWebPage}
+                            searchState={{ keywords, loading, data, page: currentPage, hasMore }}
+                            setSearchState={{ setKeywords, setLoading, setData, setPage, setHasMore }}
+                        />
+                    </div>
+                );
+            case PageType.CourseStats:
                 return <div key="514"><CourseStats setWebPage={setWebPage} /></div>;
         }
     }
-    
+
 
     const closePopup = () => {
         const popup = document.getElementById('course_score');
@@ -104,6 +133,29 @@ function PopUp() {
             popup.remove();
         }
     };
+    // 更新SearchPage的滚动位置
+    const updateScrollValue = (e: Event) => {
+        const target = e.target as HTMLDivElement;
+        searchPageScrollTop = target.scrollTop;
+    };
+    //监听页面切换，保存/恢复SearchPage滚动位置
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (page === PageType.SearchPage && scrollContainer) {
+            // 恢复滚动位置
+            scrollContainer.scrollTo({ top: searchPageScrollTop });
+            scrollContainer.addEventListener('scroll', updateScrollValue)
+            return () => {
+                if (scrollContainer) {
+                    scrollContainer.removeEventListener('scroll', updateScrollValue);
+                }
+            };
+        }
+    }, [page]);
+
+    const gotoSearchPage = () => {
+        setWebPage(PageType.SearchPage)
+    }
 
     return (
         <div
@@ -112,52 +164,109 @@ function PopUp() {
                 position: 'fixed',
                 width: '500px',
                 height: '600px',
-                overflowY: "auto",
                 background: 'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
-                cursor: 'pointer',
-                borderRadius: '30px',
+                borderRadius: '20px',
                 left: `${position[0]}px`,
                 top: `${position[1]}px`,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                padding: '10px'
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'  // 添加这行来裁剪超出圆角的内容
             }}
-            onMouseDown={handleMouseDown}
         >
             {/* 窗口标题栏 */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center', 
-                marginBottom: '16px'
-            }}>
-                <h2 style={{ 
-                    margin: 0,
-                    lineHeight: '32px'  
-                }}>选课通</h2>
-                <Button 
-                    type="text" 
+            <div
+                id="popup-title"
+                style={{
+                    padding: "5px 5px 5px 13px",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer',
+                }}
+                onMouseDown={handleMouseDown}
+            >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Button
+                        type="text"
+                        onClick={gotoSearchPage}
+                        style={{
+                            fontSize: '18px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: page === PageType.SearchPage ? 'rgba(0, 0, 0, 0.25)' : undefined,
+                            cursor: page === PageType.SearchPage ? 'not-allowed' : 'pointer',
+                            transition: 'color 0.3s ease-in-out'  // 添加颜色过渡动画
+                        }}
+                        disabled={page === PageType.SearchPage}
+                    >
+                        <span style={{ fontSize: '20px' }}><ArrowLeftOutlined /></span>
+                    </Button>
+                    <h2 style={{
+                        margin: 0,
+                        marginLeft: '8px', // Add some space between the button and the title
+                        lineHeight: '32px',
+                        userSelect: 'none',
+                        fontWeight: 'bold'
+                    }}>选课通</h2>
+                </div>
+                <Button
+                    type="text"
                     onClick={closePopup}
-                    style={{ 
+                    style={{
                         fontSize: '18px',
-                        height: '32px', 
+                        height: '32px',
                         display: 'flex',
-                        alignItems: 'center'  // 确保×符号垂直居中
+                        alignItems: 'center'
                     }}
                 >
-                    <span style={{ fontSize: '24px' }}>×</span>
+                    <span style={{ fontSize: '20px' }}><CloseOutlined /></span>
                 </Button>
             </div>
-            {entry()}
+
+            {/* 可滚动内容区域 */}
+            <div
+                ref={scrollContainerRef}
+                style={{
+                    overflowY: "auto",
+                    flex: 1,
+                    padding: '16px',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+                }}
+            >
+                {entry()}
+            </div>
         </div>
     );
 }
 
-function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
-    const [keywords, setKeywords] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+function SearchPage({
+    setWebPage,
+    searchState,
+    setSearchState
+}: {
+    setWebPage: (page: PageType) => void;
+    searchState: {
+        keywords: string;
+        loading: boolean;
+        data: any[];
+        page: number;
+        hasMore: boolean;
+    };
+    setSearchState: {
+        setKeywords: (val: string) => void;
+        setLoading: (val: boolean) => void;
+        setData: (val: any[]) => void;
+        setPage: (val: number) => void;
+        setHasMore: (val: boolean) => void;
+    };
+}) {
+    // 从props获取状态和更新函数
+    const { keywords, loading, data, page, hasMore } = searchState;
+    const { setKeywords, setLoading, setData, setPage, setHasMore } = setSearchState;
 
     const search = async (reset = false) => {
         if (!keywords.trim()) {
@@ -165,7 +274,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
             return;
         }
 
-        setLoading(true);
+        setLoading(true);  // 使用props的setLoading
         try {
             const res = await chrome.runtime.sendMessage({
                 action: 'request',
@@ -180,7 +289,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                     setData(result.data);
                     setHasMore(result.data.length == 15);
                 } else {
-                    setData(prev => [...prev, ...result.data]);
+                    setData(result.data);
                     setHasMore(result.data.length == 15);
                 }
             } else {
@@ -197,7 +306,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     };
 
     const loadNextPage = () => {
-        setPage(prevPage => prevPage + 1);
+        setPage(page + 1);
     };
 
     useEffect(() => {
@@ -251,7 +360,7 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                                 minWidth: '300px',
                                 flexGrow: 1
                             }}
-                            onClick={() =>{
+                            onClick={() => {
                                 parameters.kid = item.kid
                                 setWebPage(PageType.CourseStats)
                             }}
@@ -275,8 +384,8 @@ function SearchPage({ setWebPage }: { setWebPage: (page: PageType) => void }) {
             )}
 
             {loading && (
-                <div style={{ 
-                    textAlign: 'center', 
+                <div style={{
+                    textAlign: 'center',
                     padding: '16px 0',
                     position: 'absolute',
                     left: '50%',
@@ -347,7 +456,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
     if (loading) {
         return (
-            <div style={{ 
+            <div style={{
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
@@ -447,16 +556,8 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
         height: 300,
     };
 
-
-    const backtohome = () => {
-        setWebPage(PageType.SearchPage)
-    }
-
     return (
         <div className="course-stats-container">
-            <Button onClick={backtohome}>
-                <RollbackOutlined />
-                返回</Button>
             <Card
                 title={data.kname}
 
