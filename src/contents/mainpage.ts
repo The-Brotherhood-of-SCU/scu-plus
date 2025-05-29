@@ -1,9 +1,11 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { $, $all, xpath_query } from "../script/utils"
+import { $, $all, checkVersion, UpdateCheckResult, xpath_query } from "../script/utils"
 import { Children } from "react";
 import { getSetting, type SettingItem } from "~script/config";
 import injectHotPost from "../mainpageContents/hotPost";
 import selectionBar from "../mainpageContents/selectionBar";
+import { message } from "antd";
+import package_config from "../../package.json"
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -272,8 +274,36 @@ const injectMenu = async () => {
                             </li>
                         </ul>
                     </li>
-                </ul>`.replace('emoji', "🎯");
+
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            版本更新
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a href="#" id="checkVersionBtn">&nbsp;&nbsp;
+                                    检查版本更新
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                `.replace('emoji', "🎯");
   (settingsBtn.querySelector("#settingsBtn") as HTMLElement).onclick = () => chrome.runtime.sendMessage({ action: 'open-settings' });
+  (settingsBtn.querySelector("#checkVersionBtn") as HTMLElement).onclick = ()=>{
+    checkVersion().then(result=>{
+      if(result==UpdateCheckResult.NEW_VERSION_AVAILABLE){
+        message.info("有新版本！正在跳转下载页面")
+        window.open(package_config.download)
+      }else if(result==UpdateCheckResult.UP_TP_DATE){
+        message.info("已经是最新版本了")
+      }
+    })
+  }
   menus.appendChild(settingsBtn);
   console.log("注入SCU+设置按钮成功");
 }
