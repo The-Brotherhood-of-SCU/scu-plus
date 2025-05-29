@@ -289,7 +289,7 @@ function SearchPage({
                     setData(result.data);
                     setHasMore(result.data.length == 15);
                 } else {
-                    setData(result.data);
+                    setData([...data,...result.data]);
                     setHasMore(result.data.length == 15);
                 }
             } else {
