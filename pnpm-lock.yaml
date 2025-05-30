@@ -48,9 +48,6 @@ importers:
       '@types/chrome':
         specifier: 0.0.258
         version: 0.0.258
-      '@types/node':
-        specifier: 20.11.5
-        version: 20.11.5
       '@types/react':
         specifier: 18.2.48
         version: 18.2.48
