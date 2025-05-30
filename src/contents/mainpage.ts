@@ -1,10 +1,9 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { $, $all, checkVersion, UpdateCheckResult, xpath_query } from "../script/utils"
-import { Children } from "react";
 import { getSetting, type SettingItem } from "~script/config";
 import injectHotPost from "../mainpageContents/hotPost";
 import selectionBar from "../mainpageContents/selectionBar";
-import { message } from "antd";
+import { message, Modal } from "antd";
 import package_config from "../../package.json"
 
 export const config: PlasmoCSConfig = {
@@ -13,6 +12,8 @@ export const config: PlasmoCSConfig = {
   ],
   all_frames: true
 }
+
+const {confirm} = Modal
 
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
@@ -297,8 +298,12 @@ const injectMenu = async () => {
   (settingsBtn.querySelector("#checkVersionBtn") as HTMLElement).onclick = ()=>{
     checkVersion().then(result=>{
       if(result==UpdateCheckResult.NEW_VERSION_AVAILABLE){
-        message.info("有新版本！正在跳转下载页面")
-        window.open(package_config.download)
+        confirm({
+          title:"获取到新版本，是否调整下载？",
+          okText:"确定",
+          cancelText:"取消",
+          onOk:()=>window.open(package_config.download)
+        })
       }else if(result==UpdateCheckResult.UP_TP_DATE){
         message.info("已经是最新版本了")
       }
