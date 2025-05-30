@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { Button, Input, notification } from "antd"
+import { Button, Input, message, notification } from "antd"
 import { xpath_query, randomInt } from "~script/utils"
 import ReactDOM from "react-dom/client"
 import React, { useState } from "react"
@@ -9,7 +9,7 @@ import type { NotificationArgsProps } from 'antd';
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "http://zhjw.scu.edu.cn/student/teachingEvaluation/newEvaluation/evaluation/*"
+        "http://zhjw.scu.edu.cn/student/teachingEvaluation/newEvaluation/*"
     ],
     all_frames: true
 }
@@ -20,8 +20,50 @@ window.addEventListener("load", () => {
         e.appendChild(div)
         const root = ReactDOM.createRoot(div)
         root.render(<Controller />)
+        do_it(80,100)
+        setInterval(() => {
+            let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
+            if(commitBtn.disabled==false){
+                commitBtn.click();
+            }
+        }, 1000);
+    });
+    let isRunningEvaluation = localStorage.getItem("isRunningEvaluation")=="true";
+    xpath_query('//*[@id="home"]/div/div/h4/span',(e)=>{
+        let btn = document.createElement("button")
+        btn.innerText =isRunningEvaluation? "🎯暂停评教": "🎯一键评教";
+        btn.onclick = ()=> RunningEvaluation(!isRunningEvaluation);
+        e.appendChild(btn);
+        RunningEvaluation(isRunningEvaluation);
     })
 })
+
+
+function RunningEvaluation(run:boolean){
+    if(run){
+        localStorage.setItem("isRunningEvaluation","true")
+        message.info("正在进行自动评教，3s后跳转")
+        setTimeout(() => {
+            let table = document.querySelector('#codeTable') as HTMLTableElement;
+            let hasMore = false;
+            for(let row of table.rows){
+                let btn = row.querySelector('button') as HTMLButtonElement;
+                if(btn==null)continue;
+                if(btn.innerText=='评估'){
+                    hasMore = true;
+                    btn.click();
+                }
+            }
+            if(hasMore==false){
+                message.info("已经全部评教完成！");
+                RunningEvaluation(false)
+            }
+        }, 3000);
+    }else{
+        localStorage.setItem("isRunningEvaluation","false")
+        message.info("已暂停评教")
+    }
+}
 
 function Controller() {
     const [minscore, set_minscore] = useState(80)
