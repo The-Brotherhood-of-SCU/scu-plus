@@ -75,13 +75,15 @@
 ## 🛠️ 快速安装
 
 ### 浏览器扩展安装
-1. [点击下载](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases)压缩包 (chrome-mv3-prod.zip)
-2. 访问扩展页面：  
-   `chrome://extensions` 或 `edge://extensions`
-3. 启用开发者模式  
-   <kbd>开发者模式开关</kbd> → 切换至开启状态
-4. 加载插件文件  
-   解压ZIP包 → 把文件夹拖入扩展页面 → 确认安装
+
+| 步骤 | 操作说明 |
+|------|----------|
+| 1. **下载** | [点击下载](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases)压缩包 (chrome-mv3-prod.zip) |
+| 2. **访问浏览器扩展页面** | `chrome://extensions` |
+| 3. **启用开发者模式** | `开发者模式`开关 → 切换至开启状态 → 刷新页面 |
+| 4. **加载插件** | 把ZIP包拖入扩展页面 → 确认安装 |
+
+**Note**：仅支持Chromium系浏览器（Chrome、Edge等），暂不支持FireFox
 
 
 ## 🌟 高阶功能
