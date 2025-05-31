@@ -61,7 +61,7 @@ function RunningEvaluation(run:boolean){
         }, 3000);
     }else{
         localStorage.setItem("isRunningEvaluation","false")
-        message.info("已暂停评教")
+        message.info("已暂停自动评教")
     }
 }
 
