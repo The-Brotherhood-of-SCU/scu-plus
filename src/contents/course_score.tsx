@@ -3,9 +3,9 @@ import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
 import { useEffect, useRef, useState } from "react"
 import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
-import { ArrowLeftOutlined, CloseOutlined, RollbackOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CloseOutlined } from "@ant-design/icons";
 
-import { Column, Pie } from "@ant-design/charts";
+import { Line, Pie } from "@ant-design/charts";
 
 let searchPageScrollTop = 0;
 
@@ -289,7 +289,7 @@ function SearchPage({
                     setData(result.data);
                     setHasMore(result.data.length == 15);
                 } else {
-                    setData([...data,...result.data]);
+                    setData([...data, ...result.data]);
                     setHasMore(result.data.length == 15);
                 }
             } else {
@@ -484,7 +484,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
         { type: '0-59分', value: data.e },
     ];
 
-    // 历史数据柱状图
+    // 历史分数数据
     const historyData = data.history.map(item => ({
         examTime: item.examTime?.toString() ?? '未知',
         avg: parseFloat(item.avg.toFixed(1)),
@@ -516,44 +516,26 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
         },
     };
 
-    // 柱状图配置
-    const configColumn = {
+    // 折线图配置
+    const configLine = {
         data: historyData,
+        padding: 'auto',
+        forceFit: true,
         xField: 'examTime',
         yField: 'avg',
-        padding: 'auto',
-        appendPadding: [10, 0, 0, 0],
-        label: {
-            position: 'top',
-            style: {
-                fill: '#000',
-                fontSize: 12,
-            },
-            text: (datum) => `${datum.avg}`,
-        },
-        xAxis: {
-            label: {
-                autoHide: false,
-                autoRotate: false,
-                style: {
-                    fontSize: 12,
-                },
-            },
-        },
-        yAxis: {
-            nice: true,
-            min: 0,
-            max: 100,
-            label: {
-                formatter: (val) => `${val}`,
-            },
-        },
-        style: {
-            // 圆角样式
-            radiusTopLeft: 10,
-            radiusTopRight: 10,
-        },
         height: 300,
+        lineStyle: {
+            stroke: '#4096ff',
+            strokeWidth: 2,
+        },
+        point: {
+            size: 4,
+            style: {
+                fill: '#4096ff',
+                stroke: '#fff',
+                strokeWidth: 2,
+            },
+        },
     };
 
     return (
@@ -598,11 +580,14 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
                 <Divider />
 
-                <div className="chart-section">
-                    <h3>历史考试平均分趋势</h3>
-                    <Column {...configColumn} />
-                </div>
+                {historyData.length > 0 && historyData[0].avg != 0 && (
+                    <div className="chart-section">
+                        <h3>历史考试平均分趋势</h3>
+                        <Line {...configLine} />
+                    </div>
+                )}
             </Card>
+            <span style={{color:"grey"}}>数据来源：陈一一的自留地</span>
         </div>
     );
 };
