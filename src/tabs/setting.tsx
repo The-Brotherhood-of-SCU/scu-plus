@@ -4,9 +4,6 @@ import { getSetting, saveSetting, SettingItem } from "~script/config";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
-import type { promises } from "dns";
-
-
 
 function SettingPage() {
   return (
@@ -41,6 +38,11 @@ function DataSettingFragment() {
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+
+  const [showAvatarFields, setShowAvatarFields] = useState(false);
+  const [showNameHideField, setShowNameHideField] = useState(false);
+  const [showBeautifyField, setShowBeautifyField] = useState(false);
+
   const success = () => {
     messageApi.open({
       type: 'success',
@@ -76,7 +78,11 @@ function DataSettingFragment() {
       const savedSettings = await getSetting();
       setSetting(savedSettings);
       setLoading(false);
+      setShowAvatarFields(!!savedSettings.avatarSwitch);
+      setShowNameHideField(!!savedSettings.nameHideSwitch);
+      setShowBeautifyField(!!savedSettings.beautifySwitch);
     };
+
     loadSettings();
   }, []);
 
@@ -86,8 +92,9 @@ function DataSettingFragment() {
       newConfig = { ...prev, ...changedValues };
       return newConfig;
     });
-
-
+    setShowAvatarFields(form.getFieldValue('avatarSwitch'));
+    setShowBeautifyField(form.getFieldValue('beautifySwitch'));
+    setShowNameHideField(form.getFieldValue('nameHideSwitch'));
   };
 
   if (loading) {
@@ -158,7 +165,7 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        {form.getFieldValue('avatarSwitch')!=false ? (
+        {showAvatarFields && (
           <>
             <Form.Item
               label="头像来源类型"
@@ -176,7 +183,7 @@ function DataSettingFragment() {
               <Input placeholder={setting.avatarSource == "qq" ? "输入QQ号" : "头像URL地址"} />
             </Form.Item>
           </>
-        ) : <></>}
+        )}
         <Form.Item
           label="每日一句开关"
           name="dailyQuoteSwitch"
@@ -207,7 +214,7 @@ function DataSettingFragment() {
         >
           <Switch />
         </Form.Item>
-        {form.getFieldValue('nameHideSwitch')!=false ? (
+        {showNameHideField && (
           <>
             <Form.Item
               label="输入隐藏名字的替代文字"
@@ -216,21 +223,21 @@ function DataSettingFragment() {
               <Input />
             </Form.Item>
           </>
-        ) : <></>}
+        )}
         <Form.Item
           label="输入OCR服务提供者"
           name="ocrProvider"
         >
           <Input placeholder="eg. https://example.com/ocr" />
         </Form.Item>
-        {form.getFieldValue('beautifySwitch')!=false ? (<>
+        {showBeautifyField && (<>
           <Form.Item
             label="美化颜色"
             name="beautifyColor"
           >
             <Input placeholder="eg. #caeae3" />
           </Form.Item>
-        </>) : <></>}
+        </>)}
         <Form.Item
           label="自定义首页GPA处显示的值（为空则忽略）"
           name="gpaCustomText"
@@ -281,16 +288,18 @@ function DataSettingFragment() {
           <Button onClick={() => openNotification('导入配置文件', '将配置文件拖入本窗口中，即可实现导入', 'topRight')} style={{ marginRight: '10px' }}>
             导入配置文件
           </Button>
-          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-            美化颜色：
-            <ColorPicker value={setting.beautifyColor} onChangeComplete={
-              (color) => {
-                const newColor = color.toHexString();
-                handleFormChange({ beautifyColor: newColor })
-                form.setFieldsValue({ beautifyColor: newColor })
-              }}
-              showText />
-          </div>
+          {showBeautifyField && (
+            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              美化颜色：
+              <ColorPicker value={setting.beautifyColor} onChangeComplete={
+                (color) => {
+                  const newColor = color.toHexString();
+                  handleFormChange({ beautifyColor: newColor })
+                  form.setFieldsValue({ beautifyColor: newColor })
+                }}
+                showText />
+            </div>
+          )}
         </Form.Item>
       </Form></div>
 
