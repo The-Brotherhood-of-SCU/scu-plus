@@ -1,5 +1,4 @@
 import { dailySentence } from "../script/utils";
-import { getSetting, SettingItem } from "~script/config";
 
 function updateCookie(key, value) {
     const cookies = document.cookie
