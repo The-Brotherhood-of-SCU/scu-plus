@@ -86,7 +86,7 @@ const navBarinject = () => {
     navBar.style.borderRadius = "4px";
     $("#navbar-container > div.navbar-header.pull-left > a > small", (title) => {
       title.style.color = "black";
-      title.innerText = "四川大学教务管理系统(SCU+)🎯";
+      title.innerText = "四川大学教务管理系统(SCU+ v{version})🎯".replace("{version}",package_config.version);
     });
     if (savedSettings.nameHideSwitch) {
       $("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.light-blue > a > span", (e) => e.innerHTML = `
@@ -306,6 +306,10 @@ const injectMenu = async () => {
         })
       }else if(result==UpdateCheckResult.UP_TP_DATE){
         message.info("已经是最新版本了")
+      }else if(result==UpdateCheckResult.NETWORK_ERROR){
+        message.error("网络错误连接，请检查网络是否正常")
+      }else{
+        message.error("检查更新失败，请稍后再试")
       }
     })
   }
