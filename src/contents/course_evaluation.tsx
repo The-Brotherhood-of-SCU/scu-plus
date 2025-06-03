@@ -113,7 +113,7 @@ function do_it(min: number, max: number) {
     let body = table.querySelector("tbody");
     for (let row of body.rows) {
         // 单选
-        let randomScore = ["A_", "B_", "C_"][randomInt(0, 3)];
+        let randomScore = ["A_", "B_", "C_"][randomInt(0, 2)];
         let inputs = row.querySelectorAll("input");
         for (let input of inputs) {
             if (input.type == "radio") {
@@ -166,7 +166,7 @@ function do_it(min: number, max: number) {
         ];
         let textInputs = document.querySelectorAll("textarea");
         for(let inp of textInputs){
-            inp.value = answers[randomInt(0,answers.length)];
+            inp.value = answers[randomInt(0,answers.length-1)];
         }
     }
 
