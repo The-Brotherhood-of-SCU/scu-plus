@@ -44,6 +44,9 @@ function RunningEvaluation(run:boolean){
         localStorage.setItem("isRunningEvaluation","true")
         message.info("正在进行自动评教，3s后跳转")
         setTimeout(() => {
+            if(localStorage.getItem("isRunningEvaluation")!=="true"){
+                return;
+            }
             let table = document.querySelector('#codeTable') as HTMLTableElement;
             let hasMore = false;
             for(let row of table.rows){
