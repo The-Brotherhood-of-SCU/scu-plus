@@ -94,17 +94,7 @@
 | 自动OCR服务 | 自动识别并填充验证码 | 设置页 → 输入OCR服务提供者 （详情如下） |
 
 ### OCR服务配置（可选）
-```bash
-# 启动OCR服务（需Python环境）
-cd ./ocr_server/python
-python server.py
-```
-1. 进入插件设置 → 网络设置
-2. 输入API地址：`http://localhost:[port]/ocr`
-3. 测试连接 → 保存配置
-
-**：其实我们的OCR服务端有多种实现，如果有能力，我们更推荐使用[Rust版](https://github.com/The-Brotherhood-of-SCU/scu-plus/tree/main/ocr_server)*
-
+如果要部署ocr服务，请前往**[OCR代码仓库](https://github.com/The-Brotherhood-of-SCU/scu-plus-ocr)**
 
 
 ## 🤝 参与贡献
