@@ -15,17 +15,23 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Set up Node.js
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
-          
+          node-version: 20
+          cache: 'pnpm'
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
         
       - name: Build plugin
-        run: npm run build
+        run: pnpm build
         
       - name: Compress build artifacts
         run: |
