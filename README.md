@@ -101,7 +101,13 @@
 
 我们欢迎任何形式的贡献！您可以通过以下方式参与：
 1. 提交功能建议 → [新建Issue](https://github.com/The-Brotherhood-of-SCU/scu-plus/issues)
+
 2. 开发新功能 → Fork项目后提交Pull Request
+
+   > 1. 需要发布新版本时，只需创建并推送一个新标签（如 `git tag v1.0.1 && git push origin v1.0.1`）
+   > 2. GitHub Actions 会自动触发工作流，构建插件，压缩文件，并创建带有压缩包的 Release
+   > 3. 记得修改package.json的版本号再提交
+
 3. 文档改进 → 直接编辑README.md文件
 
 
