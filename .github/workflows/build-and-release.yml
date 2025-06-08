@@ -12,20 +12,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
+        
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: 'pnpm'
           
+      - name: Install pnpm
+        run: npm install -g pnpm
+        
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
         
       - name: Build plugin
-        run: npm run build
+        run: pnpm run build
         
       - name: Compress build artifacts
         run: |
