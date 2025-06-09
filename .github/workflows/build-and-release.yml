@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
     
     steps:
       - name: Checkout code
@@ -35,7 +35,7 @@ jobs:
         run: pnpm install
         
       - name: Build plugin
-        run: CI=false pnpm build
+        run: pnpm build
         
       - name: Compress build artifacts
         run: |
