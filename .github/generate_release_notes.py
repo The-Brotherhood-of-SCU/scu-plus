@@ -14,18 +14,21 @@ def filter(commit:str)->bool:
         return True
     return False
 
-powershell_path = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-
 def get_release_notes():
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     # 获取上一个tag
     try:
-        prev_tag = subprocess.check_output(
-            "git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1)",
-            shell=True, 
+        commit_id = subprocess.check_output(
+            "git rev-list --tags --skip=1 --max-count=1",
+            shell=True,
             text=True,
-            cwd=repo_root,
-            executable=powershell_path # cmd 会报错
+            cwd=repo_root
+        ).strip()
+        prev_tag = subprocess.check_output(
+            f"git describe --abbrev=0 --tags {commit_id}",
+            shell=True,
+            text=True,
+            cwd=repo_root
         ).strip()
     except subprocess.CalledProcessError as e:
         prev_tag = None

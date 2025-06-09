@@ -43,15 +43,15 @@ jobs:
         
       - name: Build plugin
         run: pnpm build --zip
-          
-      - name: Generate release notes
-        id: generate_notes
-        run: python .github/generate_release_notes.py
 
       - name: Set up Python 3
         uses: actions/setup-python@v3
         with:
           python-version: "3.12"
+
+      - name: Generate release notes
+        id: generate_notes
+        run: python .github/generate_release_notes.py
 
       - name: Create Release
         id: create_release
