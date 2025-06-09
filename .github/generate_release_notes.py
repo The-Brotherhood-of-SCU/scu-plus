@@ -63,7 +63,7 @@ def set_version_env():
 
     if "GITHUB_ENV" in os.environ:
         with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
-            f.write(f"title=v{version}\n")
+            f.write(f"title=scu+ {version}\n")
 
 if __name__ == "__main__":
     import sys

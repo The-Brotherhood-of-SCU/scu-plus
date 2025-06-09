@@ -31,13 +31,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Cache NPM dependencies
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-npm-cache
-          restore-keys: |
-            ${{ runner.OS }}-npm-cache
+      # - name: Cache NPM dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.OS }}-npm-cache
+      #     restore-keys: |
+      #       ${{ runner.OS }}-npm-cache
 
       - name: Install pnpm
         run: npm install -g pnpm@latest-10
@@ -55,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          release_name: Release ${{ env.title}}
           body: ${{ env.release_notes }}
           draft: false
           prerelease: false
