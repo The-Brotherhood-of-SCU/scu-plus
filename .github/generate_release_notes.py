@@ -9,7 +9,7 @@ def filter(commit:str)->bool:
     if lower in duplicated:
         return True
     duplicated.append(lower)
-    pattern="updates? \(.+?\)"
+    pattern=r"updates? \(.+?\)"
     if re.search(pattern,lower):
         return True
     return False
