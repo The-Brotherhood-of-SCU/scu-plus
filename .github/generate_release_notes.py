@@ -15,17 +15,22 @@ def filter(commit:str)->bool:
     return False
 
 def get_release_notes():
+    # 定义通用的subprocess参数
+    subprocess_kwargs = {
+        'shell': True,
+        'text': True,
+        'encoding': 'utf-8'
+    }
+    
     # 获取上一个tag
     try:
         commit_id = subprocess.check_output(
             "git rev-list --tags --skip=1 --max-count=1",
-            shell=True,
-            text=True,
+            **subprocess_kwargs
         ).strip()
         prev_tag = subprocess.check_output(
             f"git describe --abbrev=0 --tags {commit_id}",
-            shell=True,
-            text=True,
+            **subprocess_kwargs
         ).strip()
     except subprocess.CalledProcessError as e:
         prev_tag = None
@@ -36,12 +41,12 @@ def get_release_notes():
     if not prev_tag:
         notes = subprocess.check_output(
             "git log --pretty=format:\"- %s (%an)\" --no-merges",
-            shell=True, text=True
+            **subprocess_kwargs
         )
     else:
         notes = subprocess.check_output(
             f"git log {prev_tag}..HEAD --pretty=format:\"- %s (%an)\" --no-merges",
-            shell=True, text=True
+            **subprocess_kwargs
         )
     #filter "update"
     notes = "\n".join([note for note in notes.split("\n") if not filter(note)])
