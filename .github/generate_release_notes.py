@@ -15,20 +15,17 @@ def filter(commit:str)->bool:
     return False
 
 def get_release_notes():
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     # 获取上一个tag
     try:
         commit_id = subprocess.check_output(
             "git rev-list --tags --skip=1 --max-count=1",
             shell=True,
             text=True,
-            cwd=repo_root
         ).strip()
         prev_tag = subprocess.check_output(
             f"git describe --abbrev=0 --tags {commit_id}",
             shell=True,
             text=True,
-            cwd=repo_root
         ).strip()
     except subprocess.CalledProcessError as e:
         prev_tag = None
