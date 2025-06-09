@@ -35,7 +35,7 @@ jobs:
         run: pnpm install
         
       - name: Build plugin
-        run: pnpm build
+        run: CI=false pnpm build
         
       - name: Compress build artifacts
         run: |
