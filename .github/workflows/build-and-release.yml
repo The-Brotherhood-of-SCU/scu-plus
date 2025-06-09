@@ -12,10 +12,11 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+        run: |
+          git clone --branch=${{ github.ref_name }} https://github.com/${{ github.repository }}.git .
+          git fetch --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Set up Python 3
         uses: actions/setup-python@v3
