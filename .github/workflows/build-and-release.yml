@@ -35,13 +35,7 @@ jobs:
         run: pnpm install
         
       - name: Build plugin
-        run: pnpm build
-        
-      - name: Compress build artifacts
-        run: |
-          cd build
-          zip -r chrome-mv3-prod.zip chrome-mv3-prod/
-          cd ..
+        run: pnpm build --zip
           
       - name: Generate release notes
         id: generate_notes
