@@ -54,10 +54,16 @@ def get_release_notes():
     return f"### 主要更新\n\n{notes}"
 
 if __name__ == "__main__":
+    import sys
+    import io
+    
+    # Set stdout to use UTF-8 encoding
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    
     release_notes = get_release_notes()
     print(release_notes)
     if "GITHUB_ENV" in os.environ:
-        with open(os.environ["GITHUB_ENV"], "a") as f:
+        with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
             f.write(f"release_notes<<EOF\n{release_notes}\nEOF\n")
     else:
         print("GITHUB_ENV not found. Release notes not exported.")
