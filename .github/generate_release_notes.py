@@ -1,6 +1,7 @@
 import os
 import subprocess
 import re
+import json
 
 duplicated=[]
 
@@ -53,6 +54,17 @@ def get_release_notes():
     
     return f"### 主要更新\n\n{notes}"
 
+def set_version_env():
+    """从package.json读取版本号并设置到GitHub Actions环境变量env.title"""
+    with open('package.json', 'r', encoding='utf-8') as f:
+        version = json.load(f)['version']
+    
+    print(f"version: {version}")
+
+    if "GITHUB_ENV" in os.environ:
+        with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
+            f.write(f"title=v{version}\n")
+
 if __name__ == "__main__":
     import sys
     import io
@@ -62,6 +74,9 @@ if __name__ == "__main__":
     
     release_notes = get_release_notes()
     print(release_notes)
+    
+    set_version_env()
+    
     if "GITHUB_ENV" in os.environ:
         with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
             f.write(f"release_notes<<EOF\n{release_notes}\nEOF\n")
