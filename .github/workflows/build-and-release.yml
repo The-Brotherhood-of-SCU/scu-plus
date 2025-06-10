@@ -27,21 +27,15 @@ jobs:
         id: generate_notes
         run: python .github/generate_release_notes.py
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.11.0
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      # - name: Cache NPM dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.OS }}-npm-cache
-      #     restore-keys: |
-      #       ${{ runner.OS }}-npm-cache
-
-      - name: Install pnpm
-        run: npm install -g pnpm@latest-10
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
@@ -70,3 +64,15 @@ jobs:
           asset_path: ./build/chrome-mv3-prod.zip
           asset_name: chrome-mv3-prod.zip
           asset_content_type: application/zip
+
+
+      # 上面的版本即将废弃，以下发布release的版本存在bug，等待修复完成后替换
+      # - name: Release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     name: Release ${{ env.title}}
+      #     body: ${{ env.release_notes }}
+      #     files: ./build/chrome-mv3-prod.zip
+      #     draft: false
+      #     prerelease: false
