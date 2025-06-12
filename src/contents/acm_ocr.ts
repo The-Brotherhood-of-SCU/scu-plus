@@ -9,6 +9,9 @@ export const config: PlasmoCSConfig = {
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
 
+//OCR次数
+let ocr_counts = 0;
+
 (async () => {
     savedSettingsAsync = getSetting();
     savedSettings = await savedSettingsAsync;
@@ -22,6 +25,7 @@ window.addEventListener("load", () => {
             savedSettings = await savedSettingsAsync;
         }
         if (savedSettings.ocrProvider != "") {
+            ocr_counts++;
             process(savedSettings.ocrProvider, img, input);
         }
     }
@@ -34,12 +38,10 @@ window.addEventListener("load", () => {
 async function process(provider: string, img: HTMLImageElement, input: HTMLInputElement): Promise<void> {
     try {
         var result = await ocr_external(img, provider);
-        // 验证码识别问题，最多重试2次
-        for (let i = 0; i < 2; i++) {
-            if (result.length == 4) {
-                break;
-            }
-            img.click()
+        // 验证码识别问题，最多重试3次
+        if (result.length != 4 && ocr_counts<=3) {
+            ocr_counts++;
+            img.click();
         }
         console.log("ocr: " + result)
         input.value = result;

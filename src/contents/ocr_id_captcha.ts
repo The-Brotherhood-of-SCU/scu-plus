@@ -11,6 +11,9 @@ export const config: PlasmoCSConfig = {
 var img = document.getElementsByClassName("captcha-img")[0] as HTMLImageElement;
 var input = document.getElementsByClassName("ivu-input ivu-input-default")[2] as HTMLInputElement;
 
+//OCR次数
+let ocr_counts = 0;
+
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
 (async () => {
@@ -30,12 +33,10 @@ img.onload = async () => {
 async function process(provider: string): Promise<void> {
   try {
     var result = await ocr_external(img, provider);
-    // 验证码识别问题，最多重试2次
-    for(let i=0;i<2;i++){
-      if(result.length==4){
-        break;
-      }
-      img.click()
+    // 验证码识别问题，最多重试3次
+    if (result.length != 4 && ocr_counts <= 3) {
+      ocr_counts++;
+      img.click();
     }
     console.log("ocr: " + result)
     input.value = result;
