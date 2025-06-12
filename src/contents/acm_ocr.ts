@@ -4,8 +4,7 @@ import { ocr_external } from "~script/ocr_external";
 
 export const config: PlasmoCSConfig = {
     matches: ["*://acm.scu.edu.cn/teach/"],
-    all_frames: true,
-    run_at: "document_start"
+    run_at: "document_end",
 }
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
@@ -18,25 +17,30 @@ let savedSettingsAsync: Promise<SettingItem>;
 window.addEventListener("load", () => {
     const img = document.querySelector("#app > div > div > form > img") as HTMLImageElement
     const input = document.getElementsByClassName("el-input__inner")[2] as HTMLInputElement
-    const ocr=async()=>{
+    const ocrFunc = async () => {
         if (savedSettings == null) {
             savedSettings = await savedSettingsAsync;
         }
         if (savedSettings.ocrProvider != "") {
-            process(savedSettings.ocrProvider,img,input);
+            process(savedSettings.ocrProvider, img, input);
         }
     }
-    img.onload = ocr;
-    ocr()
-    
-
+    img.onload = ocrFunc
+    ocrFunc();
 })
 
 
 
-async function process(provider: string,img: HTMLImageElement,input:HTMLInputElement): Promise<void> {
+async function process(provider: string, img: HTMLImageElement, input: HTMLInputElement): Promise<void> {
     try {
         var result = await ocr_external(img, provider);
+        // 验证码识别问题，最多重试2次
+        for (let i = 0; i < 2; i++) {
+            if (result.length == 4) {
+                break;
+            }
+            img.click()
+        }
         console.log("ocr: " + result)
         input.value = result;
         input.dispatchEvent(new Event('input'));
