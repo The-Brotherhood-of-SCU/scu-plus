@@ -18,19 +18,21 @@ let ocr_counts = 0;
 })();
 
 window.addEventListener("load", () => {
-    const img = document.querySelector("#app > div > div > form > img") as HTMLImageElement
-    const input = document.getElementsByClassName("el-input__inner")[2] as HTMLInputElement
-    const ocrFunc = async () => {
-        if (savedSettings == null) {
-            savedSettings = await savedSettingsAsync;
+    setTimeout(() => {
+        const img = document.querySelector("#app > div > div > form > img") as HTMLImageElement
+        const input = document.getElementsByClassName("el-input__inner")[2] as HTMLInputElement
+        const ocrFunc = async () => {
+            if (savedSettings == null) {
+                savedSettings = await savedSettingsAsync;
+            }
+            if (savedSettings.ocrProvider != "") {
+                ocr_counts++;
+                process(savedSettings.ocrProvider, img, input);
+            }
         }
-        if (savedSettings.ocrProvider != "") {
-            ocr_counts++;
-            process(savedSettings.ocrProvider, img, input);
-        }
-    }
-    img.onload = ocrFunc
-    ocrFunc();
+        img.onload = ocrFunc
+        ocrFunc();
+    }, 1000);
 })
 
 
@@ -39,12 +41,12 @@ async function process(provider: string, img: HTMLImageElement, input: HTMLInput
     try {
         var result = await ocr_external(img, provider);
         // 验证码识别问题，最多重试3次
-        if (result.length != 4 && ocr_counts<=3) {
+        if (result.length != 4 && ocr_counts <= 3) {
             ocr_counts++;
             img.click();
             return;
         }
-        ocr_counts=0;
+        ocr_counts = 0;
         console.log("ocr: " + result)
         input.value = result;
         input.dispatchEvent(new Event('input'));
