@@ -37,7 +37,9 @@ async function process(provider: string): Promise<void> {
     if (result.length != 4 && ocr_counts <= 3) {
       ocr_counts++;
       img.click();
+      return;
     }
+    ocr_counts=0;
     console.log("ocr: " + result)
     input.value = result;
     input.dispatchEvent(new Event('input'));
