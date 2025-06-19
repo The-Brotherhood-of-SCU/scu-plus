@@ -128,3 +128,7 @@ A：浏览器扩展页面 → 移除插件。
 ## 📜 开源协议
 
 本项目基于 **[GPL-3.0 License](./LICENSE)** 开源，任何二次开发请保持开源且注明原始出处。
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=The-Brotherhood-of-SCU/scu-plus&type=Date)](https://www.star-history.com/#The-Brotherhood-of-SCU/scu-plus&Date)
