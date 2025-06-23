@@ -57,7 +57,7 @@ function getScoreRange(scoreValue: string) {
     if (scoreValue === "-999.999") return "未评教"
     try {
         let score = parseInt(scoreValue)
-        return scoreMapper[20 - score]
+        return scoreMapper[-20 - score]
     } catch (e) {
         console.log(e)
         return `RAW:${scoreValue}`
