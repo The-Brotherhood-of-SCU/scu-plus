@@ -187,40 +187,40 @@ const injectMenu = async () => {
 
   
   // 注入资源站
-  let res = document.createElement("li");
-  res.setAttribute('id', '1145142');
-  res.setAttribute('onclick', "rootMenuClick(this);");
-  res.innerHTML = `<a href="#" class="dropdown-toggle">
-                    <i class="menu-icon fa fa-book"></i>
-                    <span class="menu-text"> 学习资料emoji </span>
-                    <b class="arrow fa fa-angle-down"></b>
-                </a>
-                <b class="arrow"></b>
-                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
-                    <li class="hsub open">
-                        <a href="#" class="dropdown-toggle">
-                            <i class="menu-icon fa fa-caret-right"></i>
-                            学习资料
-                            <b class="arrow fa fa-angle-down"></b>
-                        </a>
-                        <b class="arrow"></b>
-                        <ul class="submenu" style="display: block;">
-                            <li class="" onclick="toSelect(this);">
-                                <a href="https://www.res.jeanhua.cn/" target="_blank">&nbsp;&nbsp;
-                                    学习资料下载
-                                </a>
-                                <b class="arrow"></b>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>`.replace('emoji', "🎯");
-  menus.appendChild(res);
-  console.log("注入资源站成功");
+  // let res = document.createElement("li");
+  // res.setAttribute('id', '1145142');
+  // res.setAttribute('onclick', "rootMenuClick(this);");
+  // res.innerHTML = `<a href="#" class="dropdown-toggle">
+  //                   <i class="menu-icon fa fa-book"></i>
+  //                   <span class="menu-text"> 学习资料emoji </span>
+  //                   <b class="arrow fa fa-angle-down"></b>
+  //               </a>
+  //               <b class="arrow"></b>
+  //               <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+  //                   <li class="hsub open">
+  //                       <a href="#" class="dropdown-toggle">
+  //                           <i class="menu-icon fa fa-caret-right"></i>
+  //                           学习资料
+  //                           <b class="arrow fa fa-angle-down"></b>
+  //                       </a>
+  //                       <b class="arrow"></b>
+  //                       <ul class="submenu" style="display: block;">
+  //                           <li class="" onclick="toSelect(this);">
+  //                               <a href="https://www.res.jeanhua.cn/" target="_blank">&nbsp;&nbsp;
+  //                                   学习资料下载
+  //                               </a>
+  //                               <b class="arrow"></b>
+  //                           </li>
+  //                       </ul>
+  //                   </li>
+  //               </ul>`.replace('emoji', "🎯");
+  // menus.appendChild(res);
+  // console.log("注入资源站成功");
 
   // 注入课程评分
   let course_score = document.createElement("li");
   course_score.setAttribute('id', '1145143');
-  res.setAttribute('onclick', "rootMenuClick(this);");
+  course_score.setAttribute('onclick', "rootMenuClick(this);");
   course_score.innerHTML = `<a href="#" class="dropdown-toggle">
                     <i class="menu-icon fa fa-check-square"></i>
                     <span class="menu-text"> 课程评分emoji </span>
@@ -238,7 +238,7 @@ const injectMenu = async () => {
                         <ul class="submenu" style="display: block;">
                             <li class="" onclick="toSelect(this);">
                                 <a>&nbsp;&nbsp;
-                                    课程评分统计
+                                    选课通
                                 </a>
                                 <b class="arrow"></b>
                             </li>
