@@ -27,7 +27,7 @@ function IndexPopup() {
         欢迎使用SCU+插件😘
       </h2>
       <HorizontalLine text="便捷操作" />
-      <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务处 (统一身份验证)</Button>
+      <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务系统 (统一身份验证)</Button>
 
       <HorizontalLine text="设置" />
 
