@@ -9,7 +9,7 @@
 
 > 🌈 为四川大学教务系统量身打造的浏览器插件，兼具高颜值设计与实用功能增强
 
-快速访问: &emsp; [如何安装](#浏览器扩展安装) &emsp; [常见问题解答](#-常见问题解答)
+快速访问: &emsp; [如何安装](#浏览器扩展安装) &emsp; [常见问题解答](#-常见问题解答) &emsp; [维基页面](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki)
 
 
 
@@ -84,6 +84,8 @@
 | 4. **加载插件** | 把ZIP包拖入扩展页面 → 确认安装 |
 
 **Note**：仅支持Chromium系浏览器（Chrome、Edge等），暂不支持FireFox
+
+如果您仍然不清楚，可以参考 [小白教程](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/%E5%AE%89%E8%A3%85)
 
 
 ## 🌟 高阶功能
