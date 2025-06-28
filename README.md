@@ -9,7 +9,7 @@
 
 > 🌈 为四川大学教务系统量身打造的浏览器插件，兼具高颜值设计与实用功能增强
 
-快速访问: &emsp; [如何安装](#浏览器扩展安装) &emsp; [常见问题解答](#-常见问题解答)
+快速访问: &emsp; [如何安装](#浏览器扩展安装) &emsp; [常见问题解答](#-常见问题解答) &emsp; [维基页面](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki)
 
 
 
@@ -85,6 +85,8 @@
 
 **Note**：仅支持Chromium系浏览器（Chrome、Edge等），暂不支持FireFox
 
+如果您仍然不清楚，可以参考 [小白教程](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/%E5%AE%89%E8%A3%85)
+
 
 ## 🌟 高阶功能
 
@@ -94,7 +96,7 @@
 | 自动OCR服务 | 自动识别并填充验证码 | 设置页 → 输入OCR服务提供者 （详情如下） |
 
 ### OCR服务配置（可选）
-如果要部署ocr服务，请前往**[OCR代码仓库](https://github.com/The-Brotherhood-of-SCU/scu-plus-ocr)**
+如果要部署ocr服务，请参考[相关维基](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/%E8%AE%BE%E7%BD%AE#ocr-%E9%85%8D%E7%BD%AE)
 
 
 ## 🤝 参与贡献
@@ -102,11 +104,7 @@
 我们欢迎任何形式的贡献！您可以通过以下方式参与：
 1. 提交功能建议 → [新建Issue](https://github.com/The-Brotherhood-of-SCU/scu-plus/issues)
 
-2. 开发新功能 → Fork项目后提交Pull Request
-
-   > 1. 需要发布新版本时，只需创建并推送一个新标签（如 `git tag v1.0.1 && git push origin v1.0.1`）
-   > 2. GitHub Actions 会自动触发工作流，构建插件，压缩文件，并创建带有压缩包的 Release
-   > 3. 记得修改package.json的版本号再提交
+2. 开发新功能 → 参考 [贡献手册](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/%E8%B4%A1%E7%8C%AE)
 
 3. 文档改进 → 直接编辑README.md文件
 
@@ -118,7 +116,7 @@
 A：用于自动识别统一认证登录的验证码，服务端代码已包含在`ocr_server`目录。
 
 **Q：插件数据会上传服务器吗？**  
-A：所有数据处理均在本地完成，不存在数据上传行为。
+A：所有数据处理均在本地完成，不存在数据上传行为（除了OCR服务）。
 
 **Q：如何彻底卸载插件？**  
 A：浏览器扩展页面 → 移除插件。

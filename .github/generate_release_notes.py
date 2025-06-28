@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # Set stdout to use UTF-8 encoding
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     
-    release_notes = get_release_notes()
+    release_notes = "请下载 chrome-mv3-prod.zip 文件\n\n"+get_release_notes()
     print(release_notes)
     
     set_version_env()
