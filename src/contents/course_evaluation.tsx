@@ -2,7 +2,7 @@ import type { PlasmoCSConfig } from "plasmo"
 import { Button, Input, message, notification } from "antd"
 import { xpath_query, randomInt } from "~script/utils"
 import ReactDOM from "react-dom/client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import type { NotificationArgsProps } from 'antd';
 
 
@@ -72,6 +72,17 @@ function Controller() {
     const [minscore, set_minscore] = useState(80)
     const [maxscore, set_maxscore] = useState(100)
     const [api, contextHolder] = notification.useNotification();
+    useEffect(()=>{
+        let evaluation_score_range = localStorage.getItem("evaluation_score_range");
+        if(evaluation_score_range.includes(":")){
+            let score1 = parseInt(evaluation_score_range.split[":"][0]??"80");
+            let score2 = parseInt(evaluation_score_range.split[":"][1]??"100");
+            if(score1<=score2&&score1>=0&&score2<=100){
+                set_minscore(score1);
+                set_maxscore(score2);
+            }
+        }
+    },[])
     const openNotification = (placement: NotificationPlacement) => {
         api.info({
             message: `提示`,
@@ -84,6 +95,7 @@ function Controller() {
         if (minscore > maxscore || minscore < 0 || minscore > 100 || maxscore < 0 || maxscore > 100) {
             openNotification('top')
         } else {
+            localStorage.setItem("evaluation_score_range",minscore.toString()+":"+maxscore.toString())
             do_it(minscore, maxscore)
         }
     }
