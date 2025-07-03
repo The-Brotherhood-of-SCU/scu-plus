@@ -20,50 +20,126 @@ window.addEventListener("load", () => {
         e.appendChild(div)
         const root = ReactDOM.createRoot(div)
         root.render(<Controller />)
-        do_it(80,100)
+        do_it(80, 100)
         setInterval(() => {
             let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
-            if(commitBtn.disabled==false){
+            if (commitBtn.disabled == false) {
                 commitBtn.click();
             }
         }, 1000);
     });
-    let isRunningEvaluation = localStorage.getItem("isRunningEvaluation")=="true";
-    xpath_query('//*[@id="home"]/div/div/h4/span',(e)=>{
-        let btn = document.createElement("button")
-        btn.innerText =isRunningEvaluation? "🎯暂停评教": "🎯一键评教";
-        btn.onclick = ()=> RunningEvaluation(!isRunningEvaluation);
+    let isRunningEvaluation = localStorage.getItem("isRunningEvaluation") == "true";
+    xpath_query('//*[@id="home"]/div/div/h4/span', (e) => {
+        injectBtnStyle()
+        let btn = document.createElement("button");
+        btn.className = 'scu-plus-button';
+        btn.innerText = isRunningEvaluation ? "🎯暂停评教" : "🎯一键评教";
+        btn.onclick = () => RunningEvaluation(!isRunningEvaluation);
         e.appendChild(btn);
         RunningEvaluation(isRunningEvaluation);
     })
 })
 
+function injectBtnStyle() {
+    let styleSheet = document.createElement("style");
+    styleSheet.innerHTML = `
+        .scu-plus-button {
+            display: inline-block !important;
+            padding: 6px 12px !important;
+            font-family: 'Arial', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+            color: #ffffff !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            text-transform: none !important;
+            letter-spacing: 0.5px !important;
+            background-color: #4a6bff !important;
+            border: 2px solid transparent !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
 
-function RunningEvaluation(run:boolean){
-    if(run){
-        localStorage.setItem("isRunningEvaluation","true")
+        .scu-plus-button:hover {
+            background-color: #3a5bef !important;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .scu-plus-button:active {
+            background-color: #2a4bdf !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+            transform: translateY(0) !important;
+        }
+
+        .scu-plus-button:focus {
+            outline: none !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .scu-plus-button::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 5px !important;
+            height: 5px !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+            opacity: 0 !important;
+            border-radius: 100% !important;
+            transform: scale(1, 1) translate(-50%, -50%) !important;
+            transform-origin: 50% 50% !important;
+        }
+
+        .scu-plus-button:focus:not(:active)::after {
+            animation: ripple 1s ease-out !important;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0) translate(-50%, -50%) !important;
+                opacity: 0.5 !important;
+            }
+            100% {
+                transform: scale(20, 20) translate(-50%, -50%) !important;
+                opacity: 0 !important;
+            }
+        }
+    `
+    document.head.appendChild(styleSheet);
+}
+
+
+function RunningEvaluation(run: boolean) {
+    if (run) {
+        localStorage.setItem("isRunningEvaluation", "true")
         message.info("正在进行自动评教，3s后跳转")
         setTimeout(() => {
-            if(localStorage.getItem("isRunningEvaluation")!=="true"){
+            if (localStorage.getItem("isRunningEvaluation") !== "true") {
                 return;
             }
             let table = document.querySelector('#codeTable') as HTMLTableElement;
             let hasMore = false;
-            for(let row of table.rows){
+            for (let row of table.rows) {
                 let btn = row.querySelector('button') as HTMLButtonElement;
-                if(btn==null)continue;
-                if(btn.innerText=='评估'){
+                if (btn == null) continue;
+                if (btn.innerText == '评估') {
                     hasMore = true;
                     btn.click();
                 }
             }
-            if(hasMore==false){
+            if (hasMore == false) {
                 message.info("已经全部评教完成！");
                 RunningEvaluation(false)
             }
         }, 3000);
-    }else{
-        localStorage.setItem("isRunningEvaluation","false")
+    } else {
+        localStorage.setItem("isRunningEvaluation", "false")
         message.info("已暂停自动评教")
     }
 }
@@ -72,17 +148,17 @@ function Controller() {
     const [minscore, set_minscore] = useState(80)
     const [maxscore, set_maxscore] = useState(100)
     const [api, contextHolder] = notification.useNotification();
-    useEffect(()=>{
+    useEffect(() => {
         let evaluation_score_range = localStorage.getItem("evaluation_score_range");
-        if(evaluation_score_range.includes(":")){
-            let score1 = parseInt(evaluation_score_range.split[":"][0]??"80");
-            let score2 = parseInt(evaluation_score_range.split[":"][1]??"100");
-            if(score1<=score2&&score1>=0&&score2<=100){
+        if (evaluation_score_range.includes(":")) {
+            let score1 = parseInt(evaluation_score_range.split[":"][0] ?? "80");
+            let score2 = parseInt(evaluation_score_range.split[":"][1] ?? "100");
+            if (score1 <= score2 && score1 >= 0 && score2 <= 100) {
                 set_minscore(score1);
                 set_maxscore(score2);
             }
         }
-    },[])
+    }, [])
     const openNotification = (placement: NotificationPlacement) => {
         api.info({
             message: `提示`,
@@ -95,7 +171,7 @@ function Controller() {
         if (minscore > maxscore || minscore < 0 || minscore > 100 || maxscore < 0 || maxscore > 100) {
             openNotification('top')
         } else {
-            localStorage.setItem("evaluation_score_range",minscore.toString()+":"+maxscore.toString())
+            localStorage.setItem("evaluation_score_range", minscore.toString() + ":" + maxscore.toString())
             do_it(minscore, maxscore)
         }
     }
@@ -180,8 +256,8 @@ function do_it(min: number, max: number) {
             "感谢老师的辛勤付出，这是一门值得推荐的好课！"
         ];
         let textInputs = document.querySelectorAll("textarea");
-        for(let inp of textInputs){
-            inp.value = answers[randomInt(0,answers.length-1)];
+        for (let inp of textInputs) {
+            inp.value = answers[randomInt(0, answers.length - 1)];
         }
     }
 

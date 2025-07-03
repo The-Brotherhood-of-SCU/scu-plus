@@ -123,7 +123,6 @@ const beautify = () => {
   $("#page-content-template", (widgetBox) => {
     widgetBox.style.borderRadius = "20px";
     widgetBox.style.border = `2px solid #96e6a1`;
-    widgetBox.style.overflow = "hidden";
     widgetBox.style.backgroundColor = savedSettings.beautifyColor || '#caeae3';
     widgetBox.style.minHeight = "80vh";
     widgetBox.style.margin = "15px";
@@ -184,38 +183,6 @@ const injectMenu = async () => {
                 </ul>`.replace('emoji', "🎯");
   menus.appendChild(peiyang);
   console.log("注入培养方案按钮成功");
-
-  
-  // 注入资源站
-  // let res = document.createElement("li");
-  // res.setAttribute('id', '1145142');
-  // res.setAttribute('onclick', "rootMenuClick(this);");
-  // res.innerHTML = `<a href="#" class="dropdown-toggle">
-  //                   <i class="menu-icon fa fa-book"></i>
-  //                   <span class="menu-text"> 学习资料emoji </span>
-  //                   <b class="arrow fa fa-angle-down"></b>
-  //               </a>
-  //               <b class="arrow"></b>
-  //               <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
-  //                   <li class="hsub open">
-  //                       <a href="#" class="dropdown-toggle">
-  //                           <i class="menu-icon fa fa-caret-right"></i>
-  //                           学习资料
-  //                           <b class="arrow fa fa-angle-down"></b>
-  //                       </a>
-  //                       <b class="arrow"></b>
-  //                       <ul class="submenu" style="display: block;">
-  //                           <li class="" onclick="toSelect(this);">
-  //                               <a href="https://www.res.jeanhua.cn/" target="_blank">&nbsp;&nbsp;
-  //                                   学习资料下载
-  //                               </a>
-  //                               <b class="arrow"></b>
-  //                           </li>
-  //                       </ul>
-  //                   </li>
-  //               </ul>`.replace('emoji', "🎯");
-  // menus.appendChild(res);
-  // console.log("注入资源站成功");
 
   // 注入课程评分
   let course_score = document.createElement("li");
