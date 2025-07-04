@@ -1,6 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { $,downloadCanvas } from "~script/utils";
-import html2canvas from 'html2canvas';
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -63,9 +62,12 @@ const injectExportFunc = ()=>{
         btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji',"🎯");
         e.appendChild(btn);
         btn.addEventListener('click',()=>{
-            html2canvas(document.getElementById('mycoursetable')).then((canvas)=>{
-                downloadCanvas(canvas,'课程表.png',"image/png",1.0);
-            });
+            let cources = document.getElementsByClassName("class_div") as HTMLCollectionOf<HTMLElement>;
+            for(let c of cources){
+                c.style.transform = `translate(-15px, 0px)`;
+            }
+            let canvas = document.getElementById('courseTable') as HTMLElement;
+            downloadCanvas(canvas,'课程表',1);
         });
     });
     $("#mainDIV > h4:nth-child(3)",(e)=>{
@@ -74,9 +76,12 @@ const injectExportFunc = ()=>{
         btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji',"🎯");
         e.appendChild(btn);
         btn.addEventListener('click',()=>{
-            html2canvas(document.getElementById('mycoursetable')).then((canvas)=>{
-                downloadCanvas(canvas,'课程表.png',"image/png",1.0);
-            });
+            let cources = document.getElementsByClassName("class_div") as HTMLCollectionOf<HTMLElement>;
+            for(let c of cources){
+                c.style.transform = `translate(-15px, 20px)`;
+            }
+            let canvas = document.getElementById('courseTable') as HTMLElement;
+            downloadCanvas(canvas,'课程表',1);
         });
     })
 }
