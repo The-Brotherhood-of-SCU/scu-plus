@@ -293,12 +293,12 @@ function SearchPage({
                     setHasMore(result.data.length == 15);
                 }
             } else {
-                message.error(result.msg || "搜索失败");
+                message.error(result.msg ?? "搜索失败");
                 if (reset) setData([]);
                 setHasMore(false);
             }
         } catch (err) {
-            message.error("网络请求失败");
+            message.error("无法连接到服务器，可能是系统正在维护，请稍后再试");
             console.error(err);
         } finally {
             setLoading(false);

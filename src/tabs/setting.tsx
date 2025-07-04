@@ -179,6 +179,7 @@ function DataSettingFragment() {
             <Form.Item
               label="头像来源"
               name="avatarInfo"
+              tooltip="如果选择URL,则在此输入头像链接; 如果选择QQ, 则在此输入QQ号"
             >
               <Input placeholder={setting.avatarSource == "qq" ? "输入QQ号" : "头像URL地址"} />
             </Form.Item>
@@ -227,6 +228,7 @@ function DataSettingFragment() {
         <Form.Item
           label="输入OCR服务提供者"
           name="ocrProvider"
+          tooltip="输入OCR接口后将用于在登陆时自动输入验证码，建议和下面将 '四川大学教务管理系统登录' 重定向到 '统一登陆' 功能一起使用"
         >
           <Input placeholder="eg. https://example.com/ocr" />
         </Form.Item>
