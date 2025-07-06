@@ -127,6 +127,19 @@ const beautify = () => {
     widgetBox.style.minHeight = "80vh";
     widgetBox.style.margin = "15px";
   });
+
+  for (const sheet of document.styleSheets) {
+        try {
+            for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
+                const rule = sheet.cssRules[i] as any;
+                if (rule.selectorText === '.green_background') {
+                    sheet.deleteRule(i);
+                }
+            }
+        } catch (e) {
+            console.warn('无法访问样式表', sheet.href);
+        }
+    }
 }
 
 function sleep(ms) {
