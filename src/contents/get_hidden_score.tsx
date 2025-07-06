@@ -121,7 +121,13 @@ function generateInnerHtml(list: any[]): string {
             tContent += "<td></td><td></td>";
         }
         tContent += `<td>${v.englishCourseName}</td>`;
-        tContent += `<td>${getScoreRange(v.levlePoint)}</td><td>${v.inputStatusExplain}</td>`;
+        let range_text = getScoreRange(v.levlePoint)
+        if(v.levlePoint==="-30"&&v.inputStatusExplain==="确定"){
+            range_text="不及格"
+        }else if(v.inputStatusExplain==="确定"){
+            range_text = v.courseScore
+        }
+        tContent += `<td>${range_text}</td><td>${v.inputStatusExplain}</td>`;
         tContent += "</tr>";
     });
     return tContent;
