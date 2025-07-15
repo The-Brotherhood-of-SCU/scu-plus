@@ -5,7 +5,7 @@ import { createSecondPageElement } from "~script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "http://zhjw.scu.edu.cn/student/courseSelect/quitCourse/*",
+        "https://zhjw.scu.edu.cn/student/courseSelect/quitCourse/*",
     ],
     all_frames: true,
 }

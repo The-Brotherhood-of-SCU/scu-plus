@@ -8,12 +8,12 @@ import package_config from "../../package.json"
 
 export const config: PlasmoCSConfig = {
   matches: [
-    "http://zhjw.scu.edu.cn/*",
+    "https://zhjw.scu.edu.cn/*",
   ],
   all_frames: true
 }
 
-const {confirm} = Modal
+const { confirm } = Modal
 
 let savedSettings: SettingItem;
 let savedSettingsAsync: Promise<SettingItem>;
@@ -64,15 +64,15 @@ window.addEventListener("load", async () => {
   if (savedSettings.failedCourseCustomText != "" && savedSettings.failedCourseCustomText) {
     customText("#coursePas", savedSettings.failedCourseCustomText);
   }
-  if(savedSettings.showHotPostSwitch){
-    console.log("注入热帖");  
+  if (savedSettings.showHotPostSwitch) {
+    console.log("注入热帖");
     injectHotPost();
   }
 })
 const customText = (id: string, text: string) => {
   $(id, (e) => {
     e.innerText = text;
-    e.setAttribute("id",id+"_changed");
+    e.setAttribute("id", id + "_changed");
     console.log(`修改${id}文本成功`);
   })
 }
@@ -86,7 +86,7 @@ const navBarinject = () => {
     navBar.style.borderRadius = "4px";
     $("#navbar-container > div.navbar-header.pull-left > a > small", (title) => {
       title.style.color = "black";
-      title.innerText = "四川大学教务管理系统(SCU+ v{version})🎯".replace("{version}",package_config.version);
+      title.innerText = "四川大学教务管理系统(SCU+ v{version})🎯".replace("{version}", package_config.version);
     });
     if (savedSettings.nameHideSwitch) {
       $("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.light-blue > a > span", (e) => e.innerHTML = `
@@ -129,17 +129,17 @@ const beautify = () => {
   });
 
   for (const sheet of document.styleSheets) {
-        try {
-            for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
-                const rule = sheet.cssRules[i] as any;
-                if (rule.selectorText === '.green_background') {
-                    sheet.deleteRule(i);
-                }
-            }
-        } catch (e) {
-            console.warn('无法访问样式表', sheet.href);
+    try {
+      for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
+        const rule = sheet.cssRules[i] as any;
+        if (rule.selectorText === '.green_background' || rule.selectorText === '.red_background') {
+          sheet.deleteRule(i);
         }
+      }
+    } catch (e) {
+      console.warn('无法访问样式表', sheet.href);
     }
+  }
 }
 
 function sleep(ms) {
@@ -157,14 +157,14 @@ const injectMenu = async () => {
   xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
   //xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期课表🎯');
-  xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML = e.innerHTML.replace('本学期课表','本学期课表🎯'));
-  xpath_query('//*[@id="1002000000"]/a/span',(e)=>e.innerText+='🎯');//选课管理
-  xpath_query('//*[@id="1007001005"]/a',(e)=>e.innerHTML=e.innerHTML.replace('本学期成绩','本学期成绩🎯'));
-  xpath_query('//*[@id="1002001003"]/a',(e)=>e.innerHTML=e.innerHTML.replace('选课结果','选课结果🎯'));
-  xpath_query('//*[@id="1002001004"]/a',(e)=>e.innerHTML=e.innerHTML.replace('退课','退课🎯'));
-  xpath_query('//*[@id="1002002002"]/a',(e)=>e.innerHTML= e.innerHTML.replace('历年学期课表','历年学期课表🎯'));
-  xpath_query('//*[@id="1003000000"]/a/span',(e)=>e.innerHTML= e.innerHTML.replace('教师课堂评价','教师课堂评价🎯'));
-  xpath_query('//*[@id="1003001002"]/a',(e)=>e.innerHTML= e.innerHTML.replace('教学评估','教学评估🎯'))
+  xpath_query('//*[@id="1002002001"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期课表', '本学期课表🎯'));
+  xpath_query('//*[@id="1002000000"]/a/span', (e) => e.innerText += '🎯');//选课管理
+  xpath_query('//*[@id="1007001005"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期成绩', '本学期成绩🎯'));
+  xpath_query('//*[@id="1002001003"]/a', (e) => e.innerHTML = e.innerHTML.replace('选课结果', '选课结果🎯'));
+  xpath_query('//*[@id="1002001004"]/a', (e) => e.innerHTML = e.innerHTML.replace('退课', '退课🎯'));
+  xpath_query('//*[@id="1002002002"]/a', (e) => e.innerHTML = e.innerHTML.replace('历年学期课表', '历年学期课表🎯'));
+  xpath_query('//*[@id="1003000000"]/a/span', (e) => e.innerHTML = e.innerHTML.replace('教师课堂评价', '教师课堂评价🎯'));
+  xpath_query('//*[@id="1003001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('教学评估', '教学评估🎯'))
   // 插入培养方案查看
   let menus = document.querySelector("#menus") as HTMLElement;
   let peiyang = document.createElement("li");
@@ -186,7 +186,7 @@ const injectMenu = async () => {
                         <b class="arrow"></b>
                         <ul class="submenu" style="display: block;">
                             <li class="" onclick="toSelect(this);">
-                                <a href="http://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index">&nbsp;&nbsp;
+                                <a href="https://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index">&nbsp;&nbsp;
                                     培养方案查看
                                 </a>
                                 <b class="arrow"></b>
@@ -275,20 +275,20 @@ const injectMenu = async () => {
                 </ul>
                 `.replace('emoji', "🎯");
   (settingsBtn.querySelector("#settingsBtn") as HTMLElement).onclick = () => chrome.runtime.sendMessage({ action: 'open-settings' });
-  (settingsBtn.querySelector("#checkVersionBtn") as HTMLElement).onclick = ()=>{
-    checkVersion().then(result=>{
-      if(result==UpdateCheckResult.NEW_VERSION_AVAILABLE){
+  (settingsBtn.querySelector("#checkVersionBtn") as HTMLElement).onclick = () => {
+    checkVersion().then(result => {
+      if (result == UpdateCheckResult.NEW_VERSION_AVAILABLE) {
         confirm({
-          title:"获取到新版本，是否调整下载？",
-          okText:"确定",
-          cancelText:"取消",
-          onOk:()=>window.open(package_config.download)
+          title: "获取到新版本，是否调整下载？",
+          okText: "确定",
+          cancelText: "取消",
+          onOk: () => window.open(package_config.download)
         })
-      }else if(result==UpdateCheckResult.UP_TP_DATE){
+      } else if (result == UpdateCheckResult.UP_TP_DATE) {
         message.info("已经是最新版本了")
-      }else if(result==UpdateCheckResult.NETWORK_ERROR){
+      } else if (result == UpdateCheckResult.NETWORK_ERROR) {
         message.error("网络错误连接，请检查网络是否正常")
-      }else{
+      } else {
         message.error("检查更新失败，请稍后再试")
       }
     })

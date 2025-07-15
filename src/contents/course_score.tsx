@@ -13,7 +13,7 @@ export default () => <></>
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "http://zhjw.scu.edu.cn/*",
+        "https://zhjw.scu.edu.cn/*",
     ],
     all_frames: true
 }

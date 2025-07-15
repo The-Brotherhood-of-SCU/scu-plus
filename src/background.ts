@@ -46,7 +46,7 @@ async function updateAvatarRedirectRules(redirectUrl) {
             }
         },
         condition: {
-            urlFilter: 'http://zhjw.scu.edu.cn/main/queryStudent/img',
+            urlFilter: 'https://zhjw.scu.edu.cn/main/queryStudent/img',
             resourceTypes: ['image']
         }
     },
@@ -60,7 +60,7 @@ async function updateAvatarRedirectRules(redirectUrl) {
             }
         },
         condition: {
-            urlFilter: 'http://zhjw.scu.edu.cn/img/head/man.png',
+            urlFilter: 'https://zhjw.scu.edu.cn/img/head/man.png',
             resourceTypes: ['image']
         }
     },
@@ -74,7 +74,7 @@ async function updateAvatarRedirectRules(redirectUrl) {
             }
         },
         condition: {
-            urlFilter: 'http://zhjw.scu.edu.cn/img/head/woman.png',
+            urlFilter: 'https://zhjw.scu.edu.cn/img/head/woman.png',
             resourceTypes: ['image']
         }
     },
@@ -88,7 +88,7 @@ async function updateAvatarRedirectRules(redirectUrl) {
             }
         },
         condition: {
-            urlFilter: 'http://zhjw.scu.edu.cn/student/rollInfo/img',
+            urlFilter: 'https://zhjw.scu.edu.cn/student/rollInfo/img',
             resourceTypes: ['image']
         }
     }
