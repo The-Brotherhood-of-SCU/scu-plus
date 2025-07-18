@@ -8,7 +8,7 @@ import package_config from "../../package.json"
 
 export const config: PlasmoCSConfig = {
   matches: [
-    "https://zhjw.scu.edu.cn/*",
+    "*://zhjw.scu.edu.cn/*",
   ],
   all_frames: true
 }
@@ -186,7 +186,7 @@ const injectMenu = async () => {
                         <b class="arrow"></b>
                         <ul class="submenu" style="display: block;">
                             <li class="" onclick="toSelect(this);">
-                                <a href="https://zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index">&nbsp;&nbsp;
+                                <a href="*://zhjw.scu.edu.cn/*student/comprehensiveQuery/search/trainProgram/index">&nbsp;&nbsp;
                                     培养方案查看
                                 </a>
                                 <b class="arrow"></b>

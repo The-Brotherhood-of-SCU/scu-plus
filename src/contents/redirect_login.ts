@@ -1,11 +1,11 @@
-//将https://zhjw.scu.edu.cn/login重定向到川大统一登陆
+//将*://zhjw.scu.edu.cn/*login重定向到川大统一登陆
 
 import type { PlasmoCSConfig } from "plasmo";
 import { getSetting } from "~script/config";
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "https://zhjw.scu.edu.cn/login*",
+        "*://zhjw.scu.edu.cn/*login*",
     ],
     run_at: "document_start",
     all_frames: true

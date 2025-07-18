@@ -6,7 +6,7 @@ import React from "react";
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "https://zhjw.scu.edu.cn/student/integratedQuery/scoreQuery/thisTermScores/*",
+        "*://zhjw.scu.edu.cn/*student/integratedQuery/scoreQuery/thisTermScores/*",
     ],
     all_frames: true,
 }
@@ -34,7 +34,7 @@ async function get_hidden_score() {
         }
     }
     if (match) {
-        const firstMatch = `https://zhjw.scu.edu.cn/${match.toString()}`;
+        const firstMatch = `*://zhjw.scu.edu.cn/*${match.toString()}`;
         console.log(`get score url: ${firstMatch}`);
         const data = await (await fetch(firstMatch)).json();
         console.log("获取成绩数据成功");

@@ -9,7 +9,7 @@ import type { NotificationArgsProps } from 'antd';
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "https://zhjw.scu.edu.cn/student/teachingEvaluation/newEvaluation/*"
+        "*://zhjw.scu.edu.cn/*student/teachingEvaluation/newEvaluation/*"
     ],
     all_frames: true
 }

@@ -3,9 +3,9 @@ import { $,downloadCanvas } from "~script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: [
-        "https://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/*",
-        "https://zhjw.scu.edu.cn/student/courseSelect/courseSelectResult/*",
-        "https://zhjw.scu.edu.cn/student/courseSelect/calendarSemesterCurriculum/*"
+        "*://zhjw.scu.edu.cn/*student/courseSelect/thisSemesterCurriculum/*",
+        "*://zhjw.scu.edu.cn/*student/courseSelect/courseSelectResult/*",
+        "*://zhjw.scu.edu.cn/*student/courseSelect/calendarSemesterCurriculum/*"
     ],
     all_frames: true
 }

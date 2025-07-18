@@ -29,7 +29,7 @@ Chart.register(
 );
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://zhjw.scu.edu.cn/student/integratedQuery/scoreQuery/schemeScores/*"],
+  matches: ["*://zhjw.scu.edu.cn/*student/integratedQuery/scoreQuery/schemeScores/*"],
   all_frames: true
 };
 
