@@ -205,7 +205,7 @@ function do_it(min: number, max: number) {
     for (let row of body.rows) {
         // 单选
         let inputs = row.querySelectorAll("input");
-        let randomScore = ["A_", "B_", "C_"][randomInt(0, inputs.length-2)]; //排除最后一个选项
+        let randomScore = ["A_", "B_", "C_","D_"][randomInt(0, inputs.length-2)]; //排除最后一个选项
         for (let input of inputs) {
             if (input.type == "radio") {
                 if (input.value.startsWith(randomScore)) {
