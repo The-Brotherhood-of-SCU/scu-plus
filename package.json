@@ -1,47 +1,47 @@
 {
-  "name": "scu-plus",
-  "displayName": "Scu plus",
-  "version": "1.3.9",
-  "description": "四川大学教务系统增强插件",
-  "author": "jeanhua",
-  "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
-  "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
-  "scripts": {
-    "dev": "plasmo dev",
-    "build": "plasmo build",
-    "package": "plasmo package"
-  },
-  "dependencies": {
-    "@ant-design/charts": "^2.3.0",
-    "@ant-design/icons": "^6.0.0",
-    "@plasmohq/storage": "^1.15.0",
-    "@zumer/snapdom": "^1.8.0",
-    "antd": "^5.24.2",
-    "chart.js": "^4.4.8",
-    "chartjs-plugin-annotation": "^3.1.0",
-    "decimal.js": "^10.5.0",
-    "plasmo": "0.90.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
-    "@types/chrome": "0.0.258",
-    "@types/react": "18.2.48",
-    "@types/react-dom": "18.2.18",
-    "prettier": "3.2.4",
-    "typescript": "5.3.3"
-  },
-  "manifest": {
-    "host_permissions": [
-      "https://*/*",
-      "http://*/*"
-    ],
-    "permissions": [
-      "scripting",
-      "storage",
-      "nativeMessaging",
-      "declarativeNetRequestWithHostAccess"
-    ]
-  }
+    "name": "scu-plus",
+    "displayName": "Scu plus",
+    "version": "1.3.9",
+    "description": "四川大学教务系统增强插件",
+    "author": "jeanhua",
+    "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
+    "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
+    "scripts": {
+        "dev": "plasmo dev",
+        "build": "plasmo build",
+        "package": "plasmo package"
+    },
+    "dependencies": {
+        "@ant-design/charts": "^2.3.0",
+        "@ant-design/icons": "^6.0.0",
+        "@plasmohq/storage": "^1.15.0",
+        "@zumer/snapdom": "^1.8.0",
+        "antd": "^5.24.2",
+        "chart.js": "^4.4.8",
+        "chartjs-plugin-annotation": "^3.1.0",
+        "decimal.js": "^10.5.0",
+        "plasmo": "0.90.5",
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+    },
+    "devDependencies": {
+        "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+        "@types/chrome": "0.0.258",
+        "@types/react": "18.2.48",
+        "@types/react-dom": "18.2.18",
+        "prettier": "3.2.4",
+        "typescript": "5.3.3"
+    },
+    "manifest": {
+        "host_permissions": [
+            "https://*/*",
+            "http://*/*"
+        ],
+        "permissions": [
+            "scripting",
+            "storage",
+            "nativeMessaging",
+            "declarativeNetRequestWithHostAccess"
+        ]
+    }
 }
