@@ -76,6 +76,12 @@ def commit_changes(new_version:str):
     print("提交更改...")
     try:
         subprocess.run(
+            ['git', 'add', '.'],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        subprocess.run(
             ['git', 'commit', '-m', f'update version code to {new_version}'],
             check=True,
             capture_output=True,
