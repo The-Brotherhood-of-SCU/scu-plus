@@ -94,11 +94,17 @@ def commit_changes(new_version:str):
         else:
             print(f"提交失败: {e.stderr}")
             raise
+def push_remote():
+    print(f"推送 main 分支到 {remote}...")
+    subprocess.run(
+        ['git', 'push', remote, 'main'],
+        check=True
+    )
 
 def create_tag(tag_name:str):
     print(f"创建tag {tag_name}...")
     subprocess.run(
-        ['git', 'tag', tag_name],
+        ['git', 'tag', tag_name, 'main'],
         check=True
     )
 
@@ -161,4 +167,5 @@ with open('package.json', 'w', encoding='utf-8') as f:
 
 commit_changes(new_version)
 create_tag(tag_name)
+push_remote()
 push_tag(remote,tag_name)
