@@ -89,7 +89,7 @@ def commit_changes(new_version:str):
         )
         print("提交成功")
     except subprocess.CalledProcessError as e:
-        if "nothing to commit" in e.stderr:
+        if "nothing to commit" in e.stdout:
             print("没有需要提交的更改，跳过提交")
         else:
             print(f"提交失败: {e.stderr}")
