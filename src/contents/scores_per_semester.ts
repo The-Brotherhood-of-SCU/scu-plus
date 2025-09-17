@@ -15,8 +15,9 @@ window.addEventListener("load", () => {
         for(let i=0;i<=result.length;i++){
             $(`#tab${i+1} > h4`,e=>{
                 let container = document.createElement('div')
-                container.innerHTML += "🎯"+`<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`
+                container.innerHTML += "emoji"+`<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`
                 container.innerHTML += `<span class="label label-grey" style="border-radius: 10px;"><font style="color:black;">必修成绩:${result[i].score.average_comp.toFixed(2)}</font></span>`
+                container.innerHTML = container.innerHTML.replace("emoji","🎯")
                 e.appendChild(container)
             })
         }
