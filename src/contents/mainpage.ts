@@ -157,6 +157,7 @@ const injectMenu = async () => {
   xpath_query(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "🎯" })
   document.getElementById("1007001003").children[0].innerHTML = document.getElementById("1007001003").children[0].innerHTML.replace("方案成绩", "方案成绩🎯");
   //xpath_query('//*[@id="1002002001"]/a',(e)=>e.innerHTML='&nbsp;&nbsp;本学期课表🎯');
+  xpath_query('//*[@id="1007001001"]/a',e=>e.innerHTML = e.innerHTML.replace('全部及格成绩', '全部及格成绩🎯'))
   xpath_query('//*[@id="1002002001"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期课表', '本学期课表🎯'));
   xpath_query('//*[@id="1002000000"]/a/span', (e) => e.innerText += '🎯');//选课管理
   xpath_query('//*[@id="1007001005"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期成绩', '本学期成绩🎯'));

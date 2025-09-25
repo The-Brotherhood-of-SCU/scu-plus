@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { checkVersion, UpdateCheckResult } from "src/script/utils"
 import packagejson from "package.json"
-import { Button } from 'antd';
+import { Button, Divider } from 'antd';
 import "style.css"
 
 const login_link = "https://id.scu.edu.cn/enduser/sp/sso/scdxplugin_jwt23?enterpriseId=scdx&target_url=index"
@@ -28,6 +28,8 @@ function IndexPopup() {
       </h2>
       <HorizontalLine text="便捷操作" />
       <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务系统 (统一身份验证)</Button>
+      <Divider style={{height:"5px", padding:"0",margin:"0"}} />
+      <Button onClick={() => openLink("http://192.168.2.135")} type="primary" style={{backgroundColor:"yellowgreen"}}> 校园网快捷登陆 </Button>
 
       <HorizontalLine text="设置" />
 

@@ -87,8 +87,10 @@ function doReplace(data: any) {
         header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计emoji</th><th>成绩状态emoji</th></tr>".replaceAll('emoji', "🎯");
     })
     const body = document.getElementById("scoretbody")
+    if(body==null)return
     body.setAttribute("id", "scoretbody_changed");
     const scoreList = data[0]["list"]
+    if(scoreList.length==0)return;
     let contentHtml = generateInnerHtml(scoreList);
     body.innerHTML = contentHtml;
 }
