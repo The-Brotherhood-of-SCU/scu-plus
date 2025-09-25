@@ -119,7 +119,7 @@ A：用于自动识别统一认证登录的验证码，服务端代码已包含�
 A：所有数据处理均在本地完成，不存在数据上传行为（除了OCR服务）。
 
 **Q：浏览器显示'关闭开发人员模式下的扩展'弹窗，如何禁用弹窗？**  
-A：参考该专栏更改配置文件：https://www.bilibili.com/opus/1003408122502447108
+A：使用工具[remove-edge-extension-notice](https://github.com/The-Brotherhood-of-SCU/remove-edge-extension-notice)，或者手动修改配置文件：参考该专栏更改配置文件：https://www.bilibili.com/opus/1003408122502447108
 
 
 
