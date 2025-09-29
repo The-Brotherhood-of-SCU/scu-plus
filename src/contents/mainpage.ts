@@ -198,6 +198,38 @@ const injectMenu = async () => {
   menus.appendChild(peiyang);
   console.log("注入培养方案按钮成功");
 
+  // 注入第二课堂
+  let second_class = document.createElement("li");
+  second_class.setAttribute('id', '666666');
+  second_class.setAttribute('onclick', "rootMenuClick(this);");
+  second_class.innerHTML = `<a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-bullhorn"></i>
+                    <span class="menu-text"> 第二课堂emoji </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu nav-hide" onclick="stopHere();" style="display: none;">   
+                    <li class="hsub open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            第二课堂
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu" style="display: block;">
+                            <li class="" onclick="toSelect(this);">
+                                <a href='https://zjczs.scu.edu.cn/ccylmp/pages/main/mine/my-activities' target='_blank'>&nbsp;&nbsp;
+                                    我报名的活动
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>`.replace('emoji', "🎯");
+  menus.appendChild(second_class);
+  console.log("注入第二课堂按钮");
+
+
   // 注入课程评分
   let course_score = document.createElement("li");
   course_score.setAttribute('id', '1145143');
