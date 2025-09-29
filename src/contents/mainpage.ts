@@ -218,6 +218,12 @@ const injectMenu = async () => {
                         <b class="arrow"></b>
                         <ul class="submenu" style="display: block;">
                             <li class="" onclick="toSelect(this);">
+                                <a href='https://zjczs.scu.edu.cn/ccylmp/' target='_blank'>&nbsp;&nbsp;
+                                    第二课堂主页
+                                </a>
+                                <b class="arrow"></b>
+                            </li>
+                            <li class="" onclick="toSelect(this);">
                                 <a href='https://zjczs.scu.edu.cn/ccylmp/pages/main/mine/my-activities' target='_blank'>&nbsp;&nbsp;
                                     我报名的活动
                                 </a>
