@@ -42,6 +42,7 @@ async function insertQRcode() {
     const searchParams = new URLSearchParams(window.location.search);
     const activity_id = searchParams.get("id");
     if (!activity_id) return;
+    if (window.location.pathname!="/ccylmp/pages/main/activity/activity-detail")return;
 
     currentRoot = ReactDOM.createRoot(qr_container);
     currentRoot.render(<QR_container id={activity_id} />);
