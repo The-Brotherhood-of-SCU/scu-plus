@@ -35,9 +35,12 @@ async function insertQRcode() {
     qr_container.style.padding = "2px";
     container.appendChild(qr_container);
 
-    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4) > uni-view > uni-view:nth-child(6) > uni-view', e => {
-        e.style.marginBottom = '0';
+    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4) > uni-view', e => {
+        (e.lastChild.lastChild as HTMLElement).style.marginBottom = '0';
     });
+    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4)',e=>{
+        e.style.marginBottom = '0';
+    })
 
     const searchParams = new URLSearchParams(window.location.search);
     const activity_id = searchParams.get("id");
