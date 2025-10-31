@@ -3,7 +3,7 @@
 > 🌈 **为四川大学教务系统量身打造的浏览器增强插件，兼具高颜值设计与实用功能**
 
 📎 快速导航：
- [🧩 安装指南](#浏览器扩展安装) · [💡 常见问题](#-常见问题解答) · [📖 维基页面](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki)
+ [🧩 安装指南](#%EF%B8%8F-安装指南) · [💡 常见问题](#-常见问题解答faq) · [📖 维基页面](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki)
 
 ------
 
