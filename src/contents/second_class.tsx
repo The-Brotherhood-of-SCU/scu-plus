@@ -1,6 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo";
 import ReactDOM from "react-dom/client";
-import { $, $all } from "~script/utils";
+import { $, $all, xpath_query } from "~script/utils";
 import { QRCode, Flex } from 'antd';
 import React from "react";
 
@@ -38,14 +38,14 @@ async function insertQRcode() {
     $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4) > uni-view', e => {
         (e.lastChild.lastChild as HTMLElement).style.marginBottom = '0';
     });
-    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4)',e=>{
+    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view:nth-child(4)', e => {
         e.style.marginBottom = '0';
     })
 
     const searchParams = new URLSearchParams(window.location.search);
     const activity_id = searchParams.get("id");
     if (!activity_id) return;
-    if (window.location.pathname!="/ccylmp/pages/main/activity/activity-detail")return;
+    if (window.location.pathname != "/ccylmp/pages/main/activity/activity-detail") return;
 
     currentRoot = ReactDOM.createRoot(qr_container);
     currentRoot.render(<QR_container id={activity_id} />);
@@ -57,6 +57,9 @@ function watchUrlChange() {
         lastUrl = currentUrl;
         setTimeout(() => insertQRcode(), 300);
     }
+    setInterval(() => {
+        addSelectAllBtn()
+    }, 1000);
 }
 
 function observePageChanges() {
@@ -77,7 +80,7 @@ window.addEventListener('load', () => {
     lastUrl = window.location.href;
     insertQRcode();
     observePageChanges();
-    
+
     setInterval(watchUrlChange, 500);
 });
 
@@ -100,4 +103,46 @@ function QR_container({ id }: { id: string }) {
             </Flex>
         </>
     );
+}
+
+function addSelectAllBtn() {
+    if(document.querySelector("#sa114514"))return
+    if ((/zjczs\.scu\.edu\.cn\/ccylmp\/pages\/main\/mine\/score-report(\/.*)?/).test(window.location.href)) {
+        console.log("第二课堂: 查看成绩页面")
+    }
+    $('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view.input-row', e => {
+        const Btn = document.createElement('button')
+        Btn.innerText = "全选"
+        Btn.style.marginLeft = '20px'
+        Btn.id="sa114514"
+        Btn.onclick = () => {
+            let count = 0;
+            if (Btn.innerText == "全选") {
+                const container = document.querySelector('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view.uni-list > uni-checkbox-group')
+                for (const e of container.children) {
+                    const checkbox = e.querySelector('uni-checkbox');
+                    const isSelect = (checkbox.querySelector('div > div').className.includes("uni-checkbox-input-checked") ? true : false);
+                    if (!isSelect) {
+                        (checkbox as HTMLElement).click()
+                        count++
+                    }
+                }
+                Btn.innerText = "取消全选"
+            } else {
+                const container = document.querySelector('body > uni-app > uni-page > uni-page-wrapper > uni-page-body > uni-view > uni-view.uni-list > uni-checkbox-group')
+                for (const e of container.children) {
+                    const checkbox = e.querySelector('uni-checkbox');
+                    const isSelect = (checkbox.querySelector('div > div').className.includes("uni-checkbox-input-checked") ? true : false);
+                    if (isSelect) {
+                        (checkbox as HTMLElement).click()
+                        count++
+                    }
+                }
+                Btn.innerText = "全选"
+            }
+            console.log("已操作" + count + "数据")
+        }
+
+        e.appendChild(Btn)
+    })
 }
