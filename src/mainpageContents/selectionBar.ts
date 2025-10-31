@@ -89,7 +89,7 @@ const showModal = async () => {
             <svg style="width: 24px; height: 24px; margin-right: 12px; color: #4a90e2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
             </svg>
-            <h3 style="margin:0; font-size: 18px; color: #2c3e50; font-weight: 600;">每日一句</h3>
+            <h3 style="margin:0; font-size: 18px; color: #2c3e50; font-weight: 600;">诗词歌赋</h3>
         </div>
         <div style="padding-left: 36px;">
             <p style="margin:0; font-size: 15px; color: #34495e; line-height: 1.7; 
