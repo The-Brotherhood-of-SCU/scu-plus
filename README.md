@@ -87,12 +87,12 @@
 | 3️⃣ **启用开发者模式** | 打开右上角 `开发者模式` 开关，刷新页面                       |
 | 4️⃣ **加载插件**       | 将下载的 ZIP 包拖入扩展页面，确认安装                        |
 
-💡 **提示**：仅支持 Chromium 系浏览器（Chrome、Edge等），暂不支持 Firefox。
+💡 **提示**：仅支持 Chromium 系浏览器（Chrome、Edge等），暂不支持 Firefox。  
  📘 详细图文版请参考 [小白安装教程](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/安装)。
 
 ------
 
-## 🌟 高阶功能
+## 🌟 辅助功能
 
 | 功能          | 使用场景       | 操作说明                                 |
 | ------------- | -------------- | ---------------------------------------- |
@@ -101,7 +101,7 @@
 
 ### 🔍 OCR 服务配置（可选）
 
-若需自行部署 OCR 服务，请参考
+若需自行部署 OCR 服务，请参考  
  👉 [OCR 配置维基文档](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/设置#ocr-配置)
 
 ------
@@ -120,22 +120,22 @@
 
 ## 📌 常见问题解答（FAQ）
 
-**Q1：为什么需要 OCR 服务？**
+**Q1：为什么需要 OCR 服务？**  
  A：用于自动识别统一认证登录验证码。服务端代码位于 `ocr_server` 目录。
 
-**Q2：插件会上传个人数据吗？**
+**Q2：插件会上传个人数据吗？**  
  A：不会。除 OCR 服务外，所有数据处理均在本地完成。
 
-**Q3：如何解决“关闭开发者模式扩展”弹窗？**
- A：可使用 [remove-edge-extension-notice](https://github.com/The-Brotherhood-of-SCU/remove-edge-extension-notice)，
+**Q3：如何解决“关闭开发者模式扩展”弹窗？**  
+ A：可使用 [remove-edge-extension-notice](https://github.com/The-Brotherhood-of-SCU/remove-edge-extension-notice)，  
  或参考此教程：[Bilibili专栏链接](https://www.bilibili.com/opus/1003408122502447108)
 
 ------
 
 ## 📜 开源协议
 
-本项目基于 **[GPL-3.0 License](https://chatgpt.com/c/LICENSE)** 开源。
- 请在二次开发中保持开源并注明原始出处。
+本项目基于 **[GPL-3.0 License](https://chatgpt.com/c/LICENSE)** 开源。  
+请在二次开发中保持开源并注明原始出处。
 
 ------
 
