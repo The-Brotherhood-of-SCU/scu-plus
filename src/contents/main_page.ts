@@ -1,8 +1,8 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { $, $all, checkVersion, UpdateCheckResult, xpath_query } from "../script/utils"
 import { getSetting, type SettingItem } from "~script/config";
-import injectHotPost from "../mainpageContents/hotPost";
-import selectionBar from "../mainpageContents/selectionBar";
+import injectHotPost from "../mainpage_contents/hot_post";
+import selectionBar from "../mainpage_contents/selection_bar";
 import { message, Modal } from "antd";
 import package_config from "../../package.json"
 
