@@ -6,6 +6,10 @@
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
+    "dailySentence":{
+        "link":"https://www.wudada.online/Api/ScSj",
+        "keys":["data"]
+    },
     "scripts": {
         "dev": "plasmo dev",
         "build": "plasmo build",

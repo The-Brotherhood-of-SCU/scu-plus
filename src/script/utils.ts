@@ -60,9 +60,9 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
 }
 
 const dailySentence = async () => {
-    const response = await chrome.runtime.sendMessage({ action: "request", url: "https://www.wudada.online/Api/ScSj" });
+    const response = await chrome.runtime.sendMessage({ action: "request", url: pkgMessage.dailySentence.link });
     if (response.success) {
-        return JSON.parse(response.data)['data'];
+        return pkgMessage.dailySentence.keys.reduce((obj:any,key)=>obj?.[key],JSON.parse(response.data));
     }
     return null;
 }
