@@ -55,6 +55,6 @@ class SettingItem {
       this.gpaCustomText = "";
       this.failedCourseCustomText = "";
       this.redirectLoginSwitch = false;
-      this.showHotPostSwitch = true;
+      this.showHotPostSwitch = false;
     }
   }
