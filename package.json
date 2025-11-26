@@ -6,9 +6,11 @@
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
-    "dailySentence":{
-        "link":"https://www.wudada.online/Api/ScSj",
-        "keys":["data"]
+    "dailySentence": {
+        "link": "https://www.wudada.online/Api/ScSj",
+        "keys": [
+            "data"
+        ]
     },
     "scripts": {
         "dev": "plasmo dev",
@@ -33,6 +35,7 @@
         "@types/chrome": "0.0.258",
         "@types/react": "18.2.48",
         "@types/react-dom": "18.2.18",
+        "baseline-browser-mapping": "^2.8.31",
         "prettier": "3.2.4",
         "typescript": "5.3.3"
     },
