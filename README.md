@@ -121,7 +121,7 @@
 ## 📌 常见问题解答（FAQ）
 
 **Q1：为什么需要 OCR 服务？**  
- A：用于自动识别统一认证登录验证码。服务端代码位于 `ocr_server` 目录。
+ A：用于自动识别统一认证登录验证码。服务端代码位于 [scu-plus-ocr](https://github.com/The-Brotherhood-of-SCU/scu-plus-ocr) 仓库。
 
 **Q2：插件会上传个人数据吗？**  
  A：不会。除 OCR 服务外，所有数据处理均在本地完成。
