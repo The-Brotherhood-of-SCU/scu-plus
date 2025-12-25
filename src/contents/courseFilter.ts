@@ -677,4 +677,3 @@ function initialize(){
 
   waitForTableAndInject()
 }
-
