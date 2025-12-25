@@ -130,7 +130,6 @@ window.addEventListener("load", () => {
         inject();
         injectExportFunc();
         hideKbtAndObserve();
-        beautifyKbtStyle();
     }, 1000);
 })
 
