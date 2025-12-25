@@ -89,9 +89,9 @@ function createSecondPageElement(innerHTML:string=""):HTMLElement{
 }
 
 async function downloadCanvas(canvas:HTMLElement,name:string,scale:number) {
-    const result = await snapdom(canvas, { scale: scale ,embedFonts:true});
+    const result = await snapdom(canvas, { scale: scale, embedFonts: false });
     await result.download({ format: 'png', filename: name });
-  }
+}
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
