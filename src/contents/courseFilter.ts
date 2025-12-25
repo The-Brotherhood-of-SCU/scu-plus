@@ -7,10 +7,14 @@ export const config: PlasmoCSConfig = {
   all_frames: true
 }
 
-;(function () {
-  if ((window as any).scuCourseFilterLoaded) return
-  ;(window as any).scuCourseFilterLoaded = true
 
+
+if (!(window as any).scuCourseFilterLoaded){
+  (window as any).scuCourseFilterLoaded = true
+  initialize()
+} 
+
+function initialize(){
   const CAMPUS_LIST = ["江安", "望江", "华西", "其他"]
   const gridDays = ['一', '二', '三', '四', '五', '六', '七']
   const gridSections = [
@@ -672,4 +676,5 @@ export const config: PlasmoCSConfig = {
   }
 
   waitForTableAndInject()
-})()
+}
+
