@@ -274,7 +274,7 @@ export const config: PlasmoCSConfig = {
     panel.style.cssText = 'position:fixed;right:20px;top:100px;z-index:10000;border:2px solid #1976d2;background:white;padding:0;border-radius:8px;min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,0.12);'
 
     panel.innerHTML = `
-      <div id="scu-filter-header" style="background:#1976d2;color:white;padding:8px 10px;border-radius:8px 8px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
+      <div id="scu-filter-header" style="background:#1976d2;color:white;padding:8px 10px;border-radius:5px 5px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
         <span id="scu-filter-title"></span>
         <button id="scu-filter-toggle" style="background:transparent;border:none;color:white;font-size:16px;cursor:pointer;">－</button>
       </div>
@@ -391,7 +391,11 @@ export const config: PlasmoCSConfig = {
           ${rowsHtml}
         </tbody>
       </table>
-      <div style="text-align:right;margin-top:8px;"><button id="cf-time-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-time-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">关闭</button></div>
+      <div style="text-align:right;margin-top:8px;">
+        <button id="cf-time-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button>
+        <button id="cf-time-clear" style="background:red;color:white;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">清空</button>
+        <button id="cf-time-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;">关闭</button>
+      </div>
     `;
     document.body.appendChild(modal);
     modal.querySelectorAll('.cf-cell').forEach(c => {
@@ -408,7 +412,17 @@ export const config: PlasmoCSConfig = {
       const apply = document.getElementById('cf-apply') as HTMLInputElement
       if (apply) { apply.checked = true; useFilter = true }
       filterCoursesByAllFilters(); modal!.remove() }
-    ;(document.getElementById('cf-time-cancel') as HTMLButtonElement).onclick = () => modal!.remove()
+      (document.getElementById('cf-time-cancel') as HTMLButtonElement).onclick = () => modal!.remove();
+      (document.getElementById('cf-time-clear') as HTMLButtonElement).onclick = () => {
+      selectedTimeGrid = Array(7).fill(null).map(() => Array(gridSections.length).fill(false))
+      modal.querySelectorAll('.cf-cell').forEach(cell => {
+        (cell as HTMLElement).style.background = '#f0f0f0'
+        cell.innerHTML = ''
+      })
+      if (useFilter) {
+        filterCoursesByAllFilters()
+      }
+    }
   }
 
   function showCampusFilterModal() {
