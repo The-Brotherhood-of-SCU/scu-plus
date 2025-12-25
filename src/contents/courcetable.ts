@@ -3,6 +3,7 @@ import { $, downloadCanvas } from "~script/utils";
 
 export const config: PlasmoCSConfig = {
     matches: [
+        "*://zhjw.scu.edu.cn/*student/courseSelect/*",
         "*://zhjw.scu.edu.cn/*student/courseSelect/thisSemesterCurriculum/*",
         "*://zhjw.scu.edu.cn/*student/courseSelect/courseSelectResult/*",
         "*://zhjw.scu.edu.cn/*student/courseSelect/calendarSemesterCurriculum/*"
@@ -29,10 +30,107 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// 屏蔽选课页面原生的浮动时间筛选器容器（id 或 class）并监听动态插入
+function hideKbtAndObserve() {
+    const selectorList = [
+        '#div_kbt',
+        '.div-kbt',
+        '#myselectTable',
+        '#div_kb',
+        '#div_cover',
+        '#lal-sxl'
+    ];
+
+    function hideElement(el: Element) {
+        try {
+            // 优先用 inline style 强制隐藏，避免被后续脚本恢复
+            const he = el as HTMLElement;
+            he.setAttribute('data-scu-plus-hidden', '1');
+            he.style.setProperty('display', 'none', 'important');
+            he.style.setProperty('visibility', 'hidden', 'important');
+            he.style.setProperty('pointer-events', 'none', 'important');
+        } catch (e) { }
+    }
+
+    function hideExisting(root: Document | ParentNode = document) {
+        try {
+            for (const sel of selectorList) {
+                const elems = root.querySelectorAll(sel as string);
+                elems.forEach((el: Element) => hideElement(el));
+            }
+        } catch (e) { }
+    }
+
+    // 处理同源 iframe：尝试访问并隐藏其中的匹配元素
+    function handleIframes() {
+        const iframes = Array.from(document.getElementsByTagName('iframe')) as HTMLIFrameElement[];
+        for (const fr of iframes) {
+            try {
+                const doc = fr.contentDocument || fr.contentWindow?.document;
+                if (doc) {
+                    hideExisting(doc);
+                }
+            } catch (e) {
+                // 跨域 iframe 无法访问，跳过
+            }
+            // 监听 iframe load 以应对动态注入
+            fr.addEventListener('load', () => {
+                try {
+                    const doc = fr.contentDocument || fr.contentWindow?.document;
+                    if (doc) hideExisting(doc);
+                } catch (e) { }
+            });
+        }
+    }
+
+    // 定期尝试隐藏（防止页面脚本反复插入或修改）——短时重试以降低开销
+    let attempts = 0;
+    const maxAttempts = 20; // 20 次，每 500ms -> 10s
+    const interval = setInterval(() => {
+        hideExisting(document);
+        handleIframes();
+        attempts++;
+        if (attempts >= maxAttempts) clearInterval(interval);
+    }, 500);
+
+    // 初次执行并启用 MutationObserver
+    hideExisting(document);
+    handleIframes();
+
+    const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            if (m.addedNodes && m.addedNodes.length) {
+                try {
+                    // 对所有新增节点尝试匹配 selector 或查询其子树
+                    m.addedNodes.forEach((node) => {
+                        if (!(node instanceof Element)) return;
+                        for (const sel of selectorList) {
+                            if ((node as Element).matches && (node as Element).matches(sel as string)) {
+                                hideElement(node as Element);
+                            }
+                        }
+                        // 检查新增节点内部
+                        hideExisting(node as ParentNode);
+                        // 如果新增的是 iframe，处理它
+                        if ((node as Element).tagName === 'IFRAME') {
+                            const fr = node as HTMLIFrameElement;
+                            try { const doc = fr.contentDocument || fr.contentWindow?.document; if (doc) hideExisting(doc); } catch (e) {}
+                            fr.addEventListener('load', () => { try { const doc = fr.contentDocument || fr.contentWindow?.document; if (doc) hideExisting(doc); } catch (e) {} });
+                        }
+                    });
+                } catch (e) { }
+            }
+        }
+    });
+    observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+}
+
 window.addEventListener("load", () => {
     setTimeout(() => {
         inject();
         injectExportFunc();
+        hideKbtAndObserve();
+        beautifyKbtStyle();
     }, 1000);
 })
 
@@ -72,6 +170,7 @@ const injectExportFunc = () => {
             downloadCanvas(canvas, '课程表', 1);
         });
     });
+
     $("#mainDIV > h4:nth-child(3)", (e) => {
         let btn = document.createElement("button");
         btn.setAttribute('class', 'btn btn-info btn-xs btn-round');
