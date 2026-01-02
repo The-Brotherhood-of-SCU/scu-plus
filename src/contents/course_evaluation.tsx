@@ -15,19 +15,6 @@ export const config: PlasmoCSConfig = {
 }
 
 window.addEventListener("load", () => {
-    xpath_query(`//*[@id="saveEvaluation"]`, (e) => {
-        let div = document.createElement("div")
-        e.appendChild(div)
-        const root = ReactDOM.createRoot(div)
-        root.render(<Controller />)
-        do_it(80, 100)
-        setInterval(() => {
-            let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
-            if (commitBtn.disabled == false) {
-                commitBtn.click();
-            }
-        }, 1000);
-    });
     let isRunningEvaluation = localStorage.getItem("isRunningEvaluation") == "true";
     xpath_query('//*[@id="home"]/div/div/h4/span', (e) => {
         injectBtnStyle()
@@ -38,6 +25,22 @@ window.addEventListener("load", () => {
         e.appendChild(btn);
         RunningEvaluation(isRunningEvaluation);
     })
+    xpath_query(`//*[@id="saveEvaluation"]`, (e) => {
+        let div = document.createElement("div")
+        e.appendChild(div)
+        const root = ReactDOM.createRoot(div)
+        root.render(<Controller />)
+        do_it(80, 100)
+        if(isRunningEvaluation){
+            setInterval(() => {
+            let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
+            if (commitBtn.disabled == false) {
+                commitBtn.click();
+            }
+        }, 1000);
+        }
+    });
+    
 })
 
 function injectBtnStyle() {
@@ -149,14 +152,13 @@ function Controller() {
     const [maxscore, set_maxscore] = useState(100)
     const [api, contextHolder] = notification.useNotification();
     useEffect(() => {
-        let evaluation_score_range = localStorage.getItem("evaluation_score_range");
-        if (evaluation_score_range.includes(":")) {
-            let score1 = parseInt(evaluation_score_range.split[":"][0] ?? "80");
-            let score2 = parseInt(evaluation_score_range.split[":"][1] ?? "100");
-            if (score1 <= score2 && score1 >= 0 && score2 <= 100) {
-                set_minscore(score1);
-                set_maxscore(score2);
-            }
+        let evaluation_score_range = localStorage.getItem("evaluation_score_range") ?? "80:100";
+        console.log(evaluation_score_range)
+        let score1 = parseInt(evaluation_score_range.split(":")[0] ?? "80");
+        let score2 = parseInt(evaluation_score_range.split(":")[1] ?? "100");
+        if (score1 <= score2 && score1 >= 0 && score2 <= 100) {
+            set_minscore(score1);
+            set_maxscore(score2);
         }
     }, [])
     const openNotification = (placement: NotificationPlacement) => {
