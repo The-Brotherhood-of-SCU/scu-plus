@@ -75,8 +75,8 @@ async function countForScore(callback: string): Promise<scoreMap[]> {
                 }
             }
         });
-        average /= scoreCount
-        average_comp /= comp_scoreCount
+        average /= scoreCount==0?1:scoreCount
+        average_comp /= comp_scoreCount==0?1:comp_scoreCount
         console.log(a["cjbh"])
         console.log("平均成绩: ", average.toFixed(2))
         console.log("必修成绩: ", average_comp.toFixed(2))
