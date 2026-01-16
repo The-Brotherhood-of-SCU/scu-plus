@@ -126,7 +126,7 @@ function generateInnerHtml(list: any[]): string {
         let range_text = getScoreRange(v.levlePoint)
         if(v.levlePoint==="-30"&&v.inputStatusExplain==="确定"){
             range_text="不及格"
-        }else if(v.inputStatusExplain==="确定"){
+        }else if(v.inputStatusExplain==="确定" && range_text!="未评教"){
             range_text = v.courseScore
         }
         tContent += `<td>${range_text}</td><td>${v.inputStatusExplain}</td>`;
