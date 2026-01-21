@@ -6,6 +6,7 @@
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
+    "checkForUpdatePkgLink":"https://gitee.com/The-Brotherhood-of-SCU/scu-plus/raw/main/package.json",
     "dailySentence": {
         "link": "https://www.wudada.online/Api/ScSj",
         "keys": [
