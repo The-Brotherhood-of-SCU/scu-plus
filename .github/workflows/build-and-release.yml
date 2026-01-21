@@ -67,22 +67,6 @@ jobs:
           asset_name: chrome-mv3-prod-${{ github.ref_name}}.zip
           asset_content_type: application/zip
 
-
-      - name: Gitee Release
-        shell: bash
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_PAT }}
-          GITEE_REPO: "The-Brotherhood-of-SCU/scu-plus" 
-          TAG: ${{ github.ref_name }}
-        run: |
-          echo "Creating Gitee Release for $TAG..."
-          curl -X POST "https://gitee.com/api/v5/repos/${GITEE_REPO}/releases" \
-               -d "access_token=${GITEE_TOKEN}" \
-               -d "tag_name=${TAG}" \
-               -d "name=Release ${TAG}" \
-               -d "body=请前往Github仓库查看更新:https://github.com/The-Brotherhood-of-SCU/scu-plus/releases" \
-               -d "prerelease=false"
-
       # 上面的版本即将废弃，以下发布release的版本存在bug，等待修复完成后替换
       # - name: Release
       #   uses: softprops/action-gh-release@v2
