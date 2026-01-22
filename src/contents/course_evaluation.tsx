@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { Button, Input, message, notification } from "antd"
+import { Button, Input, message, notification, Checkbox } from "antd"
 import { xpath_query, randomInt } from "~script/utils"
 import ReactDOM from "react-dom/client"
 import React, { useEffect, useState } from "react"
@@ -30,7 +30,7 @@ window.addEventListener("load", () => {
         e.appendChild(div)
         const root = ReactDOM.createRoot(div)
         root.render(<Controller />)
-        do_it(80, 100)
+        do_it(80, 100, false)
         if(isRunningEvaluation){
             setInterval(() => {
             let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
@@ -128,7 +128,10 @@ function RunningEvaluation(run: boolean) {
             }
             let table = document.querySelector('#codeTable') as HTMLTableElement;
             let hasMore = false;
-            for (let row of table.rows) {
+            
+            // 将HTMLCollection转换为数组以支持for...of循环
+            const rows = Array.from(table.rows);
+            for (let row of rows) {
                 let btn = row.querySelector('button') as HTMLButtonElement;
                 if (btn == null) continue;
                 if (btn.innerText == '评估') {
@@ -150,9 +153,11 @@ function RunningEvaluation(run: boolean) {
 function Controller() {
     const [minscore, set_minscore] = useState(80)
     const [maxscore, set_maxscore] = useState(100)
+    const [bestOnly, setBestOnly] = useState(false)
     const [api, contextHolder] = notification.useNotification();
     useEffect(() => {
         let evaluation_score_range = localStorage.getItem("evaluation_score_range") ?? "80:100";
+        let best_only = localStorage.getItem("evaluation_best_only") === "true";
         console.log(evaluation_score_range)
         let score1 = parseInt(evaluation_score_range.split(":")[0] ?? "80");
         let score2 = parseInt(evaluation_score_range.split(":")[1] ?? "100");
@@ -160,6 +165,7 @@ function Controller() {
             set_minscore(score1);
             set_maxscore(score2);
         }
+        setBestOnly(best_only);
     }, [])
     const openNotification = (placement: NotificationPlacement) => {
         api.info({
@@ -174,7 +180,8 @@ function Controller() {
             openNotification('top')
         } else {
             localStorage.setItem("evaluation_score_range", minscore.toString() + ":" + maxscore.toString())
-            do_it(minscore, maxscore)
+            localStorage.setItem("evaluation_best_only", bestOnly.toString())
+            do_it(minscore, maxscore, bestOnly)
         }
     }
     return <>
@@ -185,6 +192,14 @@ function Controller() {
             ~
             <Input style={{ width: "80px", marginRight: "30px" }} placeholder="最大值" value={maxscore} type="number" onChange={(e) => set_maxscore(Number(e.target.value))}></Input>
             <Button onClick={() => check()}>自动填充评估</Button>
+            <br/>
+            <Checkbox 
+              checked={bestOnly} 
+              onChange={(e) => setBestOnly(e.target.checked)}
+              style={{ marginTop: "10px" }}
+            >
+              全部选择最佳选项（单选题选A，多选题全选，主观题给满分）
+            </Checkbox>
         </div>
 
     </>
@@ -192,35 +207,57 @@ function Controller() {
 
 type NotificationPlacement = NotificationArgsProps['placement'];
 
-function do_it(min: number, max: number) {
+function do_it(min: number, max: number, bestOnly: boolean) {
     // 分数填充
-    let inputs = document.querySelectorAll('input');
+    // 将NodeList转换为数组以支持for...of循环
+    const inputs = Array.from(document.querySelectorAll('input'));
     for (let inp of inputs) {
         if (inp.placeholder == '请输入1-100的整数') {
-            inp.value = (randomInt(min, max)).toString()
+            if (bestOnly) {
+                inp.value = "100"; // 如果选择了"全部最佳"，则给满分
+            } else {
+                inp.value = (randomInt(min, max)).toString()
+            }
         }
     }
 
     // 选填题
     let table = document.querySelector("#saveEvaluation > table");
     let body = table.querySelector("tbody");
-    for (let row of body.rows) {
+    // 将HTMLCollection转换为数组以支持for...of循环
+    const rows = Array.from(body.rows);
+    for (let row of rows) {
         // 单选
         let inputs = row.querySelectorAll("input");
-        let randomScore = ["A_", "B_", "C_","D_"][randomInt(0, inputs.length-2)]; //排除最后一个选项
-        for (let input of inputs) {
-            if (input.type == "radio") {
-                if (input.value.startsWith(randomScore)) {
-                    input.checked = true;
+        if (bestOnly) {
+            // 如果选择了"全部最佳"，则始终选择第一个选项（通常为A选项，代表最佳答案）
+            for (let input of Array.from(inputs)) {
+                if (input.type == "radio") {
+                    if (input.name.includes("questionOption")) {
+                        input.checked = true;
+                        break;
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
+            }
+        } else {
+            // 随机选择选项
+            let randomScore = ["A_", "B_", "C_","D_"][randomInt(0, inputs.length-2)]; //排除最后一个选项
+            for (let input of Array.from(inputs)) {
+                if (input.type == "radio") {
+                    if (input.value.startsWith(randomScore)) {
+                        input.checked = true;
+                    }
+                } else {
+                    break;
+                }
             }
         }
 
         // 多选
         let checks: HTMLInputElement[] = []
-        for (let input of inputs) {
+        for (let input of Array.from(inputs)) {
             if (input.type == "checkbox") {
                 input.checked = false
                 checks.push(input)
@@ -228,9 +265,20 @@ function do_it(min: number, max: number) {
                 break;
             }
         }
-        for (let i = 0; i < checks.length - 1; i++) {
-            if (randomInt(1, 100) < 30) {
-                checks[i].checked = true;
+        if (bestOnly) {
+            // 如果选择了"全部最佳"，则勾选所有选项（除了"以上均无"等否定选项）
+            for (let i = 0; i < checks.length; i++) {
+                // 尝试检测是否为否定性质的选项，如"以上均无"等
+                const label = document.querySelector(`label[for="${checks[i].id}"]`)?.textContent || "";
+                if (!label.includes("以上均无") && !label.includes("均无") && !label.includes("没有")) {
+                    checks[i].checked = true;
+                }
+            }
+        } else {
+            for (let i = 0; i < checks.length - 1; i++) {
+                if (randomInt(1, 100) < 30) {
+                    checks[i].checked = true;
+                }
             }
         }
 
@@ -255,9 +303,15 @@ function do_it(min: number, max: number) {
             "课程内容实用性强，对今后的学习和工作很有帮助。",
             "注重引导和启发，提高了我的学习兴趣和主动性。",
             "课堂纪律严明，教学秩序良好，有利于专注学习。",
-            "感谢老师的辛勤付出，这是一门值得推荐的好课！"
+            "感谢老师的辛勤付出，这是一门值得推荐的好课！",
+            "老师专业水平高，课程设计合理，内容充实，受益匪浅。",
+            "课程内容前沿，理论与实践结合，极大提升了我的专业能力。",
+            "教师教学态度认真负责，关心学生学习状况，深得学生喜爱。",
+            "课程设计新颖，注重培养学生的创新思维和实践技能。",
+            "课程内容系统全面，难度适中，有助于学生深入理解专业知识。"
         ];
-        let textInputs = document.querySelectorAll("textarea");
+        // 将NodeList转换为数组以支持for...of循环
+        const textInputs = Array.from(document.querySelectorAll("textarea"));
         for (let inp of textInputs) {
             inp.value = answers[randomInt(0, answers.length - 1)];
         }
