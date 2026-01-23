@@ -52,41 +52,50 @@ interface scoreMap {
 }
 
 async function countForScore(callback: string): Promise<scoreMap[]> {
-    let data = await (await fetch(`/student/integratedQuery/scoreQuery/${callback}/allPassingScores/callback`)).json()
-    let scoresMap: scoreMap[] = []
-    for (let a of data["lnList"]) {
-        let average = 0.0
-        let scoreCount = 0
-        let average_comp = 0.0
-        let comp_scoreCount = 0
-        a["cjList"].forEach(e => {
-            let cj = parseFloat(e["cj"])
+    let data = await (await fetch(`/student/integratedQuery/scoreQuery/${callback}/allPassingScores/callback`)).json();
+    let scoresMap: scoreMap[] = [];
 
-            if (e["courseAttributeName"] == "必修") {
-                average += cj
-                average_comp += cj
+    for (let term of data["lnList"]) {
+        let totalWeightedScore = 0.0;
+        let totalCredits = 0.0;
 
-                scoreCount += 1
-                comp_scoreCount += 1
+        let compWeightedScore = 0.0;
+        let compCredits = 0.0;
+
+        term["cjList"].forEach(e => {
+            let cj = parseFloat(e["cj"]);
+            let credit = parseFloat(e["credit"]);
+
+            if (isNaN(cj) || isNaN(credit)) return;
+
+            if (e["courseAttributeName"] === "必修") {
+                totalWeightedScore += cj * credit;
+                totalCredits += credit;
+
+                compWeightedScore += cj * credit;
+                compCredits += credit;
             } else {
                 if (cj >= 60) {
-                    average += cj
-                    scoreCount += 1
+                    totalWeightedScore += cj * credit;
+                    totalCredits += credit;
                 }
             }
         });
-        average /= scoreCount==0?1:scoreCount
-        average_comp /= comp_scoreCount==0?1:comp_scoreCount
-        console.log(a["cjbh"])
-        console.log("平均成绩: ", average.toFixed(2))
-        console.log("必修成绩: ", average_comp.toFixed(2))
+
+        let average = totalCredits === 0 ? 0 : totalWeightedScore / totalCredits;
+        let average_comp = compCredits === 0 ? 0 : compWeightedScore / compCredits;
+
+        console.log(`学期: ${term["cjbh"] || "未知学期"}`);
+        console.log("加权平均分: ", average.toFixed(2));
+        console.log("必修加权分: ", average_comp.toFixed(2));
+
         scoresMap.push({
-            s_name: a["cjbh"],
+            s_name: term["cjbh"],
             score: {
                 average: average,
                 average_comp: average_comp
             }
-        })
+        });
     }
-    return scoresMap
+    return scoresMap;
 }
