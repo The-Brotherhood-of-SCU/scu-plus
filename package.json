@@ -6,7 +6,7 @@
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
-    "checkForUpdatePkgLink":"https://gitee.com/The-Brotherhood-of-SCU/scu-plus/raw/main/package.json",
+    "checkForUpdatePkgLink": "https://gitee.com/The-Brotherhood-of-SCU/scu-plus/raw/main/package.json",
     "dailySentence": {
         "link": "https://www.wudada.online/Api/ScSj",
         "keys": [
@@ -36,7 +36,7 @@
         "@types/chrome": "0.0.258",
         "@types/react": "18.2.48",
         "@types/react-dom": "18.2.18",
-        "baseline-browser-mapping": "^2.8.31",
+        "baseline-browser-mapping": "^2.9.17",
         "prettier": "3.2.4",
         "typescript": "5.3.3"
     },
