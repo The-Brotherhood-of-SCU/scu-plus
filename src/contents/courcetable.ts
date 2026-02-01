@@ -126,11 +126,9 @@ function hideKbtAndObserve() {
 }
 
 window.addEventListener("load", () => {
-    setTimeout(() => {
-        inject();
-        injectExportFunc();
-        hideKbtAndObserve();
-    }, 1000);
+    inject();
+    injectExportFunc();
+    hideKbtAndObserve();
 })
 
 // 注入学分统计
