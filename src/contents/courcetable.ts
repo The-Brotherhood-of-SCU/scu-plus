@@ -133,6 +133,11 @@ window.addEventListener("load", () => {
 
 // 注入学分统计
 async function inject() {
+    $('#h4_id1 > span.label.label-lg.label-danger.arrowed-in',e=>{
+        if(e.innerText==='注：未安排具体时间的课程请在下方“全部课程清单”中查看，并联系开课院系获取上课时间地点'){
+            e.remove()
+        }
+    })
     while (true) {
         let table = document.querySelector("#tab10646 > table > tbody") as HTMLElement;
         if (table) {
