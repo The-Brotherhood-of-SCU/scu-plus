@@ -239,7 +239,7 @@ const injectExportFunc = () => {
     $('.right_top_oper', (e) => {
         let btn = document.createElement("button");
         btn.setAttribute('class', 'btn btn-info btn-xs btn-round');
-        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji', "🎯");
+        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片\u{1f3af}`;
         e.appendChild(btn);
         btn.addEventListener('click', async () => {
             const original = document.getElementById('courseTable') as HTMLElement;

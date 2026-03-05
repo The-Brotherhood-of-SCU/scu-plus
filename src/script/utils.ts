@@ -1,14 +1,8 @@
 import { snapdom } from '@zumer/snapdom';
 import pkgMessage from '../../package.json';
-export { checkVersion, $, $all, dailySentence,xpath_query,UpdateCheckResult ,createSecondPageElement,downloadCanvas,sleep,randomInt}
+import { UpdateCheckResult } from '../common/types';
 
-enum UpdateCheckResult{
-    NEW_VERSION_AVAILABLE,
-    UP_TP_DATE,
-    NETWORK_ERROR,
-    UNKNOWN,
-    CHECKING
-}
+export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
 
 async function checkVersion () : Promise<UpdateCheckResult>{
     let newest_config = await chrome.runtime.sendMessage({ action: "request", url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
@@ -18,13 +12,6 @@ async function checkVersion () : Promise<UpdateCheckResult>{
     }
     const json = JSON.parse(newest_config.data);
     if (pkgMessage.version != json.version && json.version != null) {
-        // if (window.confirm("🎯" + `SCU+有新版(${json.version})更新! 是否跳转下载?`)) {
-        //     if (json.download != null) {
-        //         window.open(json.download);
-        //     } else {
-        //         alert("未找到下载地址!");
-        //     }
-        // }
         return UpdateCheckResult.NEW_VERSION_AVAILABLE;
     }
     else {

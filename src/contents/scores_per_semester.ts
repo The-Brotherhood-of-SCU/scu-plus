@@ -25,9 +25,8 @@ window.addEventListener("load", () => {
                 span_credit_opt.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:white;">任选学分:${result[i].credit_opt}</font></span>`
 
                 let container = document.createElement('div')
-                container.innerHTML += "emoji"+`<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`
+                container.innerHTML += `\u{1f3af}<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`
                 container.innerHTML += `<span class="label label-grey" style="border-radius: 10px;"><font style="color:black;">必修成绩:${result[i].score.average_comp.toFixed(2)}</font></span>`
-                container.innerHTML = container.innerHTML.replace("emoji","🎯")
 
                 e.append(span_credit_comp,span_credit_elec,span_credit_opt,container)
             })

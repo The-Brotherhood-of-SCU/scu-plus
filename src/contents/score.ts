@@ -160,7 +160,7 @@ window.addEventListener("load", () => {
     <div class="scu-plus-container">
       <div class="analysis-header">
         <div>
-          <button id="calculate-btn">emoji 生成学业报告</button>
+          <button id="calculate-btn">\u{1f4cA} 生成学业报告</button>
           <span style="color: #6366f1; font-weight: 600;">SCU+ 学业分析系统</span>
         </div>
           <button id="close-btn">关闭</button>
@@ -184,7 +184,7 @@ window.addEventListener("load", () => {
         * 成绩计算皆为学分加权计算结果
       </div>
     </div>
-  `.replace('emoji', "📊");
+  `;
 
   wrapper = document.createElement("div");
   wrapper.innerHTML = template;

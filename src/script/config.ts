@@ -1,9 +1,10 @@
 import { Storage } from "@plasmohq/storage"
+import { SettingItem } from "../common/types"
 
 export {
  getSetting,
  saveSetting,
- SettingItem, 
+ SettingItem,
 }
 
 const storage = new Storage();
@@ -24,37 +25,3 @@ function saveSetting(setting: SettingItem) {
   cache=setting;
   storage.set("setting", setting)
 }
-class SettingItem {
-    beautifySwitch: boolean;
-    beautifyColor: string;
-    avatarSwitch: boolean;
-    avatarSource: string;
-    avatarInfo: string;
-    dailyQuoteSwitch: boolean;
-    failSwitch: boolean;
-    passwordPopupSwitch: boolean;
-    nameHideSwitch: boolean;
-    nameHideText: string;
-    ocrProvider: string;
-    gpaCustomText: string;
-    failedCourseCustomText: string;
-    redirectLoginSwitch: boolean;
-    showHotPostSwitch: boolean;
-    constructor() {
-      this.beautifySwitch = false;
-      this.beautifyColor = "#caeae3";
-      this.avatarSwitch = false;
-      this.avatarSource = "qq";
-      this.avatarInfo = "";
-      this.dailyQuoteSwitch = false;
-      this.failSwitch = true;
-      this.passwordPopupSwitch = true;
-      this.nameHideSwitch = false;
-      this.nameHideText = "";
-      this.ocrProvider = "";
-      this.gpaCustomText = "";
-      this.failedCourseCustomText = "";
-      this.redirectLoginSwitch = false;
-      this.showHotPostSwitch = false;
-    }
-  }
