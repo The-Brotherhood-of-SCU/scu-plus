@@ -20,7 +20,7 @@ window.addEventListener("load", () => {
         injectBtnStyle()
         let btn = document.createElement("button");
         btn.className = 'scu-plus-button';
-        btn.innerText = isRunningEvaluation ? "🎯暂停评教" : "🎯一键评教";
+        btn.innerText = isRunningEvaluation ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
         btn.onclick = () => RunningEvaluation(!isRunningEvaluation);
         e.appendChild(btn);
         RunningEvaluation(isRunningEvaluation);

@@ -153,7 +153,7 @@ async function inject() {
     show_elememt.innerHTML = `
     <span style="font-size:1.3rem;color:red;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
     `;
-    show_elememt.querySelector("span").innerText += " 🎯by SCU+";
+    show_elememt.querySelector("span").innerText += " \u{1f3af}by SCU+";
     $("#myTab > li", (e) => e.appendChild(show_elememt));
 }
 
@@ -302,7 +302,7 @@ const injectExportFunc = () => {
     $("#mainDIV > h4:nth-child(3)", (e) => {
         let btn = document.createElement("button");
         btn.setAttribute('class', 'btn btn-info btn-xs btn-round');
-        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片emoji`.replace('emoji', "🎯");
+        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片\u{1f3af}`;
         e.appendChild(btn);
         btn.addEventListener('click', async () => {
             const original = document.getElementById('courseTable') as HTMLElement;
