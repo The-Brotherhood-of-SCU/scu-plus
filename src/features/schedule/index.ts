@@ -1,6 +1,8 @@
+import { Actions } from "../../constants/actions"
+
 export async function injectSchoolSchedule(): Promise<void> {
   const scheduleHtml = await chrome.runtime.sendMessage({
-    action: "request",
+    action: Actions.REQUEST,
     url: "https://jwc.scu.edu.cn/cdxl.htm"
   });
 

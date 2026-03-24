@@ -4,6 +4,7 @@ import { getSetting, saveSetting, SettingItem } from "~script/config";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
+import { Actions } from "../constants/actions";
 
 function SettingPage() {
   return (
@@ -22,14 +23,14 @@ function saveSettingWithUpdates(data: SettingItem) {
 function UpdateRedirect(newConfig: SettingItem) {
   if (newConfig.avatarSwitch) {
     if (newConfig.avatarSource === 'qq') {
-      chrome.runtime.sendMessage({ action: 'updateAvatar', url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
+      chrome.runtime.sendMessage({ action: Actions.UPDATE_AVATAR, url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
     }
     else {
-      chrome.runtime.sendMessage({ action: 'updateAvatar', url: newConfig.avatarInfo });
+      chrome.runtime.sendMessage({ action: Actions.UPDATE_AVATAR, url: newConfig.avatarInfo });
     }
   }
   else {
-    chrome.runtime.sendMessage({ action: 'removeAvatarRedirection' })
+    chrome.runtime.sendMessage({ action: Actions.REMOVE_AVATAR_REDIRECTION })
   }
 }
 function DataSettingFragment() {

@@ -1,7 +1,9 @@
 export { }
 
+import { Actions } from './constants/actions';
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action == "request") {
+    if (message.action == Actions.REQUEST) {
         // 抽象写法，主要是chrome的api设计太狗屎了
         (async () => {
             try {
@@ -20,14 +22,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         })();
         return true;
     }
-    else if(message.action=='updateAvatar'){
+    else if(message.action==Actions.UPDATE_AVATAR){
         updateAvatarRedirectRules(message.url)
         return false;
     }
-    else if(message.action=='removeAvatarRedirection'){
+    else if(message.action==Actions.REMOVE_AVATAR_REDIRECTION){
         removeAvatarRedirectRules()
         return false;
-    }else if(message.action=='open-settings'){
+    }else if(message.action==Actions.OPEN_SETTINGS){
         chrome.tabs.create({ url: `chrome-extension://${chrome.runtime.id}/tabs/setting.html` });
         return false;
     }

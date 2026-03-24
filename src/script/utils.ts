@@ -1,11 +1,12 @@
 import { snapdom } from '@zumer/snapdom';
 import pkgMessage from '../../package.json';
 import { UpdateCheckResult } from '../common/types';
+import { Actions } from '../constants/actions';
 
 export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
 
 async function checkVersion () : Promise<UpdateCheckResult>{
-    let newest_config = await chrome.runtime.sendMessage({ action: "request", url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
+    let newest_config = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
     if (!newest_config.success) {
         // alert("无法获取更新，请检查网络问题！");
         return UpdateCheckResult.NETWORK_ERROR;
@@ -47,7 +48,7 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
 }
 
 const dailySentence = async () => {
-    const response = await chrome.runtime.sendMessage({ action: "request", url: pkgMessage.dailySentence.link });
+    const response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.dailySentence.link });
     if (response.success) {
         return pkgMessage.dailySentence.keys.reduce((obj:any,key)=>obj?.[key],JSON.parse(response.data));
     }

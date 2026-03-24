@@ -6,6 +6,7 @@ import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider
 import { ArrowLeftOutlined, CloseOutlined } from "@ant-design/icons";
 
 import { Line, Pie } from "@ant-design/charts";
+import { Actions } from "../constants/actions";
 
 let searchPageScrollTop = 0;
 
@@ -277,7 +278,7 @@ function SearchPage({
         setLoading(true);  // 使用props的setLoading
         try {
             const res = await chrome.runtime.sendMessage({
-                action: 'request',
+                action: Actions.REQUEST,
                 url: `https://duomi.chenyipeng.com/pennisetum/scu/score/search?kname=${encodeURIComponent(keywords)}&page=${reset ? 1 : page}`
             });
 
@@ -430,7 +431,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                 setLoading(true);
 
                 const response = await chrome.runtime.sendMessage({
-                    action: 'request',
+                    action: Actions.REQUEST,
                     url: url
                 });
                 if (!response.success) {

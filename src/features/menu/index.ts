@@ -1,6 +1,7 @@
 import { checkVersion, UpdateCheckResult } from "../../common"
 import { message, Modal } from "antd"
 import package_config from "../../../package.json"
+import { Actions } from "../../constants/actions"
 
 export async function injectMenu(): Promise<void> {
   const xpathQuery = (xpathExpression: string, resolve: (element: HTMLElement) => void) => {
@@ -135,7 +136,7 @@ function createSettingsMenuItem(): HTMLElement {
   `;
 
   (li.querySelector("#settingsBtn") as HTMLElement).onclick = () => {
-    chrome.runtime.sendMessage({ action: 'open-settings' });
+    chrome.runtime.sendMessage({ action: Actions.OPEN_SETTINGS });
   };
 
   (li.querySelector("#checkVersionBtn") as HTMLElement).onclick = () => {
