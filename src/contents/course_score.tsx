@@ -7,6 +7,7 @@ import { ArrowLeftOutlined, CloseOutlined } from "@ant-design/icons";
 
 import { Line, Pie } from "@ant-design/charts";
 import { Actions } from "../constants/actions";
+import { MenuIds } from "~constants/menuIds";
 
 let searchPageScrollTop = 0;
 
@@ -30,7 +31,7 @@ let parameters = {
 
 window.addEventListener("load", () => {
     setTimeout(() => {
-        xpath_query('//*[@id="1145143"]/ul/li/ul/li/a', (e) => e.onclick = popupWindow)
+        xpath_query(`//*[@id="${MenuIds.COURSE_SCORE}"]/ul/li/ul/li/a`, (e) => e.onclick = popupWindow)
     }, 1000);
 })
 

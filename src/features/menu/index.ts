@@ -2,6 +2,7 @@ import { checkVersion, UpdateCheckResult } from "../../common"
 import { message, Modal } from "antd"
 import package_config from "../../../package.json"
 import { Actions } from "../../constants/actions"
+import { MenuIds } from "../../constants/menuIds"
 
 export async function injectMenu(): Promise<void> {
   const xpathQuery = (xpathExpression: string, resolve: (element: HTMLElement) => void) => {
@@ -37,12 +38,12 @@ export async function injectMenu(): Promise<void> {
   xpathQuery('//*[@id="1003000000"]/a/span', (e) => e.innerHTML = e.innerHTML.replace('教师课堂评价', '教师课堂评价\u{1f3af}'));
   xpathQuery('//*[@id="1003001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('教学评估', '教学评估\u{1f3af}'));
 
-  const peiyang = createMenuItem("1145140", "fa-picture-o", "培养方案\u{1f3af}", [
+  const peiyang = createMenuItem(MenuIds.TRAINING_PROGRAM, "fa-picture-o", "培养方案\u{1f3af}", [
     { text: "培养方案查看", href: "//zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index" }
   ]);
   menus.appendChild(peiyang);
 
-  const courseScore = createMenuItem("1145143", "fa-check-square", "课程评分\u{1f3af}", [
+  const courseScore = createMenuItem(MenuIds.COURSE_SCORE, "fa-check-square", "课程评分\u{1f3af}", [
     { text: "选课通", href: "#" }
   ]);
   menus.appendChild(courseScore);
@@ -94,7 +95,7 @@ function createSettingsMenuItem(): HTMLElement {
   const { confirm } = Modal;
 
   const li = document.createElement("li");
-  li.setAttribute('id', '1145141');
+  li.setAttribute('id', MenuIds.SETTINGS);
   li.setAttribute('onclick', "rootMenuClick(this);");
   li.innerHTML = `
     <a href="#" class="dropdown-toggle">
