@@ -37,6 +37,12 @@ export class SettingItem {
     this.failedCourseCustomText = "";
     this.redirectLoginSwitch = false;
   }
+  static equals(a: SettingItem | null | undefined, b: SettingItem | null | undefined): boolean {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    const keys = Object.keys(new SettingItem()) as Array<keyof SettingItem>;
+    return keys.every(key => a[key] === b[key]);
+  }
 }
 
 export interface CourseData {

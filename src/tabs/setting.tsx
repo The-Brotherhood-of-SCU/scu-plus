@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Form, Switch, Input, Button, Spin, Select, message, notification, ColorPicker, } from 'antd';
-import { getSetting, saveSetting, SettingItem } from "~script/config";
+import { getSetting, saveSetting } from "~script/config";
+import { SettingItem } from "../common/types";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
 import { Actions } from "../constants/actions";
 
 function SettingPage() {
+  const [isDirty, setIsDirty] = useState(false);
   return (
     <div>
-      <TitleFragment />
+      <TitleFragment isDirty={isDirty} />
       <div style={{ paddingLeft: '16px', paddingRight: '16px', maxWidth: '800px', margin: '0 auto' }}>
-        <DataSettingFragment />
+        <DataSettingFragment isDirty={isDirty} setIsDirty={setIsDirty} />
       </div>
     </div>
   )
@@ -33,12 +35,13 @@ function UpdateRedirect(newConfig: SettingItem) {
     chrome.runtime.sendMessage({ action: Actions.REMOVE_AVATAR_REDIRECTION })
   }
 }
-function DataSettingFragment() {
+function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsDirty: (dirty: boolean) => void }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [notificationApi, contextHolder2] = notification.useNotification();
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+  const initialSettingRef = useRef<SettingItem | null>(null);
 
   const [showAvatarFields, setShowAvatarFields] = useState(false);
   const [showNameHideField, setShowNameHideField] = useState(false);
@@ -82,13 +85,29 @@ function DataSettingFragment() {
       setShowAvatarFields(!!savedSettings.avatarSwitch);
       setShowNameHideField(!!savedSettings.nameHideSwitch);
       setShowBeautifyField(!!savedSettings.beautifySwitch);
+      initialSettingRef.current = savedSettings;
     };
 
     loadSettings();
   }, []);
 
+  // 处理页面关闭时的提示
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty]);
+
   const handleFormChange = (changedValues: Partial<SettingItem>) => {
-    let newConfig;
+    const initialSetting = initialSettingRef.current;
+    let newConfig: SettingItem;
     setSetting(prev => {
       newConfig = { ...prev, ...changedValues };
       return newConfig;
@@ -96,6 +115,15 @@ function DataSettingFragment() {
     setShowAvatarFields(form.getFieldValue('avatarSwitch'));
     setShowBeautifyField(form.getFieldValue('beautifySwitch'));
     setShowNameHideField(form.getFieldValue('nameHideSwitch'));
+    if (newConfig) {
+      if (SettingItem.equals(initialSetting, newConfig)) {
+        //unchanged logically
+        setIsDirty(false);
+      } else {
+        //changed
+        setIsDirty(true);
+      }
+    }
   };
 
   if (loading) {
@@ -112,6 +140,7 @@ function DataSettingFragment() {
         saveSettingWithUpdates(data);
         setSetting(data);
         form.setFieldsValue(data);
+        setIsDirty(false);
         messageApi.success('已恢复默认设置');
       }
     });
@@ -133,6 +162,7 @@ function DataSettingFragment() {
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
+                setIsDirty(false);
                 messageApi.success('配置文件导入成功（已保存）');
               } catch (error) {
                 messageApi.error('配置文件格式错误');
@@ -261,7 +291,7 @@ function DataSettingFragment() {
           <Switch />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); }} style={{ marginRight: '10px' }}>
+          <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); setIsDirty(false); }} style={{ marginRight: '10px' }}>
             保存
           </Button>
           <Button onClick={handleReset} style={{ marginRight: '10px' }}>
@@ -309,7 +339,7 @@ function LoadingFragment() {
     </div>
   );
 }
-function TitleFragment() {
+function TitleFragment({ isDirty }: { isDirty: boolean }) {
   return (
     <div
       style={{
@@ -323,7 +353,7 @@ function TitleFragment() {
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
       }}
     >
-      <div style={{ fontSize: 20, fontWeight: 500 }}>SCU PLUS 设置</div>
+      <div style={{ fontSize: 20, fontWeight: 500 }}>SCU PLUS 设置{isDirty ? '（未保存）' : ''}</div>
     </div>
   );
 }
