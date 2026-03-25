@@ -42,3 +42,8 @@ keys.json
 
 # log
 *.log
+
+# IDE
+.idea
+.vscode
+.trae
