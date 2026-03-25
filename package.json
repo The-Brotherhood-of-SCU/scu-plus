@@ -23,7 +23,7 @@
         "@ant-design/icons": "^6.1.0",
         "@plasmohq/storage": "^1.15.0",
         "@zumer/snapdom": "^2.6.0",
-        "antd": "^5.29.3",
+        "antd": "^6.3.4",
         "chart.js": "^4.5.1",
         "chartjs-plugin-annotation": "^3.1.0",
         "decimal.js": "^10.6.0",
