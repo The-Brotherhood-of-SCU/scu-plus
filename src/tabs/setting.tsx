@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Form, Switch, Input, Button, Spin, Select, message, notification, ColorPicker, } from 'antd';
-import { getSetting, saveSetting, SettingItem } from "~script/config";
+import { getSetting, saveSetting } from "~script/config";
+import { SettingItem } from "../common/types";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
@@ -40,6 +41,7 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+  const initialSettingRef = useRef<SettingItem | null>(null);
 
   const [showAvatarFields, setShowAvatarFields] = useState(false);
   const [showNameHideField, setShowNameHideField] = useState(false);
@@ -83,6 +85,7 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
       setShowAvatarFields(!!savedSettings.avatarSwitch);
       setShowNameHideField(!!savedSettings.nameHideSwitch);
       setShowBeautifyField(!!savedSettings.beautifySwitch);
+      initialSettingRef.current = savedSettings;
     };
 
     loadSettings();
@@ -103,7 +106,8 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
   }, [isDirty]);
 
   const handleFormChange = (changedValues: Partial<SettingItem>) => {
-    let newConfig;
+    const initialSetting = initialSettingRef.current;
+    let newConfig: SettingItem;
     setSetting(prev => {
       newConfig = { ...prev, ...changedValues };
       return newConfig;
@@ -111,7 +115,15 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
     setShowAvatarFields(form.getFieldValue('avatarSwitch'));
     setShowBeautifyField(form.getFieldValue('beautifySwitch'));
     setShowNameHideField(form.getFieldValue('nameHideSwitch'));
-    setIsDirty(true);
+    if (newConfig) {
+      if (SettingItem.equals(initialSetting, newConfig)) {
+        //unchanged logically
+        setIsDirty(false);
+      } else {
+        //changed
+        setIsDirty(true);
+      }
+    }
   };
 
   if (loading) {
