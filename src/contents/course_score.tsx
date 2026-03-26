@@ -1,3 +1,7 @@
+/*
+ *  选课通
+ */
+
 import ReactDOM from "react-dom/client"
 import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
@@ -424,17 +428,20 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
+    const [comments, setComments] = useState<any[]>([]);
     const url = `https://duomi.chenyipeng.com/pennisetum/scu/score/getDetail?kid=${parameters.kid}`
+    const commentUrl = `https://duomi.chenyipeng.com/pennisetum/scu/score/getClassCommentList?kid=${parameters.kid}`
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
 
-                const response = await chrome.runtime.sendMessage({
-                    action: Actions.REQUEST,
-                    url: url
-                });
+                const [response, commentRes] = await Promise.all([
+                    chrome.runtime.sendMessage({ action: Actions.REQUEST, url }),
+                    chrome.runtime.sendMessage({ action: Actions.REQUEST, url: commentUrl }),
+                ]);
+
                 if (!response.success) {
                     message.error("请求失败!")
                     return
@@ -445,6 +452,13 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                     setData(result.data);
                 } else {
                     throw new Error('获取数据失败');
+                }
+
+                if (commentRes.success) {
+                    const commentResult = JSON.parse(commentRes.data);
+                    if (commentResult.code === 200) {
+                        setComments(commentResult.list ?? commentResult.data ?? []);
+                    }
                 }
             } catch (err) {
                 setError(err.message);
@@ -587,6 +601,46 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                         <h3>历史考试平均分趋势</h3>
                         <Line {...configLine} />
                     </div>
+                )}
+
+                {comments.length > 0 && (
+                    <>
+                        <Divider />
+                        <div>
+                            <h3>课程评论</h3>
+                            {comments.map((c) => (
+                                <div key={c.cid} style={{
+                                    display: 'flex',
+                                    gap: '10px',
+                                    marginBottom: '16px',
+                                    alignItems: 'flex-start'
+                                }}>
+                                    <img
+                                        src={c.anonymous ? 'https://duomi.chenyipeng.com/static/avatar/boy-1.png' : c.creator?.avatarUrl}
+                                        alt="avatar"
+                                        style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
+                                                {c.anonymous ? '匿名用户' : c.creator?.nickName}
+                                            </span>
+                                            <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
+                                                {new Date(c.date).toLocaleDateString('zh-CN')}
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '13px', margin: '4px 0', color: 'rgba(0,0,0,0.75)' }}>
+                                            {c.content}
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#faad14' }}>
+                                            {'★'.repeat(Math.round(c.rank / 2))}{'☆'.repeat(5 - Math.round(c.rank / 2))}
+                                            <span style={{ color: 'rgba(0,0,0,0.45)', marginLeft: 4 }}>{c.rank}/10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </Card>
             <span style={{color:"grey"}}>数据来源：陈一一的自留地</span>
