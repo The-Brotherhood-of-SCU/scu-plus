@@ -5,6 +5,10 @@ import { Actions } from '../constants/actions';
 
 export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
 
+/**
+ * 检查插件是否有新版本可用
+ * @returns Promise<UpdateCheckResult> 版本检查结果
+ */
 async function checkVersion () : Promise<UpdateCheckResult>{
     let newest_config = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
     if (!newest_config.success) {
@@ -21,6 +25,11 @@ async function checkVersion () : Promise<UpdateCheckResult>{
     }
 }
 
+/**
+ * 选择第一个匹配 CSS 选择器的元素并执行回调
+ * @param selector CSS 选择器字符串
+ * @param callback 对匹配元素执行的回调函数
+ */
 const $ = (selector: string, callback = (element: HTMLElement) => { }) => {
     let e = document.querySelector(selector);;
     if (e) {
@@ -33,6 +42,11 @@ const $ = (selector: string, callback = (element: HTMLElement) => { }) => {
     }
 }
 
+/**
+ * 选择所有匹配 CSS 选择器的元素并对每个元素执行回调
+ * @param selector CSS 选择器字符串
+ * @param callback 对每个匹配元素执行的回调函数
+ */
 const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
     let children = document.querySelectorAll(selector);
     if (children) {
@@ -47,6 +61,10 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
     }
 }
 
+/**
+ * 获取每日一句
+ * @returns 每日一句内容，失败返回 null
+ */
 const dailySentence = async () => {
     const response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.dailySentence.link });
     if (response.success) {
@@ -55,6 +73,11 @@ const dailySentence = async () => {
     return null;
 }
 
+/**
+ * 使用 XPath 表达式查询 DOM 元素
+ * @param xpath_expression XPath 表达式
+ * @param resolve 对查询结果执行的回调函数
+ */
 const xpath_query = (xpath_expression:string,resolve = (element:HTMLElement)=>{})=>{
     const result = document.evaluate(xpath_expression,document).iterateNext() as HTMLElement;
     if(result){
@@ -76,15 +99,31 @@ function createSecondPageElement(innerHTML:string=""):HTMLElement{
     return wrapper;
 }
 
+/**
+ * 下载 canvas 元素为图片
+ * @param canvas 要下载的 canvas 元素
+ * @param name 下载文件名
+ * @param scale 图片缩放比例
+ */
 async function downloadCanvas(canvas:HTMLElement,name:string,scale:number) {
     const result = await snapdom(canvas, { scale: scale, embedFonts: false });
     await result.download({ format: 'png', filename: name });
 }
 
+  /**
+   * 延迟指定毫秒数
+   * @param ms 延迟时间（毫秒）
+   */
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  /**
+   * 生成指定范围内的随机整数
+   * @param min 最小值（包含）
+   * @param max 最大值（包含）
+   * @returns 随机整数
+   */
   function randomInt(min:number,max:number){
     return Math.floor(Math.random() * 100 % (max +1 - min)) + min;
   }

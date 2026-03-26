@@ -144,7 +144,7 @@ function createSettingsMenuItem(): HTMLElement {
     checkVersion().then(result => {
       if (result === UpdateCheckResult.NEW_VERSION_AVAILABLE) {
         confirm({
-          title: "获取到新版本，是否调整下载？",
+          title: "检测到新版本，是否立即下载？",
           okText: "确定",
           cancelText: "取消",
           onOk: () => window.open(package_config.download)
