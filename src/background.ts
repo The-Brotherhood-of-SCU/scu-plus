@@ -93,17 +93,31 @@ async function updateAvatarRedirectRules(redirectUrl) {
             urlFilter: '*://zhjw.scu.edu.cn/*student/rollInfo/img',
             resourceTypes: ['image']
         }
-    }
+    },
+    {
+        id: 5,
+        priority: 1,
+        action: {
+            type: 'redirect',
+            redirect: {
+                url: redirectUrl
+            }
+        },
+        condition: {
+            urlFilter: '*://zhjw.scu.edu.cn/img/icon/default_photo.png',
+            resourceTypes: ['image']
+        }
+    },
 ];
     // 更新规则
     (chrome.declarativeNetRequest as any).updateDynamicRules({
-        removeRuleIds: [1,2,3,4],
+        removeRuleIds: [1,2,3,4,5],
         addRules: newRules as any
     });
 }
 
 function removeAvatarRedirectRules(){
     chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: [1,2,3,4],
+        removeRuleIds: [1,2,3,4,5],
     });
 }
