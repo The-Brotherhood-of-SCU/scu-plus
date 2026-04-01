@@ -1,15 +1,4 @@
-import type { PlasmoCSConfig } from "plasmo"
 import { $, downloadCanvas } from "~script/utils";
-
-export const config: PlasmoCSConfig = {
-    matches: [
-        "*://zhjw.scu.edu.cn/*student/courseSelect/*",
-        "*://zhjw.scu.edu.cn/*student/courseSelect/thisSemesterCurriculum/*",
-        "*://zhjw.scu.edu.cn/*student/courseSelect/courseSelectResult/*",
-        "*://zhjw.scu.edu.cn/*student/courseSelect/calendarSemesterCurriculum/*"
-    ],
-    all_frames: true
-}
 
 function extractData(): { attribute: string; credit: number }[] {
     const rows = document.querySelectorAll("#tab10646 > table > tbody > tr");
@@ -26,7 +15,7 @@ function extractData(): { attribute: string; credit: number }[] {
     return data;
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -125,12 +114,6 @@ function hideKbtAndObserve() {
     observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
 }
 
-window.addEventListener("load", () => {
-    inject();
-    injectExportFunc();
-    hideKbtAndObserve();
-})
-
 // 注入学分统计
 async function inject() {
     $('#h4_id1 > span.label.label-lg.label-danger.arrowed-in',e=>{
@@ -153,7 +136,7 @@ async function inject() {
     show_elememt.innerHTML = `
     <span style="font-size:1.3rem;color:red;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
     `;
-    show_elememt.querySelector("span").innerText += " \u{1f3af}by SCU+";
+    show_elememt.querySelector("span")!.innerText += " \u{1f3af}by SCU+";
     $("#myTab > li", (e) => e.appendChild(show_elememt));
 }
 
@@ -359,4 +342,10 @@ const injectExportFunc = () => {
             }
         })
     })
+}
+
+export function initCourseTable(): void {
+    inject();
+    injectExportFunc();
+    hideKbtAndObserve();
 }

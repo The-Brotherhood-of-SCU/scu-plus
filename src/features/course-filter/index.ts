@@ -1,12 +1,3 @@
-import type { PlasmoCSConfig } from "plasmo"
-
-export const config: PlasmoCSConfig = {
-  matches: [
-    "*://zhjw.scu.edu.cn/student/courseSelect/*Course/index?*",
-  ],
-  all_frames: true
-}
-
 // 类型定义
 interface GridSection {
   label: string;
@@ -33,12 +24,10 @@ declare global {
   }
 }
 
-if (!window.scuCourseFilterLoaded) {
+export function initCourseFilter(): void {
+  if (window.scuCourseFilterLoaded) return;
   window.scuCourseFilterLoaded = true;
-  initialize();
-}
 
-function initialize(): void {
   const CAMPUS_LIST: string[] = ["江安", "望江", "华西", "其他"];
   const gridDays: string[] = ['一', '二', '三', '四', '五', '六', '七'];
   const gridSections: GridSection[] = [
@@ -388,7 +377,6 @@ function initialize(): void {
 
     // 折叠为球
     const toggleBtn = document.getElementById('scu-filter-toggle') as HTMLElement | null;
-    const body = document.getElementById('scu-filter-body') as HTMLElement | null;
     let collapsed: boolean = false;
     
     if (toggleBtn) {

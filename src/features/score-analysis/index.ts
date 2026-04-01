@@ -1,4 +1,3 @@
-import type { PlasmoCSConfig } from "plasmo";
 import { Decimal } from "decimal.js";
 import { $ } from "~script/utils";
 import {
@@ -28,16 +27,11 @@ Chart.register(
   annotationPlugin
 );
 
-export const config: PlasmoCSConfig = {
-  matches: ["*://zhjw.scu.edu.cn/*student/integratedQuery/scoreQuery/schemeScores/*"],
-  all_frames: true
-};
-
 let canvasIsOpen = false;
 let wrapper: HTMLDivElement;
 let style: HTMLStyleElement;
-let gpaChartInstance: Chart = null;
-let creditChartInstance: Chart = null;
+let gpaChartInstance: Chart | null = null;
+let creditChartInstance: Chart | null = null;
 
 function getGPA(score: number): number {
   if (score >= 90) return 4.0;
@@ -71,7 +65,7 @@ function calculateWeightedAverage(data: { credit: number; value: number }[]) {
   return totalCredit ? Decimal.div(total, totalCredit) : 0;
 }
 
-window.addEventListener("load", () => {
+export function initScoreAnalysis(): void {
   const container = document.querySelector("#page-content-template > div > div");
   if (!container) return;
 
@@ -190,15 +184,14 @@ window.addEventListener("load", () => {
   wrapper.innerHTML = template;
   container.insertBefore(wrapper, container.firstChild);
   container.insertBefore(style, container.firstChild);
-  const loadChartJS = () => {
-    initApp();
-  };
+  
+  initApp();
 
-  const initApp = () => {
+  function initApp() {
     const btn = document.getElementById('calculate-btn');
-    btn.addEventListener('click', analyzeGrades);
-    document.getElementById('close-btn').addEventListener("click", () => {
-      //wrapper.style.display = "none";
+    if (btn) btn.addEventListener('click', analyzeGrades);
+    const closeBtn = document.getElementById('close-btn');
+    if (closeBtn) closeBtn.addEventListener("click", () => {
       canvasIsOpen = false;
       if (gpaChartInstance) {
         gpaChartInstance.destroy();
@@ -213,7 +206,7 @@ window.addEventListener("load", () => {
     });
   };
 
-  const analyzeGrades = () => {
+  function analyzeGrades() {
     if (canvasIsOpen) return;
     canvasIsOpen = true;
     const data = extractData();
@@ -258,12 +251,12 @@ window.addEventListener("load", () => {
 
     // 更新界面
     updateStatsDisplay({
-      averageGPA,
+      averageGPA: Number(averageGPA),
       totalCredits,
-      requiredGPA,
+      requiredGPA: Number(requiredGPA),
       requiredCredits,
-      averageScore,
-      requiredAverageScore
+      averageScore: Number(averageScore),
+      requiredAverageScore: Number(requiredAverageScore)
     });
 
     renderCharts({
@@ -271,150 +264,174 @@ window.addEventListener("load", () => {
       requiredCredits,
       totalCredits,
       optionalCredits,
-      averageGPA,
+      averageGPA: Number(averageGPA),
     });
     wrapper.style.display = "block";
-    document.getElementById('charts-section').style.display = 'block';
+    const chartsSection = document.getElementById('charts-section');
+    if (chartsSection) chartsSection.style.display = 'block';
   };
 
-  const updateStatsDisplay = ({ averageGPA, totalCredits, requiredGPA, requiredCredits, averageScore, requiredAverageScore }) => {
+  function updateStatsDisplay({ averageGPA, totalCredits, requiredGPA, requiredCredits, averageScore, requiredAverageScore }: {
+    averageGPA: number;
+    totalCredits: number;
+    requiredGPA: number;
+    requiredCredits: number;
+    averageScore: number;
+    requiredAverageScore: number;
+  }) {
     const grid = document.getElementById('stats-grid');
-    grid.innerHTML = `
-      <div class="stat-card">
-        <div class="stat-value">${averageGPA.toFixed(2)}</div>
-        <div class="stat-label">平均绩点</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${requiredGPA.toFixed(2)}</div>
-        <div class="stat-label">必修绩点</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${totalCredits.toFixed(1)}</div>
-        <div class="stat-label">获得总学分</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${requiredCredits.toFixed(1)}</div>
-        <div class="stat-label">必修学分</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${averageScore.toFixed(1)}</div>
-        <div class="stat-label">平均成绩</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${requiredAverageScore.toFixed(1)}</div>
-        <div class="stat-label">必修平均成绩(含不及格科目)</div>
-      </div>
-    `;
+    if (grid) {
+        grid.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-value">${averageGPA.toFixed(2)}</div>
+            <div class="stat-label">平均绩点</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${requiredGPA.toFixed(2)}</div>
+            <div class="stat-label">必修绩点</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${totalCredits.toFixed(1)}</div>
+            <div class="stat-label">获得总学分</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${requiredCredits.toFixed(1)}</div>
+            <div class="stat-label">必修学分</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${averageScore.toFixed(1)}</div>
+            <div class="stat-label">平均成绩</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${requiredAverageScore.toFixed(1)}</div>
+            <div class="stat-label">必修平均成绩(含不及格科目)</div>
+          </div>
+        `;
+    }
   };
 
-  const renderCharts = ({ passed, requiredCredits, totalCredits, optionalCredits, averageGPA }) => {
+  function renderCharts({ passed, requiredCredits, totalCredits, optionalCredits, averageGPA }: {
+    passed: any[];
+    requiredCredits: number;
+    totalCredits: number;
+    optionalCredits: number;
+    averageGPA: number;
+  }) {
     if (gpaChartInstance) gpaChartInstance.destroy();
     if (creditChartInstance) creditChartInstance.destroy();
     // GPA 分布图表
     const labelsNumerical = [4.0, 3.7, 3.3, 3.0, 2.7, 2.3, 2.0, 1.7, 1.3, 1.0]; // 数值标签
 
-    const gpaCtx = (document.getElementById('gpaChart') as HTMLCanvasElement).getContext('2d');
-    gpaChartInstance = new Chart(gpaCtx, {
-      type: 'bar',
-      data: {
-        labels: labelsNumerical.map(String),
-        datasets: [{
-          label: '课程数量',
-          data: getGradeDistribution(passed).map((count, index) => ({
-            x: labelsNumerical[index],
-            y: count
-          })),
-          backgroundColor: 'rgba(99, 102, 241, 0.8)',
-          borderRadius: 5,
-          categoryPercentage: 1.0,
-          barPercentage: 0.8
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: '成绩分布统计'
-          },
-          annotation: {
-            annotations: {
-              averageLine: {
-                type: 'line',
-                xMin: averageGPA,
-                xMax: averageGPA,
-                borderColor: 'green',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                label: {
-                  display: true,
-                  content: `平均值: ${averageGPA.toFixed(2)}`,
-                  position: 'end',
-                  backgroundColor: 'rgba(25, 234, 63, 0.8)',
-                  color: '#fff'
+    const gpaCanvas = document.getElementById('gpaChart') as HTMLCanvasElement;
+    if (gpaCanvas) {
+        const gpaCtx = gpaCanvas.getContext('2d');
+        if (gpaCtx) {
+            gpaChartInstance = new Chart(gpaCtx, {
+              type: 'bar',
+              data: {
+                labels: labelsNumerical.map(String),
+                datasets: [{
+                  label: '课程数量',
+                  data: getGradeDistribution(passed).map((count, index) => ({
+                    x: labelsNumerical[index],
+                    y: count
+                  })),
+                  backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                  borderRadius: 5,
+                  categoryPercentage: 1.0,
+                  barPercentage: 0.8
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: '成绩分布统计'
+                  },
+                  annotation: {
+                    annotations: {
+                      averageLine: {
+                        type: 'line',
+                        xMin: averageGPA,
+                        xMax: averageGPA,
+                        borderColor: 'green',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        label: {
+                          display: true,
+                          content: `平均值: ${averageGPA.toFixed(2)}`,
+                          position: 'end',
+                          backgroundColor: 'rgba(25, 234, 63, 0.8)',
+                          color: '#fff'
+                        }
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    type: 'linear',
+                    beginAtZero: true
+                  },
+                  x: {
+                    type: 'linear',
+                    ticks: {
+                      callback: (value) => (value as number).toFixed(1)
+                    },
+                    min: 1.0,
+                    max: 4.0
+                  }
                 }
               }
-            }
-          }
-        },
-        scales: {
-          y: {
-            type: 'linear',
-            beginAtZero: true
-          },
-          x: {
-            type: 'linear',
-            ticks: {
-              callback: (value) => (value as number).toFixed(1)
-            },
-            min: 1.0,
-            max: 4.0
-          }
+            });
         }
-      }
-    });
+    }
 
     // 学分构成图表
-    const creditCtx = (document.getElementById('creditChart') as HTMLCanvasElement).getContext('2d');
-    creditChartInstance = new Chart(creditCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['必修学分', '选修学分', '任选学分'],
-        datasets: [{
-          data: [requiredCredits, totalCredits - requiredCredits - optionalCredits, optionalCredits],
-          backgroundColor: ['#90EE90', '#ADD8E6', '#FFB6C1'],
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          },
-          tooltip: {
-            enabled: true,
-            callbacks: {
-              label: function (context) {
-                const label = context.label || '';
-                const value = context.raw || 0;
-                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                const percentage = ((value as number / total) * 100).toFixed(2) + '%';
-                return `${label}(${value}): ${percentage}`;
+    const creditCanvas = document.getElementById('creditChart') as HTMLCanvasElement;
+    if (creditCanvas) {
+        const creditCtx = creditCanvas.getContext('2d');
+        if (creditCtx) {
+            creditChartInstance = new Chart(creditCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ['必修学分', '选修学分', '任选学分'],
+                datasets: [{
+                  data: [requiredCredits, totalCredits - requiredCredits - optionalCredits, optionalCredits],
+                  backgroundColor: ['#90EE90', '#ADD8E6', '#FFB6C1'],
+                  hoverOffset: 4
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    enabled: true,
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = (context.dataset.data as number[]).reduce((acc, val) => acc + val, 0);
+                        const percentage = ((value as number / total) * 100).toFixed(2) + '%';
+                        return `${label}(${value}): ${percentage}`;
+                      }
+                    }
+                  }
+                }
               }
-            }
-          }
+            });
         }
-      }
-    });
+    }
   };
 
-  const getGradeDistribution = (data) => {
+  function getGradeDistribution(data: any[]) {
     const ranges = [[90, 100], [85, 89], [80, 84], [76, 79], [73, 75], [70, 72], [66, 69], [63, 65], [61, 62], [60, 60]];
     return ranges.map(([min, max]) =>
       data.filter(item => item.score >= min && item.score <= max).length
     );
   };
-
-  loadChartJS();
-});
+}

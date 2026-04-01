@@ -10,7 +10,7 @@ export function injectNavbar(settings: SettingItem): void {
 
     $("#navbar-container > div.navbar-header.pull-left > a > small", (title) => {
       title.style.color = "black";
-      title.innerText = `四川大学教务管理系统(SCU+ v${package_config.version})🎯`;
+      title.innerText = `四川大学教务管理系统(SCU+ v${package_config.version})\u{1f3af}`;
     });
 
     if (settings.nameHideSwitch) {

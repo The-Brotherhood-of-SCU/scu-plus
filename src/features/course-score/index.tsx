@@ -1,43 +1,23 @@
-/*
- *  选课通
- */
-
 import ReactDOM from "react-dom/client"
-import type { PlasmoCSConfig } from "plasmo"
 import { xpath_query } from "~script/utils"
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Space, Input, Button, Card, message, Spin, Row, Col, Statistic, Divider } from 'antd';
 import { ArrowLeftOutlined, CloseOutlined } from "@ant-design/icons";
 
 import { Line, Pie } from "@ant-design/charts";
-import { Actions } from "../constants/actions";
+import { Actions } from "../../constants/actions";
 import { MenuIds } from "~constants/menuIds";
 
 let searchPageScrollTop = 0;
 
-export default () => <></>
-
-export const config: PlasmoCSConfig = {
-    matches: [
-        "*://zhjw.scu.edu.cn/**",
-    ],
-    all_frames: true
-}
 enum PageType {
     SearchPage,
     CourseStats
 }
 
-
 let parameters = {
     kid: "",
 }
-
-window.addEventListener("load", () => {
-    setTimeout(() => {
-        xpath_query(`//*[@id="${MenuIds.COURSE_SCORE}"]/ul/li/ul/li/a`, (e) => e.onclick = popupWindow)
-    }, 1000);
-})
 
 function popupWindow() {
     if (document.querySelectorAll("#course_score").length != 0) {
@@ -77,22 +57,24 @@ function PopUp() {
     const setPage = (val: number) => setSearchState(prev => ({ ...prev, page: val }));
     const setHasMore = (val: boolean) => setSearchState(prev => ({ ...prev, hasMore: val }));
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
         if (e.button !== 0) return;  // 只响应左键点击(button 0)
 
-        const target = e.target;
+        const target = e.target as HTMLElement;
         if (target.closest('#popup-title')) {
             const container = document.getElementById('course_score_content');
-            const rect = container.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top;
+            if (container) {
+                const rect = container.getBoundingClientRect();
+                const offsetX = e.clientX - rect.left;
+                const offsetY = e.clientY - rect.top;
 
-            setDragging(true);
-            setOffset([offsetX, offsetY]);
+                setDragging(true);
+                setOffset([offsetX, offsetY]);
+            }
         }
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
         if (dragging) {
             setPosition([
                 e.clientX - offset[0],
@@ -191,7 +173,7 @@ function PopUp() {
                     background: 'rgba(0, 0, 0, 0.1)',
                     cursor: 'pointer',
                 }}
-                onMouseDown={handleMouseDown}
+                onMouseDown={handleMouseDown as any}
             >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Button
@@ -357,7 +339,7 @@ function SearchPage({
                     gap: '16px',
                     justifyContent: 'flex-start'
                 }}>
-                    {data.map((item, index) => (
+                    {data.map((item: any, index) => (
                         <Card
                             key={index}
                             title={item.kname}
@@ -426,8 +408,8 @@ function SearchPage({
 
 function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
+    const [data, setData] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
     const [comments, setComments] = useState<any[]>([]);
     const url = `https://duomi.chenyipeng.com/pennisetum/scu/score/getDetail?kid=${parameters.kid}`
     const commentUrl = `https://duomi.chenyipeng.com/pennisetum/scu/score/getClassCommentList?kid=${parameters.kid}`
@@ -460,7 +442,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                         setComments(commentResult.list ?? commentResult.data ?? []);
                     }
                 }
-            } catch (err) {
+            } catch (err: any) {
                 setError(err.message);
                 message.error('获取课程数据失败: ' + err.message);
             } finally {
@@ -501,13 +483,13 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     ];
 
     // 历史分数数据
-    const historyData = data.history.map(item => ({
+    const historyData = data.history.map((item: any) => ({
         examTime: item.examTime?.toString() ?? '未知',
         avg: parseFloat(item.avg.toFixed(1)),
         max: item.max,
         min: item.min,
         count: item.count,
-    })).sort((a, b) => parseInt(a.examTime) - parseInt(b.examTime));
+    })).sort((a: any, b: any) => parseInt(a.examTime) - parseInt(b.examTime));
 
     // 饼状图配置
     const configPie = {
@@ -591,7 +573,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
                 <div className="chart-section">
                     <h3>成绩分布</h3>
-                    <Pie {...configPie} />
+                    <Pie {...configPie as any} />
                 </div>
 
                 <Divider />
@@ -599,7 +581,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
                 {historyData.length > 0 && historyData[0].avg != 0 && (
                     <div className="chart-section">
                         <h3>历史考试平均分趋势</h3>
-                        <Line {...configLine} />
+                        <Line {...configLine as any} />
                     </div>
                 )}
 
@@ -647,3 +629,9 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
         </div>
     );
 };
+
+export function initCourseScore(): void {
+    setTimeout(() => {
+        xpath_query(`//*[@id="${MenuIds.COURSE_SCORE}"]/ul/li/ul/li/a`, (e) => e.onclick = popupWindow)
+    }, 1000);
+}
