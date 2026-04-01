@@ -62,6 +62,17 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
     });
   };
   const testOcr = async () => {
+    // 检查权限
+    const hasPermission = await checkAndRequestPermission(setting.ocrProvider);
+    if (!hasPermission) {
+      notificationApi.warning({
+        message: '权限不足',
+        description: '请在弹窗中允许访问该 OCR 服务器，否则无法测试。',
+        placement: 'topRight',
+      });
+      return;
+    }
+
     if (await testOcrUrl(setting.ocrProvider)) {
       notificationApi.success({
         message: '测试成功',
@@ -291,7 +302,15 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
           <Switch />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={() => { saveSettingWithUpdates(setting); success(); setIsDirty(false); }} style={{ marginRight: '10px' }}>
+          <Button type="primary" onClick={async () => {
+            const hasPermission = await checkAndRequestPermission(setting.ocrProvider);
+            if (!hasPermission) {
+              message.error("未获得 OCR 服务器访问权限，功能可能受限");
+            }
+            saveSettingWithUpdates(setting);
+            success();
+            setIsDirty(false);
+          }} style={{ marginRight: '10px' }}>
             保存
           </Button>
           <Button onClick={handleReset} style={{ marginRight: '10px' }}>
@@ -356,6 +375,26 @@ function TitleFragment({ isDirty }: { isDirty: boolean }) {
       <div style={{ fontSize: 20, fontWeight: 500 }}>SCU PLUS 设置{isDirty ? '（未保存）' : ''}</div>
     </div>
   );
+}
+
+async function checkAndRequestPermission(url: string): Promise<boolean> {
+  if (!url || url.trim() === "") return true;
+  try {
+    const origin = new URL(url).origin + "/*";
+    const hasPermission = await chrome.permissions.contains({
+      origins: [origin]
+    });
+    if (hasPermission) return true;
+
+    // 动态申请权限
+    const granted = await chrome.permissions.request({
+      origins: [origin]
+    });
+    return granted;
+  } catch (e) {
+    console.error("Permission request failed:", e);
+    return false;
+  }
 }
 
 async function testOcrUrl(url: string): Promise<boolean> {
