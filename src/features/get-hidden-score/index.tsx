@@ -29,7 +29,7 @@ function WarnUi() {
     );
 
     return <Alert
-        message="SCU+ 警告"
+        title="SCU+ 警告"
         description={warningContent}
         type="warning"
         showIcon
