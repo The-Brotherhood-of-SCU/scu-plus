@@ -94,35 +94,57 @@ def commit_changes(new_version:str):
         else:
             print(f"提交失败: {e.stderr}")
             raise
+def check_tag_exists(tag_name: str, remote: str):
+    # 检查本地是否存在 tag
+    local_check = subprocess.run(
+        ['git', 'rev-parse', tag_name],
+        capture_output=True,
+        text=True
+    )
+    local_exists = local_check.returncode == 0
+
+    # 检查远程是否存在 tag
+    remote_check = subprocess.run(
+        ['git', 'ls-remote', '--tags', remote, tag_name],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    remote_exists = tag_name in remote_check.stdout
+
+    return local_exists, remote_exists
+
 def push_remote():
     print(f"推送 main 分支到 {remote}...")
     subprocess.run(
-        ['git', 'push', remote, 'main'],
+        ['git', 'push', remote, 'refs/heads/main'],
         check=True
     )
 
-def create_tag(tag_name:str):
+def create_tag(tag_name: str, force: bool = False):
     print(f"创建tag {tag_name}...")
-    subprocess.run(
-        ['git', 'tag', tag_name, 'main'],
-        check=True
-    )
+    cmd = ['git', 'tag']
+    if force:
+        cmd.append('-f')
+    cmd.extend([tag_name, 'HEAD'])
+    subprocess.run(cmd, check=True)
 
-def push_tag(remote:str,tag_name:str):
+def push_tag(remote: str, tag_name: str, force: bool = False):
     print(f"推送tag {tag_name} 到 {remote}...")
-    subprocess.run(
-        ['git', 'push', remote, tag_name],
-        check=True
-    )
+    cmd = ['git', 'push']
+    if force:
+        cmd.append('-f')
+    cmd.extend([remote, tag_name])
+    subprocess.run(cmd, check=True)
 
 remotes = get_remotes()
-assert len(remotes)==1, "存在多个远程分支，当前脚本仅支持单个远程分支"
+assert len(remotes) == 1, "存在多个远程分支，当前脚本仅支持单个远程分支"
 
 remote = remotes[0]
 url = get_remote_url(remote)
 print(f"当前远程: {remote} {url}")
 
-latest_tag=get_latest_tag()
+latest_tag = get_latest_tag()
 
 with open('package.json', 'r', encoding='utf-8') as f:
     version = json.load(f)['version']
@@ -130,35 +152,49 @@ print(f"当前版本(package.json): {version} ; 最新tag: {latest_tag}")
 
 uncommitted_changes, changed_files = has_unsaved_changes()
 if uncommitted_changes:
-    print("存在未提交的更改:",end="")
+    print("存在未提交的更改:", end="")
     for file in changed_files:
-        print(f"{file[file.find(' ')+1:]},",end="")
+        print(f"{file[file.find(' ')+1:]},", end="")
     print("请先提交或暂存更改。")
     exit(1)
-done=False
-new_version_default=get_version_increase(version)
+done = False
+new_version_default = get_version_increase(version)
 while not done:
-    new_version=input(f"请输入新的版本号(默认:{new_version_default}):")
+    new_version = input(f"请输入新的版本号(默认:{new_version_default}):")
     if not new_version:
-        new_version=new_version_default
+        new_version = new_version_default
     if verify_pattern(new_version):
-        done=True
+        done = True
     else:
         print("版本号格式错误，应为x.y.z")
 
-tag_name_default=f"v{new_version}"
-tag_name=input(f"请输入新tag名称(默认:{tag_name_default}):")
+tag_name_default = f"v{new_version}"
+tag_name = input(f"请输入新tag名称(默认:{tag_name_default}):")
 if not tag_name:
-    tag_name=tag_name_default
+    tag_name = tag_name_default
+
+local_exists, remote_exists = check_tag_exists(tag_name, remote)
+force_needed = False
+if local_exists or remote_exists:
+    location = []
+    if local_exists: location.append("本地")
+    if remote_exists: location.append("远程")
+    print(f"警告: Tag '{tag_name}' 已在 {' 和 '.join(location)} 存在。")
+    confirm_force = input("是否强制覆盖现有 Tag？(y/n): ")
+    if confirm_force.lower() == 'y':
+        force_needed = True
+    else:
+        print("操作已取消。")
+        exit(0)
 
 print(f"即将修改package.json中的版本号为:{new_version}，并创建tag {tag_name}，然后推送。")
 print("请确认是否继续？(y/n)")
-confirm=input()
-if confirm.lower()!='y':
+confirm = input()
+if confirm.lower() != 'y':
     print("已取消操作。")
     exit(0)
 
-#modify package.json
+# modify package.json
 with open('package.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 data['version'] = new_version
@@ -166,6 +202,6 @@ with open('package.json', 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=4, ensure_ascii=False)
 
 commit_changes(new_version)
-create_tag(tag_name)
+create_tag(tag_name, force=force_needed)
 push_remote()
-push_tag(remote,tag_name)
+push_tag(remote, tag_name, force=force_needed)
