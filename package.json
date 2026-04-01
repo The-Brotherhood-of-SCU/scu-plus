@@ -53,6 +53,7 @@
         ],
         "browser_specific_settings": {
             "gecko": {
+                "id": "scu-plus@the-brotherhood-of-scu.github.com",
                 "data_collection_permissions": {
                     "required": ["websiteContent"]
                 }

@@ -7,7 +7,8 @@ import "style.css"
 const login_link = "https://id.scu.edu.cn/enduser/sp/sso/scdxplugin_jwt23?enterpriseId=scdx&target_url=index"
 const project_link = packagejson.projectLink
 const gotoSettingPage = () => {
-  openLink(`chrome-extension://${chrome.runtime.id}/tabs/setting.html`)
+  const url = chrome.runtime.getURL("options.html");
+  openLink(url)
 }
 const openLink = (link: string) => {
   window.open(link)

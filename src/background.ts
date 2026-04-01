@@ -30,7 +30,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         removeAvatarRedirectRules()
         return false;
     }else if(message.action==Actions.OPEN_SETTINGS){
-        chrome.tabs.create({ url: `chrome-extension://${chrome.runtime.id}/tabs/setting.html` });
+        const url = chrome.runtime.getURL("options.html");
+        chrome.tabs.create({ url: url });
         return false;
     }
 });
