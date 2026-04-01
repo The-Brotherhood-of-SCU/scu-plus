@@ -60,11 +60,9 @@
             "gecko": {
                 "id": "scu-plus@the-brotherhood-of-scu.github.com",
                 "data_collection_permissions": {
-                    "required": {
-                        "websiteContent": {
-                            "description": "Read and send login captcha to OCR server for automatic recognition."
-                        }
-                    }
+                    "required": [
+                        "websiteContent"
+                    ]
                 }
             }
         }
