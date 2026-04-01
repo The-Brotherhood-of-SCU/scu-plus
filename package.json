@@ -1,7 +1,7 @@
 {
     "name": "scu-plus",
     "displayName": "Scu plus",
-    "version": "1.4.9",
+    "version": "1.5.0",
     "description": "四川大学教务系统增强插件",
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
@@ -55,7 +55,9 @@
             "gecko": {
                 "id": "scu-plus@the-brotherhood-of-scu.github.com",
                 "data_collection_permissions": {
-                    "required": ["websiteContent"]
+                    "required": [
+                        "websiteContent"
+                    ]
                 }
             }
         }
