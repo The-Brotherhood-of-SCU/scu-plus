@@ -10,7 +10,7 @@ jobs:
   build-and-release:
     runs-on: windows-latest
     env:
-      BUILD_FIREFOX: false # whether to build firefox plugin
+      BUILD_FIREFOX: true # whether to build firefox plugin
     
     steps:
       - name: Checkout code
