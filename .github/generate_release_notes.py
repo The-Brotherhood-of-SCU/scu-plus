@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # Set stdout to use UTF-8 encoding
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     
-    release_notes = "请下载 chrome-mv3-prod.zip 文件\n\n"+get_release_notes()
+    release_notes = "请下载 chrome-mv3-prod.zip 文件\n\n目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"+get_release_notes()
     print(release_notes)
     
     set_version_env()
