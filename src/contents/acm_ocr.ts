@@ -19,7 +19,7 @@ let ocr_counts = 0;
 
 window.addEventListener("load", () => {
     setTimeout(() => {
-        const img = document.querySelector("#app > div > div > form > img") as HTMLImageElement
+        const img = document.getElementsByClassName("captcha-img-box")[0] as HTMLImageElement
         const input = document.getElementsByClassName("el-input__inner")[2] as HTMLInputElement
         const ocrFunc = async () => {
             if (savedSettings == null) {
