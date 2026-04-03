@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-release:
     runs-on: windows-latest
+    env:
+      BUILD_FIREFOX: true # whether to build firefox plugin
     
     steps:
       - name: Checkout code
@@ -42,8 +44,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
-      - name: Build plugin
+      - name: Build chrome plugin
         run: pnpm build --zip
+
+      - name: Build firefox plugin
+        if: env.BUILD_FIREFOX == 'true'
+        run: pnpm build --zip --target=firefox-mv3
 
       - name: Create Release
         id: create_release
@@ -65,6 +71,17 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/chrome-mv3-prod.zip
           asset_name: chrome-mv3-prod-${{ github.ref_name}}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Firefox Release Asset
+        if: env.BUILD_FIREFOX == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/firefox-mv3-prod.zip
+          asset_name: firefox-mv3-prod-${{ github.ref_name}}.zip
           asset_content_type: application/zip
 
       # 上面的版本即将废弃，以下发布release的版本存在bug，等待修复完成后替换

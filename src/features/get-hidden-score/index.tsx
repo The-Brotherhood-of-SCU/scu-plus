@@ -1,57 +1,12 @@
-import type { PlasmoCSConfig, PlasmoGetOverlayAnchor } from "plasmo";
 import ReactDOM from "react-dom/client";
 import { $, createSecondPageElement } from "~script/utils";
 import { Alert } from 'antd';
 import React from "react";
 
-export const config: PlasmoCSConfig = {
-    matches: [
-        "*://zhjw.scu.edu.cn/*student/integratedQuery/scoreQuery/thisTermScores/*",
-    ],
-    all_frames: true,
-}
-
-// 使用tsx好像必须返回一个ReactNode，不然控制台会报错.(for plasmo)
-export default () => <></>
 const pattern = /student\/integratedQuery\/scoreQuery\/.{10}\/thisTermScores\/data/;
-get_hidden_score();
-async function get_hidden_score() {
-    //get scripts
-    const scripts = document.head.querySelectorAll('script');
-    let match:string=null;
-    // 遍历所有 script 标签
-    for(const i of scripts){
-        if(i.type!=="text/javascript"){
-            continue
-        }
-        if(!i.innerHTML.startsWith(`\n\t\t$(function ()`)){
-            continue
-        }
-        const result=i.innerHTML.match(pattern);
-        if(result){
-            match=result[0];
-            break
-        }
-    }
-    if (match) {
-        const firstMatch = `http://zhjw.scu.edu.cn/${match.toString()}`;
-        console.log(`get score url: ${firstMatch}`);
-        const data = await (await fetch(firstMatch)).json();
-        console.log("获取成绩数据成功");
-        //判断当前document是否加载完毕
-        if (document.readyState === "complete") {
-            doReplace(data);
-        } else {
-            window.addEventListener("load", () => {
-                doReplace(data);
-            })
-        }
 
-    } else {
-        console.log("no match data url");
-    }
-}
 const scoreMapper = ["90~100", "85~89", "80~84", "76~79", "73~75", "70~72", "66~69", "63~65", "61~62", "60", "成绩未全部录入/不及格"];
+
 function getScoreRange(scoreValue: string) {
     if (scoreValue === "") return "暂无"
     if (scoreValue === "-999.999") return "未评教"
@@ -62,8 +17,8 @@ function getScoreRange(scoreValue: string) {
         console.log(e)
         return `RAW:${scoreValue}`
     }
-
 }
+
 function WarnUi() {
     const warningContent = (
         <>
@@ -74,25 +29,11 @@ function WarnUi() {
     );
 
     return <Alert
-        message="SCU+ 警告"
+        title="SCU+ 警告"
         description={warningContent}
         type="warning"
         showIcon
         closable />;
-}
-function doReplace(data: any) {
-    const root = ReactDOM.createRoot(createSecondPageElement());
-    root.render(<WarnUi />);
-    $("#timeline-1 > div > div > div > div > table > thead", (header) => {
-        header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计\u{1f3af}</th><th>成绩状态\u{1f3af}</th></tr>";
-    })
-    const body = document.getElementById("scoretbody")
-    if(body==null)return
-    body.setAttribute("id", "scoretbody_changed");
-    const scoreList = data[0]["list"]
-    if(scoreList.length==0)return;
-    let contentHtml = generateInnerHtml(scoreList);
-    body.innerHTML = contentHtml;
 }
 
 function generateInnerHtml(list: any[]): string {
@@ -133,4 +74,54 @@ function generateInnerHtml(list: any[]): string {
         tContent += "</tr>";
     });
     return tContent;
+}
+
+function doReplace(data: any) {
+    const root = ReactDOM.createRoot(createSecondPageElement());
+    root.render(<WarnUi />);
+    $("#timeline-1 > div > div > div > div > table > thead", (header) => {
+        header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计\u{1f3af}</th><th>成绩状态\u{1f3af}</th></tr>";
+    })
+    const body = document.getElementById("scoretbody")
+    if(body==null)return
+    body.setAttribute("id", "scoretbody_changed");
+    const scoreList = data[0]["list"]
+    if(scoreList.length==0)return;
+    let contentHtml = generateInnerHtml(scoreList);
+    body.innerHTML = contentHtml;
+}
+
+export async function initGetHiddenScore(): Promise<void> {
+    const scripts = document.head.querySelectorAll('script');
+    let match:string | null = null;
+    for(const i of scripts){
+        if(i.type!=="text/javascript"){
+            continue
+        }
+        if(!i.innerHTML.startsWith(`\n\t\t$(function ()`)){
+            continue
+        }
+        const result=i.innerHTML.match(pattern);
+        if(result){
+            match=result[0];
+            break
+        }
+    }
+    if (match) {
+        const firstMatch = `http://zhjw.scu.edu.cn/${match}`;
+        console.log(`get score url: ${firstMatch}`);
+        const response = await fetch(firstMatch);
+        const data = await response.json();
+        console.log("获取成绩数据成功");
+        
+        if (document.readyState === "complete") {
+            doReplace(data);
+        } else {
+            window.addEventListener("load", () => {
+                doReplace(data);
+            })
+        }
+    } else {
+        console.log("no match data url");
+    }
 }

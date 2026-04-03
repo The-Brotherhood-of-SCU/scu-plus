@@ -1,7 +1,7 @@
 {
     "name": "scu-plus",
     "displayName": "Scu plus",
-    "version": "1.4.9",
+    "version": "1.5.0",
     "description": "四川大学教务系统增强插件",
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
@@ -42,14 +42,29 @@
     },
     "manifest": {
         "host_permissions": [
+            "*://*.scu.edu.cn/*",
+            "https://server.jeanhua.cn/*",
+            "https://www.wudada.online/*",
+            "https://gitee.com/*",
+            "https://q1.qlogo.cn/*"
+        ],
+        "optional_host_permissions": [
             "https://*/*",
             "http://*/*"
         ],
         "permissions": [
-            "scripting",
             "storage",
-            "nativeMessaging",
             "declarativeNetRequestWithHostAccess"
-        ]
+        ],
+        "browser_specific_settings": {
+            "gecko": {
+                "id": "scu-plus@the-brotherhood-of-scu.github.com",
+                "data_collection_permissions": {
+                    "required": [
+                        "websiteContent"
+                    ]
+                }
+            }
+        }
     }
 }

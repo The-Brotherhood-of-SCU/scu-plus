@@ -1,5 +1,8 @@
-import { SettingItem } from "../../common/types"
-import { dailySentence } from "../../script/utils"
+import { getSetting, SettingItem } from "../../script/config";
+import { dailySentence } from "../../script/utils";
+import { injectNavbar } from "../navbar";
+import { injectMenu } from "../menu";
+import { injectSchoolSchedule } from "../schedule";
 
 function updateCookie(key: string, value: string) {
   const cookies = document.cookie
@@ -248,4 +251,43 @@ export function removePasswordPopup(): void {
 export function isHomePage(): boolean {
   const pathname = window.location.pathname;
   return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);
+}
+
+export async function initHomePage(): Promise<void> {
+  let savedSettings = await getSetting();
+
+  console.log("SCU+插件加载成功\u{1f3af}");
+
+  if (savedSettings.passwordPopupSwitch) {
+    removePasswordPopup();
+  }
+
+  injectNavbar(savedSettings);
+
+  if (savedSettings.beautifySwitch) {
+    injectBeautify();
+    injectCss();
+  }
+
+  injectSchoolSchedule();
+  injectMenu();
+
+  if (!isHomePage()) {
+    console.log("不是主页，不注入主页特定内容");
+    return;
+  }
+
+  if (savedSettings.dailyQuoteSwitch) {
+    injectDailyQuote();
+  }
+
+  hideFailCourse(savedSettings.failSwitch);
+
+  if (savedSettings.gpaCustomText) {
+    customText("#gpa", savedSettings.gpaCustomText);
+  }
+
+  if (savedSettings.failedCourseCustomText) {
+    customText("#coursePas", savedSettings.failedCourseCustomText);
+  }
 }
