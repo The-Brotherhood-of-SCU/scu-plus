@@ -20,10 +20,10 @@
     },
     "dependencies": {
         "@ant-design/charts": "^2.6.7",
-        "@ant-design/icons": "^6.1.0",
+        "@ant-design/icons": "^6.1.1",
         "@plasmohq/storage": "^1.15.0",
-        "@zumer/snapdom": "^2.6.0",
-        "antd": "^6.3.4",
+        "@zumer/snapdom": "^2.7.0",
+        "antd": "^6.3.5",
         "chart.js": "^4.5.1",
         "chartjs-plugin-annotation": "^3.1.0",
         "decimal.js": "^10.6.0",
@@ -36,7 +36,7 @@
         "@types/chrome": "0.1.38",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
-        "baseline-browser-mapping": "^2.10.10",
+        "baseline-browser-mapping": "^2.10.13",
         "prettier": "3.8.1",
         "typescript": "6.0.2"
     },
