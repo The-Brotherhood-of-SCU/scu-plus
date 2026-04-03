@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { $, downloadCanvas } from "~script/utils";
+import { message } from "antd";
 
 export const config: PlasmoCSConfig = {
     matches: [
@@ -235,6 +236,39 @@ const injectExportFunc = () => {
         } catch (e) { console.warn('[SCU+] absolutizeClonePositions failed', e); }
     }
 
+    // helper: copy text to clipboard, fallback for non-HTTPS pages
+    function copyToClipboard(text: string) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            (document as any).execCommand('copy');
+        } finally {
+            document.body.removeChild(ta);
+        }
+        return Promise.resolve();
+    }
+
+    // helper: fetch schedule json and copy to clipboard
+    async function exportScheduleJson() {
+        try {
+            const res = await fetch('http://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/ajaxStudentSchedule/callback');
+            const text = await res.text();
+            await copyToClipboard(text);
+            message.info('课表 JSON 已复制到剪切板');
+        } catch (e) {
+            message.info('导出失败: ' + e);
+        }
+    }
+
     // main: attach export buttons that perform a clone-based safe export
     $('.right_top_oper', (e) => {
         let btn = document.createElement("button");
@@ -297,6 +331,11 @@ const injectExportFunc = () => {
                 try { sandbox.removeChild(wrapper); } catch (e) { }
             }
         });
+        let jsonBtn = document.createElement("button");
+        jsonBtn.setAttribute('class', 'btn btn-success btn-xs btn-round');
+        jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
+        e.appendChild(jsonBtn);
+        jsonBtn.addEventListener('click', exportScheduleJson);
     });
 
     $("#mainDIV > h4:nth-child(3)", (e) => {
@@ -358,5 +397,10 @@ const injectExportFunc = () => {
                 try { sandbox.removeChild(wrapper); } catch (e) { }
             }
         })
+        let jsonBtn = document.createElement("button");
+        jsonBtn.setAttribute('class', 'btn btn-success btn-xs btn-round');
+        jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
+        e.appendChild(jsonBtn);
+        jsonBtn.addEventListener('click', exportScheduleJson);
     })
 }
