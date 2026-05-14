@@ -246,6 +246,37 @@ export function removePasswordPopup(): void {
   };
 
   $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
+
+  // 兼容新版修改密码弹窗：提取 helper，检测并移除包含“修改密码/更改密码”或密码字段的 .modal-dialog
+  function removeIfPasswordModal(md: Element) {
+    try {
+      const text = md.textContent || '';
+      const hasKeywords = /修改密码|更改密码/.test(text);
+      const hasPasswordFields = !!(md.querySelector && (md.querySelector('#oldPass') || md.querySelector('#newPass1') || md.querySelector('#newPass2')));
+      if (!(hasKeywords || hasPasswordFields)) return;
+
+      const containerEl = md.closest && md.closest('.modal') || md.parentElement || md;
+      const container = containerEl as HTMLElement;
+      if (container && typeof container.remove === 'function') {
+        container.remove();
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  try {
+    document.querySelectorAll('.modal-dialog').forEach(removeIfPasswordModal);
+  } catch (e) {
+    console.warn(e);
+  }
+
+  // 同时移除残留的遮罩层
+  try {
+    document.querySelectorAll('.modal-backdrop.fade.in').forEach(b => { try { (b as HTMLElement).remove(); } catch (e) { console.warn(e); } });
+  } catch (e) {
+    console.warn(e);
+  }
 }
 
 export function isHomePage(): boolean {
