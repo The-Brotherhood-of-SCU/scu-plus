@@ -18,6 +18,7 @@ export class SettingItem {
   nameHideSwitch: boolean;
   nameHideText: string;
   ocrProvider: string;
+  skip2faSwitch: boolean;
   gpaCustomText: string;
   failedCourseCustomText: string;
   redirectLoginSwitch: boolean;
@@ -33,6 +34,7 @@ export class SettingItem {
     this.nameHideSwitch = false;
     this.nameHideText = "";
     this.ocrProvider = "";
+    this.skip2faSwitch = false;
     this.gpaCustomText = "";
     this.failedCourseCustomText = "";
     this.redirectLoginSwitch = false;

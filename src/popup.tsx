@@ -14,8 +14,6 @@ const openLink = (link: string) => {
   window.open(link)
 }
 function IndexPopup() {
-
-
   return (
     <div className="darkmode"
       style={{
@@ -28,7 +26,9 @@ function IndexPopup() {
         欢迎使用SCU+插件😘
       </h2>
       <HorizontalLine text="便捷操作" />
-      <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务系统 (统一身份验证)</Button>
+      <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+        <Button onClick={() => openLink(login_link)} type="primary"> 登陆教务系统 (统一身份验证)</Button>
+      </div>
       <Divider style={{height:"5px", padding:"0",margin:"0"}} />
       <Button onClick={() => openLink("http://192.168.2.135")} type="primary" style={{backgroundColor:"yellowgreen"}}> 校园网快捷登陆 </Button>
 

@@ -126,6 +126,7 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
     setShowAvatarFields(form.getFieldValue('avatarSwitch'));
     setShowBeautifyField(form.getFieldValue('beautifySwitch'));
     setShowNameHideField(form.getFieldValue('nameHideSwitch'));
+    
     if (newConfig) {
       if (SettingItem.equals(initialSetting, newConfig)) {
         //unchanged logically
@@ -273,6 +274,14 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
           tooltip="输入OCR接口后将用于在登陆时自动输入验证码，建议和下面将 '四川大学教务管理系统登录' 重定向到 '统一登陆' 功能一起使用"
         >
           <Input placeholder="eg. https://example.com/ocr" />
+        </Form.Item>
+        <Form.Item
+          label="跳过2FA"
+          name="skip2faSwitch"
+          tooltip="开启后在统一身份认证账号登录中使用扩展流程（token + 会话绑定 + 重定向）"
+          valuePropName="checked"
+        >
+          <Switch />
         </Form.Item>
         {showBeautifyField && (<>
           <Form.Item

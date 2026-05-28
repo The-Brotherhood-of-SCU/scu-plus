@@ -29,11 +29,13 @@
         "decimal.js": "^10.6.0",
         "plasmo": "0.90.5",
         "react": "18.2.0",
-        "react-dom": "18.2.0"
+        "react-dom": "18.2.0",
+        "sm-crypto": "^0.4.0"
     },
     "devDependencies": {
         "@ianvs/prettier-plugin-sort-imports": "4.7.1",
         "@types/chrome": "0.1.38",
+        "@types/node": "^25.9.1",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
         "baseline-browser-mapping": "^2.10.13",

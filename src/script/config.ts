@@ -13,11 +13,34 @@ async function getSetting(): Promise<SettingItem> {
     if(cache!=null){
      return cache;
     }
-    var config:SettingItem=await storage.get("setting");
-    if(config==null){
-      config=new SettingItem();
-      storage.set("setting",config);
+    const rawConfig = await storage.get("setting") as Partial<SettingItem> & {
+      scuUnifiedLoginSwitch?: boolean
     }
+
+    if(rawConfig==null){
+      const config = new SettingItem();
+      storage.set("setting",config);
+      cache=config;
+      return config;
+    }
+
+    const migratedConfig: any = { ...rawConfig }
+    if (
+      typeof migratedConfig.skip2faSwitch !== "boolean" &&
+      typeof migratedConfig.scuUnifiedLoginSwitch === "boolean"
+    ) {
+      migratedConfig.skip2faSwitch = migratedConfig.scuUnifiedLoginSwitch
+    }
+
+    const config = Object.assign(new SettingItem(), migratedConfig)
+    const shouldPersist = (Object.keys(new SettingItem()) as Array<keyof SettingItem>)
+      .some((key) => (config as any)[key] !== (rawConfig as any)[key])
+      || "scuUnifiedLoginSwitch" in migratedConfig
+
+    if (shouldPersist) {
+      storage.set("setting", config)
+    }
+
     cache=config;
     return config;
 }
