@@ -1,8 +1,14 @@
 import { sm2 } from 'sm-crypto';
 
 function base64ToHex(base64: string): string {
-  const raw = Buffer.from(base64, 'base64');
-  return raw.toString('hex');
+  const clean = base64.replace(/\s+/g, "");
+  const binary = atob(clean);
+  let hex = "";
+  for (let i = 0; i < binary.length; i++) {
+    const h = binary.charCodeAt(i).toString(16).padStart(2, "0");
+    hex += h;
+  }
+  return hex;
 }
 
 function hexToUint8Array(hex: string): Uint8Array {
@@ -15,7 +21,11 @@ function hexToUint8Array(hex: string): Uint8Array {
 }
 
 function uint8ArrayToBase64(u8: Uint8Array): string {
-  return Buffer.from(u8).toString('base64');
+  let binary = "";
+  for (let i = 0; i < u8.length; i++) {
+    binary += String.fromCharCode(u8[i]);
+  }
+  return btoa(binary);
 }
 
 function reorderC1C3C2toC1C2C3(hex: string): string {

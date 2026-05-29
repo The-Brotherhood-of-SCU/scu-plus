@@ -288,21 +288,21 @@ function bindBypass() {
   )
 }
 
-window.addEventListener("message", (event: MessageEvent) => {
+function onCaptchaCodeMessage(event: MessageEvent) {
   if (event.source !== window) return
   const data = event.data
   if (!data || data.__scu_plus_type !== "captcha-code") return
   if (typeof data.capCode === "string" && data.capCode.trim() !== "") {
     latestCapCode = data.capCode.trim()
   }
-})
-
-injectCaptchaHook()
+}
 
 void (async () => {
   try {
     const setting = await getSetting()
     if (setting?.skip2faSwitch) {
+      window.addEventListener("message", onCaptchaCodeMessage)
+      injectCaptchaHook()
       bindBypass()
     }
   } catch (e) {}

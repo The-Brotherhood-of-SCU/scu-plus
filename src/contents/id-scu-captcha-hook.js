@@ -1,12 +1,13 @@
 ;(() => {
   if (window.__scuPlusCaptchaHookInstalled) return
   window.__scuPlusCaptchaHookInstalled = true
+  const TARGET_ORIGIN = "https://id.scu.edu.cn"
 
   const postCap = (capCode) => {
     if (!capCode) return
     window.postMessage(
       { __scu_plus_type: "captcha-code", capCode: String(capCode) },
-      "*"
+      TARGET_ORIGIN
     )
   }
 
@@ -14,8 +15,7 @@
     try {
       const parsed = typeof value === "string" ? JSON.parse(value) : value
       const data = parsed && parsed.data ? parsed.data : parsed
-      const capCode =
-        data && (data.code || data.cap_code || data.captcha_code || data.token || data.capCode)
+      const capCode = data && (data.code || data.cap_code || data.captcha_code || data.capCode)
       postCap(capCode)
     } catch (e) {}
   }

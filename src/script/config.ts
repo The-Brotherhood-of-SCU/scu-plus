@@ -31,11 +31,17 @@ async function getSetting(): Promise<SettingItem> {
     ) {
       migratedConfig.skip2faSwitch = migratedConfig.scuUnifiedLoginSwitch
     }
+    delete migratedConfig.scuUnifiedLoginSwitch
 
-    const config = Object.assign(new SettingItem(), migratedConfig)
+    const config = new SettingItem()
+    for (const key of Object.keys(config) as Array<keyof SettingItem>) {
+      if (key in migratedConfig) {
+        (config as any)[key] = (migratedConfig as any)[key]
+      }
+    }
     const shouldPersist = (Object.keys(new SettingItem()) as Array<keyof SettingItem>)
       .some((key) => (config as any)[key] !== (rawConfig as any)[key])
-      || "scuUnifiedLoginSwitch" in migratedConfig
+      || "scuUnifiedLoginSwitch" in (rawConfig as any)
 
     if (shouldPersist) {
       storage.set("setting", config)
