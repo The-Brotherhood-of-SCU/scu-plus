@@ -9,11 +9,11 @@
     "./**/*.tsx"
   ],
   "compilerOptions": {
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "types": ["chrome"],
     "paths": {
-      "~*": [
-        "./src/*"
-      ]
-    },
-    "baseUrl": "."
+      "~*": ["./src/*"]
+    }
   }
 }
