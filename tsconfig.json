@@ -13,7 +13,8 @@
     "module": "ESNext",
     "types": ["chrome"],
     "paths": {
-      "~*": ["./src/*"]
+      "~*": ["./src/*"],
+      "package.json": ["./package.json"]
     }
   }
 }

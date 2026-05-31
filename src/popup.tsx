@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { checkVersion, UpdateCheckResult } from "src/script/utils"
+import { checkVersion, UpdateCheckResult } from "~/script/utils"
 import packagejson from "package.json"
 import { Button, Divider } from 'antd';
 import "style.css"
