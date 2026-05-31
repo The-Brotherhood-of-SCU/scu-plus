@@ -47,3 +47,6 @@ keys.json
 .idea
 .vscode
 .trae
+
+# MCP
+.*-mcp
