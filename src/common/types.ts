@@ -21,6 +21,7 @@ export class SettingItem {
   gpaCustomText: string;
   failedCourseCustomText: string;
   redirectLoginSwitch: boolean;
+  skip2FASwitch: boolean;
   constructor() {
     this.beautifySwitch = false;
     this.beautifyColor = "#caeae3";
@@ -36,6 +37,7 @@ export class SettingItem {
     this.gpaCustomText = "";
     this.failedCourseCustomText = "";
     this.redirectLoginSwitch = false;
+    this.skip2FASwitch = false;
   }
   static equals(a: SettingItem | null | undefined, b: SettingItem | null | undefined): boolean {
     if (a === b) return true;

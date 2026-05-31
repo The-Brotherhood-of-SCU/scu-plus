@@ -4,13 +4,20 @@ import { getSetting } from "~script/config"
 
 export const config: PlasmoCSConfig = {
   matches: ["*://id.scu.edu.cn/*"],
-  run_at: "document_end",
+  run_at: "document_start",
 }
 
 async function init() {
   try {
     const setting = await getSetting();
-    // 仅在用户开启“禁用修改密码弹窗”开关时注入拦截逻辑
+
+    // 跳过2FA：设置 dataset 标记，由 id-scu-skip2fa.ts（MAIN world）读取
+    if (setting?.skip2FASwitch) {
+      document.documentElement.dataset.__scu_skip2fa = "true";
+      console.log("[SCU+] 跳过2FA 已启用");
+    }
+
+    // 仅在用户开启"禁用修改密码弹窗"开关时注入拦截逻辑
     const enabled = setting && setting.passwordPopupSwitch;
     if (enabled) {
       const redirectTo = 'https://id.scu.edu.cn/enduser/sp/sso/scdxplugin_jwt23?enterpriseId=scdx&target_url=index';
@@ -74,9 +81,6 @@ async function init() {
         mo = new MutationObserver(checkAndRedirect);
         mo.observe(document, {subtree:true, childList:true});
       }catch(e){}
-    }
-    else {
-      // not enabled, skip
     }
   } catch (e) {
     console.warn('id-scu init failed', e);

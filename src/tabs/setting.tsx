@@ -301,6 +301,13 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
         >
           <Switch />
         </Form.Item>
+        <Form.Item
+          label="跳过两步验证（2FA）"
+          name="skip2FASwitch"
+          tooltip="开启后将自动跳过统一认证的两步验证（短信/邮件验证码）"
+        >
+          <Switch />
+        </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={async () => {
             const hasPermission = await checkAndRequestPermission(setting.ocrProvider);
