@@ -1,10 +1,5 @@
-import { Button, Input, message, notification, Checkbox } from "antd"
+import { message } from "antd"
 import { xpath_query, randomInt } from "~script/utils"
-import ReactDOM from "react-dom/client"
-import React, { useEffect, useState } from "react"
-import type { NotificationArgsProps } from 'antd';
-
-type NotificationPlacement = NotificationArgsProps['placement'];
 
 function injectBtnStyle() {
     let styleSheet = document.createElement("style");
@@ -83,191 +78,213 @@ function injectBtnStyle() {
 function RunningEvaluation(run: boolean) {
     if (run) {
         localStorage.setItem("isRunningEvaluation", "true")
-        message.info("正在进行自动评教，3s后跳转")
+
+        // 加载或构建评教队列（按表格序号顺序）
+        let queue: string[][] = JSON.parse(localStorage.getItem("evalQueue") || "null");
+        if (!queue || queue.length === 0) {
+            // 首次启动或队列已耗尽：从页面表格扫描所有带"评估"按钮的课程
+            queue = [];
+            const table = document.querySelector('#codeTable') as HTMLTableElement;
+            if (table) {
+                const rows = Array.from(table.rows);
+                for (const row of rows) {
+                    const btn = row.querySelector('button');
+                    if (!btn || btn.innerText.trim() !== '评估') continue;
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 7) continue;
+                    const kch = cells[5]?.textContent?.trim() || '';
+                    const kxh = cells[6]?.textContent?.trim() || '';
+                    if (kch && kxh) queue.push([kch, kxh]);
+                }
+            }
+            localStorage.setItem("evalQueue", JSON.stringify(queue));
+            message.info(`开始自动评教，共 ${queue.length} 个任务`);
+        } else {
+            // 继续执行：移除刚完成的第一个任务
+            queue.shift();
+            localStorage.setItem("evalQueue", JSON.stringify(queue));
+        }
+
+        if (queue.length === 0) {
+            message.success("已经全部评教完成！");
+            RunningEvaluation(false);
+            return;
+        }
+
+        message.info(`正在进行自动评教，剩余 ${queue.length} 个`);
         setTimeout(() => {
             if (localStorage.getItem("isRunningEvaluation") !== "true") {
                 return;
             }
-            let table = document.querySelector('#codeTable') as HTMLTableElement;
-            if (!table) return;
-            let hasMore = false;
-            
-            const rows = Array.from(table.rows);
-            for (let row of rows) {
-                let btn = row.querySelector('button') as HTMLButtonElement;
-                if (btn == null) continue;
-                if (btn.innerText == '评估') {
-                    hasMore = true;
-                    btn.click();
+
+            // 找到队列中第一个课程的按钮并点击
+            const [targetKch, targetKxh] = queue![0];
+            const table = document.querySelector('#codeTable') as HTMLTableElement;
+            if (table) {
+                const rows = Array.from(table.rows);
+                for (const row of rows) {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 7) continue;
+                    const kch = cells[5]?.textContent?.trim() || '';
+                    const kxh = cells[6]?.textContent?.trim() || '';
+                    if (kch === targetKch && kxh === targetKxh) {
+                        const btn = row.querySelector('button');
+                        if (btn && btn.innerText.trim() === '评估') {
+                            btn.click();
+                            return;
+                        }
+                    }
                 }
             }
-            if (hasMore == false) {
-                message.info("已经全部评教完成！");
-                RunningEvaluation(false)
-            }
+
+            // 没找到对应的行（可能已被手动处理或页面变化了），重新构建队列重试
+            localStorage.removeItem("evalQueue");
+            RunningEvaluation(true);
         }, 3000);
     } else {
         localStorage.setItem("isRunningEvaluation", "false")
+        localStorage.removeItem("evalQueue")
         message.info("已暂停自动评教")
     }
 }
 
+
+
+/**
+ * 标记当前课程为已处理（队列管理已由 RunningEvaluation 处理，保留以备扩展）
+ */
+function markEvaluationProcessed(): void {
+    // 队列方式在列表页管理进度，无需额外记录
+}
+
+
+
 function do_it(min: number, max: number, bestOnly: boolean) {
-    const inputs = Array.from(document.querySelectorAll('input'));
-    for (let inp of inputs) {
+    const form = document.querySelector("#saveEvaluation");
+    if (!form) return;
+
+    // 1. 分数输入框
+    const allInputs = Array.from(form.querySelectorAll('input'));
+    for (let inp of allInputs) {
         if (inp.placeholder == '请输入1-100的整数') {
+            inp.value = bestOnly ? "100" : randomInt(min, max).toString();
+        }
+    }
+
+    // 2. 表格行（使用后代选择器，兼容中间有包装层的情况）
+    const table = form.querySelector('table');
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    const rows = Array.from(tbody.rows);
+
+    // 准备主观题答案
+    const answers: string[] = [
+        "课程内容丰富，讲解清晰易懂，老师授课非常有激情。",
+        "教学节奏适中，重点突出，有助于理解和掌握知识点。",
+        "老师备课认真，课堂互动良好，学习氛围积极向上。",
+        "实践与理论结合紧密，提升了我的实际操作能力。",
+        "作业布置合理，能够有效巩固课堂所学知识。",
+        "课程结构安排科学，循序渐进，易于接受和理解。",
+        "老师耐心解答问题，鼓励学生提问，课堂气氛活跃。",
+        "授课方式灵活多样，能调动学生的学习积极性。",
+        "对难点讲解细致，帮助我克服了学习上的障碍。",
+        "教材选用恰当，内容紧跟学科发展前沿。",
+        "老师责任心强，批改作业认真，反馈及时。",
+        "课程进度安排合理，不紧不慢，适合大多数学生。",
+        "鼓励学生思考和表达，培养了我们的独立思维能力。",
+        "多媒体教学手段运用得当，增强了课堂的直观性。",
+        "课程考核方式公平公正，能够真实反映学习情况。",
+        "老师富有亲和力，沟通顺畅，深受学生欢迎。",
+        "课程内容实用性强，对今后的学习和工作很有帮助。",
+        "注重引导和启发，提高了我的学习兴趣和主动性。",
+        "课堂纪律严明，教学秩序良好，有利于专注学习。",
+        "感谢老师的辛勤付出，这是一门值得推荐的好课！",
+        "老师专业水平高，课程设计合理，内容充实，受益匪浅。",
+        "课程内容前沿，理论与实践结合，极大提升了我的专业能力。",
+        "教师教学态度认真负责，关心学生学习状况，深得学生喜爱。",
+        "课程设计新颖，注重培养学生的创新思维和实践技能。",
+        "课程内容系统全面，难度适中，有助于学生深入理解专业知识。"
+    ];
+
+    for (let row of rows) {
+        const inputs = Array.from(row.querySelectorAll('input'));
+
+        // === 单选题（radio）===
+        const radios = inputs.filter(inp => inp.type === "radio");
+        if (bestOnly && radios.length > 0) {
+            radios[0].checked = true; // 选中第一个（A/完全符合）
+        } else if (radios.length > 0) {
+            // 非最佳模式，随机选一个（跳过最后一个通常为负面选项）
+            const maxIndex = Math.max(0, radios.length - 2);
+            const score = ["A_", "B_", "C_", "D_"][randomInt(0, maxIndex)];
+            for (const radio of radios) {
+                if (radio.value.startsWith(score)) {
+                    radio.checked = true;
+                }
+            }
+        }
+
+        // === 多选题（checkbox）===
+        const checkboxes = inputs.filter(inp => inp.type === "checkbox");
+        if (checkboxes.length > 0) {
+            // 先全部取消选中
+            checkboxes.forEach(cb => cb.checked = false);
             if (bestOnly) {
-                inp.value = "100";
+                for (const cb of checkboxes) {
+                    const label = cb.closest('label')?.textContent?.trim() || "";
+                    if (!label.includes("以上皆无") && !label.includes("以上均无") && !label.includes("均无") && !label.includes("没有")) {
+                        cb.checked = true;
+                    }
+                }
             } else {
-                inp.value = (randomInt(min, max)).toString()
+                for (let i = 0; i < checkboxes.length - 1; i++) {
+                    if (randomInt(1, 100) < 30) {
+                        checkboxes[i].checked = true;
+                    }
+                }
             }
         }
     }
 
-    let table = document.querySelector("#saveEvaluation > table");
-    if (!table) return;
-    let body = table.querySelector("tbody");
-    if (!body) return;
-    const rows = Array.from(body.rows);
-    for (let row of rows) {
-        let inputs = row.querySelectorAll("input");
-        if (bestOnly) {
-            for (let input of Array.from(inputs)) {
-                if (input.type == "radio") {
-                    if (input.name.includes("questionOption")) {
-                        input.checked = true;
-                        break;
-                    }
-                } else {
-                    break;
-                }
-            }
-        } else {
-            let randomScore = ["A_", "B_", "C_","D_"][randomInt(0, inputs.length-2)];
-            for (let input of Array.from(inputs)) {
-                if (input.type == "radio") {
-                    if (input.value.startsWith(randomScore)) {
-                        input.checked = true;
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-
-        let checks: HTMLInputElement[] = []
-        for (let input of Array.from(inputs)) {
-            if (input.type == "checkbox") {
-                input.checked = false
-                checks.push(input)
-            } else {
-                break;
-            }
-        }
-        if (bestOnly) {
-            for (let i = 0; i < checks.length; i++) {
-                const label = document.querySelector(`label[for="${checks[i].id}"]`)?.textContent || "";
-                if (!label.includes("以上均无") && !label.includes("均无") && !label.includes("没有")) {
-                    checks[i].checked = true;
-                }
-            }
-        } else {
-            for (let i = 0; i < checks.length - 1; i++) {
-                if (randomInt(1, 100) < 30) {
-                    checks[i].checked = true;
-                }
-            }
-        }
-
-        let answers: string[] = [
-            "课程内容丰富，讲解清晰易懂，老师授课非常有激情。",
-            "教学节奏适中，重点突出，有助于理解和掌握知识点。",
-            "老师备课认真，课堂互动良好，学习氛围积极向上。",
-            "实践与理论结合紧密，提升了我的实际操作能力。",
-            "作业布置合理，能够有效巩固课堂所学知识。",
-            "课程结构安排科学，循序渐进，易于接受和理解。",
-            "老师耐心解答问题，鼓励学生提问，课堂气氛活跃。",
-            "授课方式灵活多样，能调动学生的学习积极性。",
-            "对难点讲解细致，帮助我克服了学习上的障碍。",
-            "教材选用恰当，内容紧跟学科发展前沿。",
-            "老师责任心强，批改作业认真，反馈及时。",
-            "课程进度安排合理，不紧不慢，适合大多数学生。",
-            "鼓励学生思考和表达，培养了我们的独立思维能力。",
-            "多媒体教学手段运用得当，增强了课堂的直观性。",
-            "课程考核方式公平公正，能够真实反映学习情况。",
-            "老师富有亲和力，沟通顺畅，深受学生欢迎。",
-            "课程内容实用性强，对今后的学习和工作很有帮助。",
-            "注重引导和启发，提高了我的学习兴趣和主动性。",
-            "课堂纪律严明，教学秩序良好，有利于专注学习。",
-            "感谢老师的辛勤付出，这是一门值得推荐的好课！",
-            "老师专业水平高，课程设计合理，内容充实，受益匪浅。",
-            "课程内容前沿，理论与实践结合，极大提升了我的专业能力。",
-            "教师教学态度认真负责，关心学生学习状况，深得学生喜爱。",
-            "课程设计新颖，注重培养学生的创新思维和实践技能。",
-            "课程内容系统全面，难度适中，有助于学生深入理解专业知识。"
-        ];
-        const textInputs = Array.from(document.querySelectorAll("textarea"));
-        for (let inp of textInputs) {
-            inp.value = answers[randomInt(0, answers.length - 1)];
-        }
+    // === 主观题（textarea）——放到行循环外，避免重复设置 ===
+    const textareas = Array.from(form.querySelectorAll("textarea"));
+    for (const ta of textareas) {
+        ta.value = answers[randomInt(0, answers.length - 1)];
     }
 }
 
-function Controller() {
-    const [minscore, set_minscore] = useState(80)
-    const [maxscore, set_maxscore] = useState(100)
-    const [bestOnly, setBestOnly] = useState(false)
-    const [api, contextHolder] = notification.useNotification();
-    useEffect(() => {
-        let evaluation_score_range = localStorage.getItem("evaluation_score_range") ?? "80:100";
-        let best_only = localStorage.getItem("evaluation_best_only") === "true";
-        let score1 = parseInt(evaluation_score_range.split(":")[0] ?? "80");
-        let score2 = parseInt(evaluation_score_range.split(":")[1] ?? "100");
-        if (score1 <= score2 && score1 >= 0 && score2 <= 100) {
-            set_minscore(score1);
-            set_maxscore(score2);
-        }
-        setBestOnly(best_only);
-    }, [])
-    const openNotification = (placement: NotificationPlacement) => {
-        api.info({
-            message: `提示`,
-            description: '你再看看你输入的对不对呢!😡',
-            placement,
-        });
-    };
-    const check = () => {
-        if (minscore > maxscore || minscore < 0 || minscore > 100 || maxscore < 0 || maxscore > 100) {
-            openNotification('top')
-        } else {
-            localStorage.setItem("evaluation_score_range", minscore.toString() + ":" + maxscore.toString())
-            localStorage.setItem("evaluation_best_only", bestOnly.toString())
-            do_it(minscore, maxscore, bestOnly)
-        }
-    }
-    return <>
-        {contextHolder}
-        <div className="parameter" style={{ margin: "30px", background: "linear-gradient(to right, #43e97b 0%, #38f9d7 100%)", padding: "20px", borderRadius: "10px" }}>
-            <label>分数范围：</label>
-            <Input style={{ width: "80px", borderRadius: '10px' }} value={minscore} placeholder="最小值" type="number" onChange={(e) => set_minscore(Number(e.target.value))}></Input>
-            ~
-            <Input style={{ width: "80px", marginRight: "30px" }} placeholder="最大值" value={maxscore} type="number" onChange={(e) => set_maxscore(Number(e.target.value))}></Input>
-            <Button onClick={() => check()}>自动填充评估</Button>
-            <br/>
-            <Checkbox 
-              checked={bestOnly} 
-              onChange={(e) => setBestOnly(e.target.checked)}
-              style={{ marginTop: "10px" }}
-            >
-              全部选择最佳选项（单选题选A，多选题全选，主观题给满分）
-            </Checkbox>
-        </div>
+/**
+ * 判断当前页面是否为异常评教页（已过期/关闭）
+ */
+function isAbnormalEvalPage(): boolean {
+    if (!window.location.href.includes('/evaluation2')) return false;
+    if (document.querySelector('#saveEvaluation')) return false;
+    const body = document.body;
+    if (!body) return false;
+    const content = body.textContent || '';
+    return content.includes('过程评估开关未打开') || content.includes('不在可评估范围内');
+}
 
-    </>
+/**
+ * 处理异常评教：返回评教列表（队列 shift 会在列表页自动移除该项）
+ */
+function handleAbnormalEval(): void {
+    message.info("检测到异常评教（已过期/关闭），已自动跳过");
+    setTimeout(() => {
+        window.location.href = '/student/teachingEvaluation/newEvaluation/index';
+    }, 500);
 }
 
 export function initCourseEvaluation(): void {
     let isRunningEvaluation = localStorage.getItem("isRunningEvaluation") == "true";
+
+    // 自动评教模式下，检测到异常评教页则跳过并返回列表
+    if (isRunningEvaluation && isAbnormalEvalPage()) {
+        handleAbnormalEval();
+        return;
+    }
+
     xpath_query('//*[@id="home"]/div/div/h4/span', (e) => {
         injectBtnStyle()
         let btn = document.createElement("button");
@@ -277,14 +294,34 @@ export function initCourseEvaluation(): void {
         e.appendChild(btn);
         RunningEvaluation(isRunningEvaluation);
     })
-    xpath_query(`//*[@id="saveEvaluation"]`, (e) => {
-        let div = document.createElement("div")
-        e.appendChild(div)
-        const root = ReactDOM.createRoot(div)
-        root.render(<Controller />)
-        do_it(80, 100, false)
+    xpath_query(`//*[@id="saveEvaluation"]`, () => {
+        // 默认最佳选项填表（单选题选A，多选题全选，主观题给满分），用户可在倒计时内修改
+        do_it(80, 100, true)
         if(isRunningEvaluation){
+            let popupHandled = false;
             setInterval(() => {
+            // 优先检测"打分选项"弹窗 (layer.confirm)
+            const dfxxRadios = document.querySelectorAll('input[name="dfxx"]');
+            if (dfxxRadios.length > 0) {
+                if (!popupHandled) {
+                    popupHandled = true;
+                    // 随机选择一个打分选项
+                    const randomIndex = randomInt(0, dfxxRadios.length - 1);
+                    (dfxxRadios[randomIndex] as HTMLInputElement).checked = true;
+                    // 使用 jQuery 触发点击以兼容 layer.js 事件绑定
+                    const $ = (window as any).jQuery || (window as any).$;
+                    if ($) {
+                        $('.layui-layer-btn0').trigger('click');
+                    } else {
+                        const confirmBtn = document.querySelector('.layui-layer-btn0') as HTMLElement;
+                        if (confirmBtn) confirmBtn.click();
+                    }
+                    // 标记此课程为已处理
+                    markEvaluationProcessed();
+                }
+                // 弹窗还在显示时跳过保存按钮点击（等待 AJAX 完成页面跳转）
+                return;
+            }
             let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
             if (commitBtn && commitBtn.disabled == false) {
                 commitBtn.click();
