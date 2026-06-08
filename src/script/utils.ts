@@ -125,5 +125,5 @@ async function downloadCanvas(canvas:HTMLElement,name:string,scale:number) {
    * @returns 随机整数
    */
   function randomInt(min:number,max:number){
-    return Math.floor(Math.random() * 100 % (max +1 - min)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }

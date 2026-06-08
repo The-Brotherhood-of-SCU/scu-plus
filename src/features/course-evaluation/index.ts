@@ -75,7 +75,15 @@ function injectBtnStyle() {
     document.head.appendChild(styleSheet);
 }
 
+function updateEvalButtonText(running: boolean) {
+    const btn = document.querySelector('.scu-plus-button') as HTMLButtonElement;
+    if (btn) {
+        btn.innerText = running ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
+    }
+}
+
 function RunningEvaluation(run: boolean) {
+    updateEvalButtonText(run);
     if (run) {
         localStorage.setItem("isRunningEvaluation", "true")
 
@@ -118,7 +126,7 @@ function RunningEvaluation(run: boolean) {
             }
 
             // 找到队列中第一个课程的按钮并点击
-            const [targetKch, targetKxh] = queue![0];
+            const [targetKch, targetKxh] = queue[0];
             const table = document.querySelector('#codeTable') as HTMLTableElement;
             if (table) {
                 const rows = Array.from(table.rows);
@@ -150,15 +158,6 @@ function RunningEvaluation(run: boolean) {
 
 
 
-/**
- * 标记当前课程为已处理（队列管理已由 RunningEvaluation 处理，保留以备扩展）
- */
-function markEvaluationProcessed(): void {
-    // 队列方式在列表页管理进度，无需额外记录
-}
-
-
-
 function do_it(min: number, max: number, bestOnly: boolean) {
     const form = document.querySelector("#saveEvaluation");
     if (!form) return;
@@ -166,7 +165,7 @@ function do_it(min: number, max: number, bestOnly: boolean) {
     // 1. 分数输入框
     const allInputs = Array.from(form.querySelectorAll('input'));
     for (let inp of allInputs) {
-        if (inp.placeholder == '请输入1-100的整数') {
+        if (inp.placeholder === '请输入1-100的整数') {
             inp.value = bestOnly ? "100" : randomInt(min, max).toString();
         }
     }
@@ -277,7 +276,7 @@ function handleAbnormalEval(): void {
 }
 
 export function initCourseEvaluation(): void {
-    let isRunningEvaluation = localStorage.getItem("isRunningEvaluation") == "true";
+    let isRunningEvaluation = localStorage.getItem("isRunningEvaluation") === "true";
 
     // 自动评教模式下，检测到异常评教页则跳过并返回列表
     if (isRunningEvaluation && isAbnormalEvalPage()) {
@@ -290,7 +289,7 @@ export function initCourseEvaluation(): void {
         let btn = document.createElement("button");
         btn.className = 'scu-plus-button';
         btn.innerText = isRunningEvaluation ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
-        btn.onclick = () => RunningEvaluation(!isRunningEvaluation);
+        btn.onclick = () => RunningEvaluation(localStorage.getItem("isRunningEvaluation") !== "true");
         e.appendChild(btn);
         RunningEvaluation(isRunningEvaluation);
     })
@@ -299,7 +298,12 @@ export function initCourseEvaluation(): void {
         do_it(80, 100, true)
         if(isRunningEvaluation){
             let popupHandled = false;
-            setInterval(() => {
+            const evalTimer = setInterval(() => {
+            // 如果用户暂停了评教，停止轮询
+            if (localStorage.getItem("isRunningEvaluation") !== "true") {
+                clearInterval(evalTimer);
+                return;
+            }
             // 优先检测"打分选项"弹窗 (layer.confirm)
             const dfxxRadios = document.querySelectorAll('input[name="dfxx"]');
             if (dfxxRadios.length > 0) {
@@ -316,14 +320,13 @@ export function initCourseEvaluation(): void {
                         const confirmBtn = document.querySelector('.layui-layer-btn0') as HTMLElement;
                         if (confirmBtn) confirmBtn.click();
                     }
-                    // 标记此课程为已处理
-                    markEvaluationProcessed();
+                    // 队列已在 RunningEvaluation 中管理，无需额外处理
                 }
                 // 弹窗还在显示时跳过保存按钮点击（等待 AJAX 完成页面跳转）
                 return;
             }
             let commitBtn = document.querySelector('#savebutton') as HTMLButtonElement;
-            if (commitBtn && commitBtn.disabled == false) {
+            if (commitBtn && commitBtn.disabled === false) {
                 commitBtn.click();
             }
         }, 1000);
