@@ -252,6 +252,223 @@ const injectExportFunc = () => {
         }
     }
 
+    // ics export helpers
+
+    const TIME_TABLE_JIANGAN: Record<number, [string, string]> = {
+        1: ["08:15", "09:00"],
+        2: ["09:10", "09:55"],
+        3: ["10:15", "11:00"],
+        4: ["11:10", "11:55"],
+        5: ["13:50", "14:35"],
+        6: ["14:45", "15:30"],
+        7: ["15:40", "16:25"],
+        8: ["16:45", "17:30"],
+        9: ["17:40", "18:25"],
+        10: ["19:20", "20:05"],
+        11: ["20:15", "21:00"],
+        12: ["21:10", "21:55"],
+    };
+
+    const TIME_TABLE_HUAXI: Record<number, [string, string]> = {
+        1: ["08:00", "08:45"],
+        2: ["08:55", "09:40"],
+        3: ["10:00", "10:45"],
+        4: ["10:55", "11:40"],
+        5: ["14:00", "14:45"],
+        6: ["14:55", "15:40"],
+        7: ["15:50", "16:35"],
+        8: ["16:55", "17:40"],
+        9: ["17:50", "18:35"],
+        10: ["19:30", "20:15"],
+        11: ["20:25", "21:10"],
+        12: ["21:20", "22:05"],
+    };
+
+    function parseCurrentWeek(): number | null {
+        console.log('[SCU+ ICS] parseCurrentWeek start');
+        let spans: NodeListOf<Element> | null = null;
+        // 优先从顶层 frame 查找 (all_frames: true 下可能运行在 iframe 中)
+        try { spans = top?.document?.querySelectorAll('.span_bbzx'); console.log('[SCU+ ICS] top.document spans count:', spans?.length); } catch (e) { console.log('[SCU+ ICS] top.document error:', e); }
+        if (!spans?.length) try { spans = parent?.document?.querySelectorAll('.span_bbzx'); console.log('[SCU+ ICS] parent.document spans count:', spans?.length); } catch (e) { console.log('[SCU+ ICS] parent.document error:', e); }
+        if (!spans?.length) { spans = document.querySelectorAll('.span_bbzx'); console.log('[SCU+ ICS] document spans count:', spans?.length); }
+        if (!spans?.length) { console.log('[SCU+ ICS] no .span_bbzx found in any frame'); return null; }
+        for (const span of spans) {
+            const text = span.textContent || '';
+            console.log('[SCU+ ICS] span text:', text);
+            const match = text.match(/第(\d+)周/);
+            if (match) {
+                console.log('[SCU+ ICS] match:', match);
+                return parseInt(match[1], 10);
+            }
+        }
+        console.log('[SCU+ ICS] no 第X周 found in any span');
+        return null;
+    }
+
+    function calcFirstMonday(currentWeek: number): Date {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const mondayOfThisWeek = new Date(today);
+        mondayOfThisWeek.setHours(0, 0, 0, 0);
+        mondayOfThisWeek.setDate(today.getDate() - daysSinceMonday);
+        const firstMonday = new Date(mondayOfThisWeek);
+        firstMonday.setDate(mondayOfThisWeek.getDate() - (currentWeek - 1) * 7);
+        return firstMonday;
+    }
+
+    function escapeIcsText(text: string): string {
+        return text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    }
+
+    function formatIcsDate(date: Date): string {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        const ss = String(date.getSeconds()).padStart(2, '0');
+        return `${y}${m}${d}T${hh}${mm}${ss}`;
+    }
+
+    function buildCourseDescription(course: any, tapl: any, week: number, idx: number, total: number): string {
+        const lines: string[] = [];
+        const noSchedule = !tapl.teachingBuildingName && !tapl.classroomName;
+        if (noSchedule) {
+            lines.push('（本课程没有安排时间）');
+        } else {
+            lines.push(`本周是第 ${week} 周 | 课程进度 ${idx + 1}/${total} 节`);
+        }
+        lines.push(`课程号_课序号: ${tapl.coureNumber}_${tapl.coureSequenceNumber}`);
+        lines.push(`课程名称: ${tapl.coureName}`);
+        if (course.englishCourseName) lines.push(course.englishCourseName);
+        lines.push(`教师: ${course.attendClassTeacher || ''}`);
+        lines.push(`学分: ${course.unit}`);
+        lines.push(`课程属性: ${tapl.coursePropertiesName || course.coursePropertiesName || ''}`);
+        if (course.courseCategoryName) lines.push(`课程类别: ${course.courseCategoryName}`);
+        lines.push(`选课状态: ${course.selectCourseStatusName || ''}`);
+        lines.push(`上课地点: ${tapl.campusName || ''} / ${tapl.teachingBuildingName || ''} / ${tapl.classroomName || ''}`);
+        lines.push(`上课周数: ${tapl.weekDescription || ''}`);
+        lines.push(`上课星期: ${tapl.classDay}`);
+        const sessionEnd = tapl.classSessions + tapl.continuingSession - 1;
+        lines.push(`上课节数: ${tapl.classSessions}-${sessionEnd}`);
+        if (course.restrictedCondition) lines.push(`选课限制: ${course.restrictedCondition}`);
+        if (course.pkbz) lines.push(`排课备注: ${course.pkbz}`);
+        return lines.join('\\n');
+    }
+
+    function generateIcs(rawData: any, firstMonday: Date): string {
+        const lines: string[] = [];
+        lines.push('BEGIN:VCALENDAR');
+        lines.push('VERSION:2.0');
+        lines.push('PRODID:-//SCU Plus//CN');
+
+        const coursesIndex = rawData.xkxx[0];
+        console.log('[SCU+ ICS] generating events for', Object.keys(coursesIndex).length, 'courses');
+        let eventCount = 0;
+        let skippedCount = 0;
+        for (const key of Object.keys(coursesIndex)) {
+            const course = coursesIndex[key];
+            const taplList = course.timeAndPlaceList || [];
+            for (let ti = 0; ti < taplList.length; ti++) {
+                const tapl = taplList[ti];
+                const classWeek: string = tapl.classWeek || '';
+                const classDay: number = tapl.classDay || 1;
+                const classSessions: number = tapl.classSessions || 1;
+                const continuingSession: number = tapl.continuingSession || 1;
+                const campusName: string = tapl.campusName || '';
+
+                const timeTable = campusName === '江安' ? TIME_TABLE_JIANGAN : TIME_TABLE_HUAXI;
+                const startSection = classSessions;
+                const endSection = classSessions + continuingSession - 1;
+                const startTime = timeTable[startSection]?.[0];
+                const endTime = timeTable[endSection]?.[1];
+                if (!startTime || !endTime) {
+                    skippedCount++;
+                    console.log('[SCU+ ICS] skip course (no timetable for section):', tapl.coureName, 'campus:', campusName, 'session:', startSection, '-', endSection);
+                    continue;
+                }
+
+                const weeks: number[] = [];
+                for (let i = 0; i < classWeek.length; i++) {
+                    if (classWeek[i] === '1') weeks.push(i + 1);
+                }
+                console.log('[SCU+ ICS] course:', tapl.coureName, 'campus:', campusName, 'day:', classDay, 'sessions:', startSection, '-', endSection, 'weeks:', weeks.length, 'classWeek:', classWeek);
+
+                for (let wi = 0; wi < weeks.length; wi++) {
+                    const week = weeks[wi];
+                    const eventDate = new Date(firstMonday);
+                    eventDate.setDate(firstMonday.getDate() + (week - 1) * 7 + (classDay - 1));
+
+                    const [startH, startM] = startTime.split(':').map(Number);
+                    const [endH, endM] = endTime.split(':').map(Number);
+
+                    const dtStart = new Date(eventDate);
+                    dtStart.setHours(startH, startM, 0, 0);
+                    const dtEnd = new Date(eventDate);
+                    dtEnd.setHours(endH, endM, 0, 0);
+
+                    const summary = escapeIcsText(tapl.coureName || course.courseName || '未知课程');
+                    const location = escapeIcsText(`${campusName} ${tapl.teachingBuildingName || ''} ${tapl.classroomName || ''}`.trim());
+                    const description = buildCourseDescription(course, tapl, week, wi, weeks.length);
+
+                    lines.push('BEGIN:VEVENT');
+                    lines.push(`SUMMARY:${summary}`);
+                    lines.push(`LOCATION:${location}`);
+                    lines.push(`DESCRIPTION:${description}`);
+                    lines.push(`DTSTART;TZID=Asia/Shanghai:${formatIcsDate(dtStart)}`);
+                    lines.push(`DTEND;TZID=Asia/Shanghai:${formatIcsDate(dtEnd)}`);
+                    lines.push('END:VEVENT');
+                    eventCount++;
+                }
+            }
+        }
+
+        console.log('[SCU+ ICS] total events:', eventCount, 'skipped:', skippedCount);        lines.push('END:VCALENDAR');
+        return lines.join('\r\n');
+    }
+
+    function downloadIcsFile(content: string) {
+        const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'schedule.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    async function exportScheduleIcs() {
+        try {
+            console.log('[SCU+ ICS] exportScheduleIcs start');
+            console.log('[SCU+ ICS] window.location.href:', window.location.href);
+            console.log('[SCU+ ICS] is top:', window === top);
+            const currentWeek = parseCurrentWeek();
+            console.log('[SCU+ ICS] currentWeek:', currentWeek);
+            if (!currentWeek) {
+                message.info('无法获取当前周数，请确认页面已加载学期信息');
+                return;
+            }
+            const res = await fetch('http://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/ajaxStudentSchedule/callback');
+            console.log('[SCU+ ICS] fetch status:', res.status);
+            const text = await res.text();
+            console.log('[SCU+ ICS] response text length:', text.length, 'first 200 chars:', text.substring(0, 200));
+            const rawData = JSON.parse(text);
+            console.log('[SCU+ ICS] parsed OK, xkxx keys count:', Object.keys(rawData.xkxx[0]).length);
+            const firstMonday = calcFirstMonday(currentWeek);
+            console.log('[SCU+ ICS] firstMonday:', firstMonday.toISOString());
+            const icsContent = generateIcs(rawData, firstMonday);
+            console.log('[SCU+ ICS] icsContent length:', icsContent.length, 'first 500 chars:', icsContent.substring(0, 500));
+            downloadIcsFile(icsContent);
+            message.info('课表 ICS 已下载');
+        } catch (e) {
+            console.error('[SCU+ ICS] error:', e);
+            message.info('导出 ICS 失败: ' + e);
+        }
+    }
+
     // main: attach export buttons that perform a clone-based safe export
     $('.right_top_oper', (e) => {
         let btn = document.createElement("button");
@@ -319,6 +536,11 @@ const injectExportFunc = () => {
         jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
         e.appendChild(jsonBtn);
         jsonBtn.addEventListener('click', exportScheduleJson);
+        let icsBtn = document.createElement("button");
+        icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
+        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
+        e.appendChild(icsBtn);
+        icsBtn.addEventListener('click', exportScheduleIcs);
     });
 
     $("#mainDIV > h4:nth-child(3)", (e) => {
@@ -385,6 +607,11 @@ const injectExportFunc = () => {
         jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
         e.appendChild(jsonBtn);
         jsonBtn.addEventListener('click', exportScheduleJson);
+        let icsBtn = document.createElement("button");
+        icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
+        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
+        e.appendChild(icsBtn);
+        icsBtn.addEventListener('click', exportScheduleIcs);
     })
 }
 
