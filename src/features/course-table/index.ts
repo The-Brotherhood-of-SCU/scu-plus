@@ -1,5 +1,6 @@
 import { $, downloadCanvas } from "~script/utils";
 import { message } from "antd";
+import { exportScheduleIcs, parsePlanCode, COURSE_SCHEDULE_API } from "./ics";
 
 function extractData(): { attribute: string; credit: number }[] {
     const rows = document.querySelectorAll("#tab10646 > table > tbody > tr");
@@ -241,9 +242,20 @@ const injectExportFunc = () => {
     }
 
     // helper: fetch schedule json and copy to clipboard
+
     async function exportScheduleJson() {
         try {
-            const res = await fetch('http://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/ajaxStudentSchedule/callback');
+            const { planCode } = parsePlanCode();
+            let res: Response;
+            if (planCode) {
+                res = await fetch(COURSE_SCHEDULE_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ planCode }).toString()
+                });
+            } else {
+                res = await fetch(COURSE_SCHEDULE_API);
+            }
             const text = await res.text();
             await copyToClipboard(text);
             message.info('课表 JSON 已复制到剪切板');
@@ -319,6 +331,11 @@ const injectExportFunc = () => {
         jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
         e.appendChild(jsonBtn);
         jsonBtn.addEventListener('click', exportScheduleJson);
+        let icsBtn = document.createElement("button");
+        icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
+        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
+        e.appendChild(icsBtn);
+        icsBtn.addEventListener('click', exportScheduleIcs);
     });
 
     $("#mainDIV > h4:nth-child(3)", (e) => {
@@ -385,6 +402,11 @@ const injectExportFunc = () => {
         jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
         e.appendChild(jsonBtn);
         jsonBtn.addEventListener('click', exportScheduleJson);
+        let icsBtn = document.createElement("button");
+        icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
+        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
+        e.appendChild(icsBtn);
+        icsBtn.addEventListener('click', exportScheduleIcs);
     })
 }
 
