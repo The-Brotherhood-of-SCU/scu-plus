@@ -90,7 +90,7 @@ function getDefaultFirstMonday(planCode: string): Date | null {
         return d;
     } else if (parts[2] === '2') {
         // 春季：yyyy 年 2 月最后一个周一
-        const d = new Date(endYear, 1, 0); // 2 月最后一天
+        const d = new Date(endYear, 2, 0); // 2 月最后一天
         while (d.getDay() !== 1) {
             d.setDate(d.getDate() - 1);
         }
@@ -128,7 +128,7 @@ function formatFilenameDate(date: Date): string {
     const absOff = Math.abs(offset);
     const offH = String(Math.floor(absOff / 60)).padStart(2, '0');
     const offM = String(absOff % 60).padStart(2, '0');
-    return `${y}-${m}-${d}T${hh}:${mm}:${ss}${sign}${offH}:${offM}`;
+    return `${y}-${m}-${d}-${hh}-${mm}-${ss}-${sign}${offH}${offM}`;
 }
 
 // ── ICS 生成 ────────────────────────────────────────────────────
@@ -164,6 +164,16 @@ function generateIcs(rawData: any, firstMonday: Date): string {
     lines.push('BEGIN:VCALENDAR');
     lines.push('VERSION:2.0');
     lines.push('PRODID:-//SCU Plus//CN');
+    lines.push('X-WR-CALNAME:SCU Plus 课表');
+    lines.push('BEGIN:VTIMEZONE');
+    lines.push('TZID:Asia/Shanghai');
+    lines.push('BEGIN:STANDARD');
+    lines.push('DTSTART:19700101T000000');
+    lines.push('TZOFFSETFROM:+0800');
+    lines.push('TZOFFSETTO:+0800');
+    lines.push('TZNAME:CST');
+    lines.push('END:STANDARD');
+    lines.push('END:VTIMEZONE');
 
     const coursesIndex = rawData.xkxx[0];
     for (const key of Object.keys(coursesIndex)) {
@@ -207,6 +217,7 @@ function generateIcs(rawData: any, firstMonday: Date): string {
                 const description = buildCourseDescription(course, tapl, week, wi, weeks.length);
 
                 lines.push('BEGIN:VEVENT');
+                lines.push(`UID:${key}-${ti}-${week}@scu.edu.cn`);
                 lines.push(`SUMMARY:${summary}`);
                 lines.push(`LOCATION:${location}`);
                 lines.push(`DESCRIPTION:${description}`);
