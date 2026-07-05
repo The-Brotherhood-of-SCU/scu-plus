@@ -79,7 +79,7 @@ async function initChangePasswd() {
   } catch (e) {
     console.warn('id-scu init failed', e);
   }
-  // 继续原有功能：初始化验证码 OCR
+
   initIdCaptchaOcr();
 }
 
