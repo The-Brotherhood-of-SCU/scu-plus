@@ -16,45 +16,57 @@ export const config: PlasmoCSConfig = {
   all_frames: true
 }
 
+// 让每个特性独立初始化，单个特性异常不影响其他特性注入
+const safeInit = (name: string, init: () => void | Promise<void>) => {
+  try {
+    const result = init();
+    if (result instanceof Promise) {
+      result.catch((e) => console.warn(`SCU+ 特性 [${name}] 初始化失败:`, e));
+    }
+  } catch (e) {
+    console.warn(`SCU+ 特性 [${name}] 初始化失败:`, e);
+  }
+}
+
 const main = async () => {
   const url = window.location.href;
 
   // 1. 全局加载的特性 (如导航栏、美化等)
-  await initHomePage();
+  safeInit("homepage", initHomePage);
 
   // 3. 选课通 (全局菜单注入)
-  initCourseScore();
+  safeInit("courseScore", initCourseScore);
 
   // 4. 特定页面的特性
   if (url.includes("/student/courseSelect/")) {
     // 选课相关
-    initCourseTable();
+    safeInit("courseTable", initCourseTable);
     if (url.includes("/index?")) {
-        initCourseFilter();
+        safeInit("courseFilter", initCourseFilter);
     }
     if (url.includes("/quitCourse/")) {
-        initEnhanceQuitCourse();
+        safeInit("enhanceQuitCourse", initEnhanceQuitCourse);
     }
   }
 
   if (url.includes("/student/integratedQuery/scoreQuery/schemeScores/")) {
     // 成绩分析
-    initScoreAnalysis();
+    safeInit("scoreAnalysis", initScoreAnalysis);
   }
 
   if (url.includes("/student/integratedQuery/scoreQuery/allPassingScores/")) {
     // 全部及格成绩
-    initScoresPerSemester();
+    safeInit("scoresPerSemester", initScoresPerSemester);
   }
 
   if (url.includes("/student/integratedQuery/scoreQuery/thisTermScores/")) {
     // 本学期成绩 (含隐藏成绩)
-    initGetHiddenScore();
+    safeInit("getHiddenScore", initGetHiddenScore);
   }
 
   if (url.includes("/student/teachingEvaluation/newEvaluation/")) {
     // 评教
-    initCourseEvaluation();
+    safeInit("courseEvaluation", initCourseEvaluation);
   }
 }
 

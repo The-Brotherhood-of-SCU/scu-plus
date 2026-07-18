@@ -9,4 +9,4 @@ export const config: PlasmoCSConfig = {
     all_frames: true
 }
 
-initRedirectLogin();
+initRedirectLogin().catch((e) => console.warn("SCU+: 登录重定向初始化失败", e));

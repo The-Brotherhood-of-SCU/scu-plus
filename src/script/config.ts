@@ -17,6 +17,10 @@ async function getSetting(): Promise<SettingItem> {
     if(config==null){
       config=new SettingItem();
       storage.set("setting",config);
+    }else{
+      // 旧版本存储的配置可能缺少后续新增的字段，用默认值回填，
+      // 避免默认 true 的开关（如 failSwitch）因缺失变成 undefined 而被静默禁用
+      config=Object.assign(new SettingItem(),config);
     }
     cache=config;
     return config;

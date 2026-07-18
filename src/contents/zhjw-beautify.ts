@@ -61,7 +61,9 @@ function boot(): void {
   earlyInject();
 
   // 2) 异步校准真实设置（首次启用、跨标签页修改、镜像被清除等情况）
-  getSetting().then((s) => applyAndMirror(s.beautifySwitch, s.beautifyColor))
+  getSetting()
+    .then((s) => applyAndMirror(s.beautifySwitch, s.beautifyColor))
+    .catch((e) => console.warn("SCU+: 读取美化设置失败，保持镜像状态", e))
 
   // 3) 设置页保存后实时同步，无需等下次导航
   new Storage().watch({

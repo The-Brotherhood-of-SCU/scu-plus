@@ -10,18 +10,24 @@ export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadC
  * @returns Promise<UpdateCheckResult> 版本检查结果
  */
 async function checkVersion () : Promise<UpdateCheckResult>{
-    let newest_config = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
-    if (!newest_config.success) {
-        // alert("无法获取更新，请检查网络问题！");
+    try {
+        let newest_config = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
+        if (!newest_config?.success) {
+            // alert("无法获取更新，请检查网络问题！");
+            return UpdateCheckResult.NETWORK_ERROR;
+        }
+        const json = JSON.parse(newest_config.data);
+        if (pkgMessage.version != json.version && json.version != null) {
+            return UpdateCheckResult.NEW_VERSION_AVAILABLE;
+        }
+        else {
+            // alert("🎯SCU+已是最新版本!");
+            return UpdateCheckResult.UP_TP_DATE;
+        }
+    } catch (e) {
+        // gitee 反爬/限流时可能返回非 JSON 的 HTML 错误页，或消息通道被回收
+        console.warn("检查更新失败:", e);
         return UpdateCheckResult.NETWORK_ERROR;
-    }
-    const json = JSON.parse(newest_config.data);
-    if (pkgMessage.version != json.version && json.version != null) {
-        return UpdateCheckResult.NEW_VERSION_AVAILABLE;
-    }
-    else {
-        // alert("🎯SCU+已是最新版本!");
-        return UpdateCheckResult.UP_TP_DATE;
     }
 }
 
@@ -37,7 +43,7 @@ const $ = (selector: string, callback = (element: HTMLElement) => { }) => {
         try {
             callback(he);
         } catch (e) {
-            console.warn(he);
+            console.warn(e);
         }
     }
 }
@@ -66,9 +72,14 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
  * @returns 每日一句内容，失败返回 null
  */
 const dailySentence = async () => {
-    const response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.dailySentence.link });
-    if (response.success) {
-        return pkgMessage.dailySentence.keys.reduce((obj:any,key)=>obj?.[key],JSON.parse(response.data));
+    try {
+        const response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.dailySentence.link });
+        if (response?.success) {
+            return pkgMessage.dailySentence.keys.reduce((obj:any,key)=>obj?.[key],JSON.parse(response.data));
+        }
+    } catch (e) {
+        // 第三方接口返回非 JSON 或消息通道异常时，静默降级为不显示每日一句
+        console.warn("获取每日一句失败:", e);
     }
     return null;
 }
@@ -87,12 +98,12 @@ const xpath_query = (xpath_expression:string,resolve = (element:HTMLElement)=>{}
 /**
  * 在子页面的顶部创建一个div元素，并返回该元素
  * @param innerHTML 元素的innerHTML 内容 (可选)
- * @returns div元素
+ * @returns div元素，找不到挂载点时返回 null
  */
-function createSecondPageElement(innerHTML:string=""):HTMLElement{
-    
+function createSecondPageElement(innerHTML:string=""):HTMLElement | null {
+
     const container = document.querySelector("#page-content-template > div > div");
-    if (!container) return;
+    if (!container) return null;
     const wrapper = document.createElement("div");
     wrapper.innerHTML = innerHTML;
     container.insertBefore(wrapper, container.firstChild);

@@ -7,7 +7,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // 抽象写法，主要是chrome的api设计太狗屎了
         (async () => {
             try {
-                const response = await fetch(message.url,{redirect:"follow",headers:{
+                // 加超时，避免请求挂起导致 MV3 service worker 回收后消息通道静默断开
+                const response = await fetch(message.url,{redirect:"follow",signal:AbortSignal.timeout(15000),headers:{
                     "accept":message.accept?message.accept:'*/*'
                 }});
                 if (response.ok) {
@@ -23,11 +24,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
     else if(message.action==Actions.UPDATE_AVATAR){
-        updateAvatarRedirectRules(message.url)
+        updateAvatarRedirectRules(message.url).catch((e) => console.warn("更新头像重定向规则失败:", e))
         return false;
     }
     else if(message.action==Actions.REMOVE_AVATAR_REDIRECTION){
-        removeAvatarRedirectRules()
+        removeAvatarRedirectRules().catch((e) => console.warn("移除头像重定向规则失败:", e))
         return false;
     }else if(message.action==Actions.OPEN_SETTINGS){
         const url = chrome.runtime.getURL("options.html");
@@ -111,14 +112,14 @@ async function updateAvatarRedirectRules(redirectUrl) {
     },
 ];
     // 更新规则
-    (chrome.declarativeNetRequest as any).updateDynamicRules({
+    await (chrome.declarativeNetRequest as any).updateDynamicRules({
         removeRuleIds: [1,2,3,4,5],
         addRules: newRules as any
     });
 }
 
 function removeAvatarRedirectRules(){
-    chrome.declarativeNetRequest.updateDynamicRules({
+    return chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: [1,2,3,4,5],
     });
 }
