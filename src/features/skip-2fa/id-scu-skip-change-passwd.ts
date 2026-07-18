@@ -50,9 +50,6 @@ async function initChangePasswd() {
         }catch(e){}
       }
 
-      // initial
-      checkAndRedirect();
-
       // SPA navigation listeners
       const origPush = history.pushState;
       const origReplace = history.replaceState;
@@ -75,12 +72,16 @@ async function initChangePasswd() {
         mo = new MutationObserver(checkAndRedirect);
         mo.observe(document, {subtree:true, childList:true});
       }catch(e){}
+
+      // initial（必须在 origPush/origReplace/mo 声明之后调用，
+      // 否则命中跳转时 removeAllListeners 会触发 TDZ ReferenceError）
+      checkAndRedirect();
     }
   } catch (e) {
     console.warn('id-scu init failed', e);
   }
 
-  initIdCaptchaOcr();
+  initIdCaptchaOcr().catch((e) => console.warn('id-scu captcha ocr init failed', e));
 }
 
 export { initChangePasswd };

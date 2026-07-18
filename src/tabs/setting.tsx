@@ -118,22 +118,18 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
 
   const handleFormChange = (changedValues: Partial<SettingItem>) => {
     const initialSetting = initialSettingRef.current;
-    let newConfig: SettingItem;
-    setSetting(prev => {
-      newConfig = { ...prev, ...changedValues };
-      return newConfig;
-    });
+    // 直接基于当前 state 计算，避免依赖 setState updater 的立即执行（React 不保证）
+    const newConfig = { ...setting, ...changedValues } as SettingItem;
+    setSetting(newConfig);
     setShowAvatarFields(form.getFieldValue('avatarSwitch'));
     setShowBeautifyField(form.getFieldValue('beautifySwitch'));
     setShowNameHideField(form.getFieldValue('nameHideSwitch'));
-    if (newConfig) {
-      if (SettingItem.equals(initialSetting, newConfig)) {
-        //unchanged logically
-        setIsDirty(false);
-      } else {
-        //changed
-        setIsDirty(true);
-      }
+    if (SettingItem.equals(initialSetting, newConfig)) {
+      //unchanged logically
+      setIsDirty(false);
+    } else {
+      //changed
+      setIsDirty(true);
     }
   };
 
@@ -151,6 +147,10 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
         saveSettingWithUpdates(data);
         setSetting(data);
         form.setFieldsValue(data);
+        setShowAvatarFields(!!data.avatarSwitch);
+        setShowBeautifyField(!!data.beautifySwitch);
+        setShowNameHideField(!!data.nameHideSwitch);
+        initialSettingRef.current = data;
         setIsDirty(false);
         messageApi.success('已恢复默认设置');
       }
@@ -165,14 +165,23 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
         const files = e.dataTransfer.files;
         if (files.length > 0) {
           const file = files[0];
-          if (file.type === 'application/json') {
+          // 部分系统（如某些 Windows 环境）对 .json 文件返回空 MIME 类型，用扩展名兜底
+          if (file.type === 'application/json' || /\.json$/i.test(file.name)) {
             const reader = new FileReader();
             reader.onload = (event) => {
               try {
-                const jsonData = { ...setting, ...JSON.parse(event.target?.result as string) };
+                const parsed = JSON.parse(event.target?.result as string);
+                if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                  throw new Error('not a settings object');
+                }
+                const jsonData = { ...setting, ...parsed };
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 form.setFieldsValue(jsonData);
+                setShowAvatarFields(!!jsonData.avatarSwitch);
+                setShowBeautifyField(!!jsonData.beautifySwitch);
+                setShowNameHideField(!!jsonData.nameHideSwitch);
+                initialSettingRef.current = jsonData;
                 setIsDirty(false);
                 messageApi.success('配置文件导入成功（已保存）');
               } catch (error) {
@@ -317,6 +326,7 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
               message.error("未获得 OCR 服务器访问权限，功能可能受限");
             }
             saveSettingWithUpdates(setting);
+            initialSettingRef.current = setting;
             success();
             setIsDirty(false);
           }} style={{ marginRight: '10px' }}>

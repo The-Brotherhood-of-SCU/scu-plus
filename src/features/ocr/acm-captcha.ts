@@ -23,9 +23,12 @@ export async function initAcmCaptchaOcr(): Promise<void> {
             try {
                 var result = await ocr_external(img, provider);
                 // 验证码识别问题，最多重试3次
-                if (result.length != 4 && ocr_counts <= 3) {
-                    ocr_counts++;
-                    img.click();
+                if (result.length != 4) {
+                    if (ocr_counts < 3) {
+                        ocr_counts++;
+                        img.click();
+                    }
+                    // 重试耗尽后不填入非法结果，留给用户手动输入
                     return;
                 }
                 ocr_counts = 0;
@@ -39,7 +42,6 @@ export async function initAcmCaptchaOcr(): Promise<void> {
 
         const ocrFunc = async () => {
             if (savedSettings.ocrProvider != "") {
-                ocr_counts++;
                 await process(savedSettings.ocrProvider, img, input);
             }
         }
