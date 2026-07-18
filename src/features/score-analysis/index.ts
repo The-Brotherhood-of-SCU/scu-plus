@@ -33,6 +33,20 @@ let style: HTMLStyleElement;
 let gpaChartInstance: Chart | null = null;
 let creditChartInstance: Chart | null = null;
 
+/** 读取杂志风主题注入的 CSS 变量；主题关闭时回退到原配色 */
+function getThemeColor(name: string, fallback: string): string {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
+/** #rrggbb → rgba()，非法输入原样返回 */
+function withAlpha(color: string, alpha: number): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(color.trim());
+  if (!m) return color;
+  const num = parseInt(m[1], 16);
+  return `rgba(${(num >> 16) & 0xff}, ${(num >> 8) & 0xff}, ${num & 0xff}, ${alpha})`;
+}
+
 function getGPA(score: number): number {
   if (score >= 90) return 4.0;
   if (score >= 85) return 3.7;
@@ -74,10 +88,11 @@ export function initScoreAnalysis(): void {
     .scu-plus-container {
       margin: 2rem 0;
       padding: 1.5rem;
-      background: #fff;
+      background: var(--scu-surface, #fff);
+      border: 1px solid var(--scu-line, transparent);
       border-radius: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: var(--scu-sans, 'Segoe UI', system-ui, sans-serif);
     }
     .analysis-header {
       display: flex;
@@ -88,18 +103,19 @@ export function initScoreAnalysis(): void {
       justify-content:space-between;
     }
     #calculate-btn,#close-btn{
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      background: var(--scu-ink, linear-gradient(135deg, #6366f1 0%, #4f46e5 100%));
       border: none;
       padding: 0.75rem 1.5rem;
       border-radius: 8px;
-      color: white;
+      color: var(--scu-surface, white);
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    #calculate-btn:hover {
+    #calculate-btn:hover,#close-btn:hover {
+      background: var(--scu-accent, #4f46e5);
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
     }
     .stats-grid {
       display: grid;
@@ -109,17 +125,19 @@ export function initScoreAnalysis(): void {
     }
     .stat-card {
       padding: 1rem;
-      background: #f8f9fa;
+      background: var(--scu-paper, #f8f9fa);
+      border: 1px solid var(--scu-line, transparent);
       border-radius: 8px;
       text-align: center;
     }
     .stat-value {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--scu-ink, #1e293b);
+      font-family: var(--scu-serif, 'Segoe UI', system-ui, sans-serif);
     }
     .stat-label {
-      color: #64748b;
+      color: var(--scu-ink-faint, #64748b);
       font-size: 0.9rem;
     }
     .charts-container {
@@ -131,8 +149,9 @@ export function initScoreAnalysis(): void {
     .chart-container {
       position: relative;
       height: 300px;
-      background: white;
+      background: var(--scu-surface, white);
       padding: 1rem;
+      border: 1px solid var(--scu-line, transparent);
       border-radius: 12px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
@@ -142,10 +161,10 @@ export function initScoreAnalysis(): void {
       }
     }
     .disclaimer {
-      color: #94a3b8;
+      color: var(--scu-ink-faint, #94a3b8);
       font-size: 0.85rem;
       margin-top: 1rem;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid var(--scu-line, #e2e8f0);
       padding-top: 1rem;
     }
   `;
@@ -155,7 +174,7 @@ export function initScoreAnalysis(): void {
       <div class="analysis-header">
         <div>
           <button id="calculate-btn">\u{1f4cA} 生成学业报告</button>
-          <span style="color: #6366f1; font-weight: 600;">SCU+ 学业分析系统</span>
+          <span style="color: var(--scu-accent, #6366f1); font-weight: 600;">SCU+ 学业分析系统</span>
         </div>
           <button id="close-btn">关闭</button>
       </div>
@@ -319,6 +338,14 @@ export function initScoreAnalysis(): void {
   }) {
     if (gpaChartInstance) gpaChartInstance.destroy();
     if (creditChartInstance) creditChartInstance.destroy();
+
+    // 跟随杂志风主题（主题未开启时回退到原配色）
+    const accent = getThemeColor('--scu-accent', '#6366f1');
+    const ink = getThemeColor('--scu-ink', '#1e293b');
+    const inkSoft = getThemeColor('--scu-ink-soft', '#475569');
+    const inkFaint = getThemeColor('--scu-ink-faint', '#94a3b8');
+    const gridLine = getThemeColor('--scu-line', 'rgba(0, 0, 0, 0.08)');
+
     // GPA 分布图表
     const labelsNumerical = [4.0, 3.7, 3.3, 3.0, 2.7, 2.3, 2.0, 1.7, 1.3, 1.0]; // 数值标签
 
@@ -336,7 +363,7 @@ export function initScoreAnalysis(): void {
                     x: labelsNumerical[index],
                     y: count
                   })),
-                  backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                  backgroundColor: withAlpha(accent, 0.85),
                   borderRadius: 5,
                   categoryPercentage: 1.0,
                   barPercentage: 0.8
@@ -347,7 +374,11 @@ export function initScoreAnalysis(): void {
                 plugins: {
                   title: {
                     display: true,
-                    text: '成绩分布统计'
+                    text: '成绩分布统计',
+                    color: ink
+                  },
+                  legend: {
+                    labels: { color: inkSoft }
                   },
                   annotation: {
                     annotations: {
@@ -355,15 +386,15 @@ export function initScoreAnalysis(): void {
                         type: 'line',
                         xMin: averageGPA,
                         xMax: averageGPA,
-                        borderColor: 'green',
+                        borderColor: getThemeColor('--scu-ink', 'green'),
                         borderWidth: 2,
                         borderDash: [5, 5],
                         label: {
                           display: true,
                           content: `平均值: ${averageGPA.toFixed(2)}`,
                           position: 'end',
-                          backgroundColor: 'rgba(25, 234, 63, 0.8)',
-                          color: '#fff'
+                          backgroundColor: accent,
+                          color: getThemeColor('--scu-surface', '#fff')
                         }
                       }
                     }
@@ -372,13 +403,17 @@ export function initScoreAnalysis(): void {
                 scales: {
                   y: {
                     type: 'linear',
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: { color: inkFaint },
+                    grid: { color: gridLine }
                   },
                   x: {
                     type: 'linear',
                     ticks: {
-                      callback: (value) => (value as number).toFixed(1)
+                      callback: (value) => (value as number).toFixed(1),
+                      color: inkFaint
                     },
+                    grid: { color: gridLine },
                     min: 1.0,
                     max: 4.0
                   }
@@ -399,7 +434,11 @@ export function initScoreAnalysis(): void {
                 labels: ['必修学分', '选修学分', '任选学分'],
                 datasets: [{
                   data: [requiredCredits, totalCredits - requiredCredits - optionalCredits, optionalCredits],
-                  backgroundColor: ['#1e7b1e', '#2d687b', '#ec7284'],
+                  backgroundColor: [
+                    getThemeColor('--scu-c2', '#1e7b1e'),
+                    getThemeColor('--scu-c3', '#2d687b'),
+                    getThemeColor('--scu-c4', '#ec7284')
+                  ],
                   hoverOffset: 4
                 }]
               },
@@ -407,7 +446,8 @@ export function initScoreAnalysis(): void {
                 responsive: true,
                 plugins: {
                   legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: { color: inkSoft }
                   },
                   tooltip: {
                     enabled: true,
