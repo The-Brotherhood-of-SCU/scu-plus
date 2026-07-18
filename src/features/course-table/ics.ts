@@ -116,6 +116,17 @@ function formatIcsDate(date: Date): string {
     return `${y}${m}${d}T${hh}${mm}${ss}`;
 }
 
+// DTSTAMP 等需要 UTC 时间戳（带 Z 后缀）的场景使用
+function formatIcsDateUtc(date: Date): string {
+    const y = date.getUTCFullYear();
+    const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(date.getUTCDate()).padStart(2, '0');
+    const hh = String(date.getUTCHours()).padStart(2, '0');
+    const mm = String(date.getUTCMinutes()).padStart(2, '0');
+    const ss = String(date.getUTCSeconds()).padStart(2, '0');
+    return `${y}${m}${d}T${hh}${mm}${ss}Z`;
+}
+
 function formatFilenameDate(date: Date): string {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -156,7 +167,8 @@ function buildCourseDescription(course: any, tapl: any, week: number, idx: numbe
     lines.push(`上课节数: ${tapl.classSessions}-${sessionEnd}`);
     if (course.restrictedCondition) lines.push(`选课限制: ${course.restrictedCondition}`);
     if (course.pkbz) lines.push(`排课备注: ${course.pkbz}`);
-    return lines.map(l => l.replace(/[\r\n]+/g, '\\n').replace(/\\n$/, '')).join('\\n');
+    // 逐行做 ICS TEXT 转义（反斜杠/分号/逗号/真实换行），再用字面 \n 连接
+    return lines.map((l) => escapeIcsText(l)).join('\\n');
 }
 
 function generateIcs(rawData: any, firstMonday: Date): string {
@@ -175,7 +187,11 @@ function generateIcs(rawData: any, firstMonday: Date): string {
     lines.push('END:STANDARD');
     lines.push('END:VTIMEZONE');
 
-    const coursesIndex = rawData.xkxx[0];
+    const coursesIndex = rawData.xkxx?.[0];
+    if (!coursesIndex) {
+        throw new Error('课表数据为空');
+    }
+    const dtstamp = formatIcsDateUtc(new Date());
     for (const key of Object.keys(coursesIndex)) {
         const course = coursesIndex[key];
         const taplList = course.timeAndPlaceList || [];
@@ -218,6 +234,7 @@ function generateIcs(rawData: any, firstMonday: Date): string {
 
                 lines.push('BEGIN:VEVENT');
                 lines.push(`UID:${key}-${ti}-${week}@scu.edu.cn`);
+                lines.push(`DTSTAMP:${dtstamp}`);
                 lines.push(`SUMMARY:${summary}`);
                 lines.push(`LOCATION:${location}`);
                 lines.push(`DESCRIPTION:${description}`);

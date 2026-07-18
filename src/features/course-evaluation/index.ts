@@ -82,13 +82,21 @@ function updateEvalButtonText(running: boolean) {
     }
 }
 
-function RunningEvaluation(run: boolean) {
+function RunningEvaluation(run: boolean, notify: boolean = true) {
     updateEvalButtonText(run);
     if (run) {
         localStorage.setItem("isRunningEvaluation", "true")
 
         // 加载或构建评教队列（按表格序号顺序）
-        let queue: string[][] = JSON.parse(localStorage.getItem("evalQueue") || "null");
+        let queue: string[][] = null;
+        try {
+            const parsed = JSON.parse(localStorage.getItem("evalQueue") || "null");
+            if (Array.isArray(parsed)) queue = parsed;
+        } catch (e) {
+            // localStorage 中数据损坏时重置队列，避免整个评教功能崩溃
+            console.warn("evalQueue 数据损坏，已重置", e);
+            localStorage.removeItem("evalQueue");
+        }
         if (!queue || queue.length === 0) {
             // 首次启动或队列已耗尽：从页面表格扫描所有带"评估"按钮的课程
             queue = [];
@@ -115,7 +123,7 @@ function RunningEvaluation(run: boolean) {
 
         if (queue.length === 0) {
             message.success("已经全部评教完成！");
-            RunningEvaluation(false);
+            RunningEvaluation(false, false);
             return;
         }
 
@@ -152,7 +160,7 @@ function RunningEvaluation(run: boolean) {
     } else {
         localStorage.setItem("isRunningEvaluation", "false")
         localStorage.removeItem("evalQueue")
-        message.info("已暂停自动评教")
+        if (notify) message.info("已暂停自动评教")
     }
 }
 
@@ -291,7 +299,10 @@ export function initCourseEvaluation(): void {
         btn.innerText = isRunningEvaluation ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
         btn.onclick = () => RunningEvaluation(localStorage.getItem("isRunningEvaluation") !== "true");
         e.appendChild(btn);
-        RunningEvaluation(isRunningEvaluation);
+        // 仅在评教进行中才恢复执行；未在评教时按钮文案已正确设置，无需调用（否则会误弹"已暂停"提示）
+        if (isRunningEvaluation) {
+            RunningEvaluation(true);
+        }
     })
     xpath_query(`//*[@id="saveEvaluation"]`, () => {
         // 默认最佳选项填表（单选题选A，多选题全选，主观题给满分），用户可在倒计时内修改

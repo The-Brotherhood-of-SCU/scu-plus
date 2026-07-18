@@ -7,7 +7,8 @@ function extractData(): { attribute: string; credit: number }[] {
     const data: { attribute: string; credit: number }[] = [];
     rows.forEach((row) => {
         const cells = row.querySelectorAll("td");
-        if (cells.length >= 6) {
+        // 需要读到第 7 列（cells[6]），行必须至少有 7 个单元格
+        if (cells.length >= 7) {
             const attribute = cells[6].textContent?.trim() || ""; // 第7列：课程属性
             const creditText = cells[5].textContent?.trim(); // 第6列：学分
             const credit = parseFloat(creditText || "0");
@@ -53,6 +54,7 @@ function hideKbtAndObserve() {
     }
 
     // 处理同源 iframe：尝试访问并隐藏其中的匹配元素
+    const boundIframes = new WeakSet<HTMLIFrameElement>();
     function handleIframes() {
         const iframes = Array.from(document.getElementsByTagName('iframe')) as HTMLIFrameElement[];
         for (const fr of iframes) {
@@ -64,7 +66,9 @@ function hideKbtAndObserve() {
             } catch (e) {
                 // 跨域 iframe 无法访问，跳过
             }
-            // 监听 iframe load 以应对动态注入
+            // 监听 iframe load 以应对动态注入（同一 iframe 只绑定一次）
+            if (boundIframes.has(fr)) continue;
+            boundIframes.add(fr);
             fr.addEventListener('load', () => {
                 try {
                     const doc = fr.contentDocument || fr.contentWindow?.document;
@@ -106,7 +110,10 @@ function hideKbtAndObserve() {
                         if ((node as Element).tagName === 'IFRAME') {
                             const fr = node as HTMLIFrameElement;
                             try { const doc = fr.contentDocument || fr.contentWindow?.document; if (doc) hideExisting(doc); } catch (e) {}
-                            fr.addEventListener('load', () => { try { const doc = fr.contentDocument || fr.contentWindow?.document; if (doc) hideExisting(doc); } catch (e) {} });
+                            if (!boundIframes.has(fr)) {
+                                boundIframes.add(fr);
+                                fr.addEventListener('load', () => { try { const doc = fr.contentDocument || fr.contentWindow?.document; if (doc) hideExisting(doc); } catch (e) {} });
+                            }
                         }
                     });
                 } catch (e) { }
@@ -123,13 +130,15 @@ async function inject() {
             e.remove()
         }
     })
-    while (true) {
+    // 课表可能尚未渲染，轮询等待；但本函数也会在退课页等无课表页面运行，限制重试次数避免永久空转
+    for (let i = 0; i < 30; i++) {
         let table = document.querySelector("#tab10646 > table > tbody") as HTMLElement;
         if (table) {
             break;
         }
         await sleep(1000);
     }
+    if (!document.querySelector("#tab10646 > table > tbody")) return;
     let data = extractData();
     let requiredCredits = data.reduce((sum, cur) => sum + (cur.attribute === "必修" ? cur.credit : 0), 0);
     let n_requiredCredits = data.reduce((sum, cur) => sum + (cur.attribute === "选修" ? cur.credit : 0), 0);

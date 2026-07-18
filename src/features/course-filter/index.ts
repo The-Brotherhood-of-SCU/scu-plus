@@ -49,6 +49,8 @@ export function initCourseFilter(): void {
   let allRestrictionsSet: Set<string> = new Set<string>();
   let restrictionFilters: string[] = [];
   let useFilter: boolean = false;
+  // 限制筛选弹窗挂在 document 上的 click 监听，重开/关闭弹窗时需要移除，避免累积
+  let restrictDocClickHandler: ((ev: MouseEvent) => void) | null = null;
 
   function groupRowsByCheckbox(): CourseGroup {
     const tbody: HTMLElement | null = document.getElementById('xirxkxkbody') || document.querySelector('tbody');
@@ -249,7 +251,8 @@ export function initCourseFilter(): void {
     
     while ((m = regex.exec(courseTimeStr)) !== null) {
       foundAny = true;
-      const dayIdx: number = gridDays.indexOf(m[1]);
+      // gridDays 用"七"表示周日，课程文本可能写"日"，统一映射到最后一列
+      const dayIdx: number = m[1] === '日' ? gridDays.length - 1 : gridDays.indexOf(m[1]);
       if (dayIdx < 0) continue;
       const sectionStart: number = parseInt(m[2]);
       const sectionEnd: number = parseInt(m[3]);
@@ -819,13 +822,23 @@ export function initCourseFilter(): void {
       };
     }
 
-    // click outside to close the options container
-    document.addEventListener('click', (ev: MouseEvent) => { 
-      const t = ev.target as Node; 
-      if (modal && !modal.contains(t) && !optionsDiv.contains(t)) { 
-        optionsDiv.style.display = 'none'; 
-      } 
-    });
+    // click outside to close the options container（具名注册，弹窗关闭时移除，避免泄漏）
+    if (restrictDocClickHandler) {
+      document.removeEventListener('click', restrictDocClickHandler);
+    }
+    restrictDocClickHandler = (ev: MouseEvent) => {
+      const t = ev.target as Node;
+      if (modal && !modal.contains(t) && !optionsDiv.contains(t)) {
+        optionsDiv.style.display = 'none';
+      }
+    };
+    document.addEventListener('click', restrictDocClickHandler);
+    const removeDocClickHandler = () => {
+      if (restrictDocClickHandler) {
+        document.removeEventListener('click', restrictDocClickHandler);
+        restrictDocClickHandler = null;
+      }
+    };
 
     const addBtn = document.getElementById('cf-restrict-add') as HTMLButtonElement | null;
     if (addBtn) {
@@ -871,23 +884,42 @@ export function initCourseFilter(): void {
         restrictionFilters = [...localRestrictions];
         // 自动启用并应用筛选
         const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-        if (apply) { 
-          apply.checked = true; 
-          useFilter = true; 
+        if (apply) {
+          apply.checked = true;
+          useFilter = true;
         }
         filterCoursesByAllFilters();
         if (optionsDiv && optionsDiv.parentNode) optionsDiv.remove();
+        removeDocClickHandler();
         modal!.remove();
       };
     }
-    
+
     const cancelBtn = document.getElementById('cf-restrict-cancel') as HTMLButtonElement | null;
     if (cancelBtn) {
-      cancelBtn.onclick = () => { 
-        if (optionsDiv && optionsDiv.parentNode) optionsDiv.remove(); 
-        modal!.remove(); 
+      cancelBtn.onclick = () => {
+        if (optionsDiv && optionsDiv.parentNode) optionsDiv.remove();
+        removeDocClickHandler();
+        modal!.remove();
       };
     }
+  }
+
+  // 监听课程表内容变化：选课列表是 AJAX 分页的，翻页后新行需要重新应用筛选
+  function watchTableAndRefilter(tbody: HTMLElement): void {
+    let debounceTimer: number | null = null;
+    const observer = new MutationObserver((mutations) => {
+      if (!useFilter) return;
+      // 只响应行增删（翻页/重新加载），display 等样式变更不算
+      const rowsChanged = mutations.some(m => m.addedNodes.length > 0 || m.removedNodes.length > 0);
+      if (!rowsChanged) return;
+      if (debounceTimer !== null) window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => {
+        if (useFilter) filterCoursesByAllFilters();
+      }, 300);
+    });
+    // 观察 tbody 的父节点，兼容 tbody 整棵被替换的情况
+    observer.observe(tbody.parentElement || tbody, { childList: true, subtree: true });
   }
 
   // 监听页面，若有课程表则注入面板
@@ -895,6 +927,7 @@ export function initCourseFilter(): void {
     const tbody: HTMLElement | null = document.getElementById('xirxkxkbody') || document.querySelector('tbody');
     if (tbody) {
       createPanel();
+      watchTableAndRefilter(tbody);
     } else {
       setTimeout(waitForTableAndInject, 800);
     }

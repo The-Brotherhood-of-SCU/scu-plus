@@ -10,6 +10,9 @@ import { MenuIds } from "~constants/menuIds";
 
 let searchPageScrollTop = 0;
 
+// 保存弹窗的 React root，关闭时需要 unmount，否则 window 上的拖拽监听器会随每次开关累积
+let popupRoot: ReactDOM.Root | null = null;
+
 enum PageType {
     SearchPage,
     CourseStats
@@ -31,8 +34,8 @@ function popupWindow() {
 
     wind.setAttribute("id", "course_score")
     document.body.appendChild(wind)
-    const root = ReactDOM.createRoot(wind);
-    root.render(<PopUp />)
+    popupRoot = ReactDOM.createRoot(wind);
+    popupRoot.render(<PopUp />)
 }
 
 function PopUp() {
@@ -117,6 +120,14 @@ function PopUp() {
 
     const closePopup = () => {
         const popup = document.getElementById('course_score');
+        // 延迟到事件处理结束后 unmount，避免在 React 事件回调中同步卸载自身
+        const root = popupRoot;
+        popupRoot = null;
+        if (root) {
+            setTimeout(() => {
+                try { root.unmount(); } catch (e) { /* 已卸载则忽略 */ }
+            }, 0);
+        }
         if (popup) {
             popup.remove();
         }
@@ -483,9 +494,9 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
     ];
 
     // 历史分数数据
-    const historyData = data.history.map((item: any) => ({
+    const historyData = (data.history ?? []).map((item: any) => ({
         examTime: item.examTime?.toString() ?? '未知',
-        avg: parseFloat(item.avg.toFixed(1)),
+        avg: parseFloat(Number(item.avg ?? 0).toFixed(1)),
         max: item.max,
         min: item.min,
         count: item.count,
@@ -559,7 +570,7 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 
                 <Row gutter={16}>
                     <Col span={8}>
-                        <Statistic title="平均分" value={data.avg.toFixed(1)} />
+                        <Statistic title="平均分" value={Number(data.avg ?? 0).toFixed(1)} />
                     </Col>
                     <Col span={8}>
                         <Statistic title="最高分" value={data.max} />
@@ -631,7 +642,17 @@ function CourseStats({ setWebPage }: { setWebPage: (page: PageType) => void }) {
 };
 
 export function initCourseScore(): void {
-    setTimeout(() => {
-        xpath_query(`//*[@id="${MenuIds.COURSE_SCORE}"]/ul/li/ul/li/a`, (e) => e.onclick = popupWindow)
+    // 菜单项由 menu 特性异步注入，轮询等待其出现后再绑定，避免页面加载慢时绑定静默丢失
+    let attempts = 0;
+    const timer = setInterval(() => {
+        attempts++;
+        let found = false;
+        xpath_query(`//*[@id="${MenuIds.COURSE_SCORE}"]/ul/li/ul/li/a`, (e) => {
+            e.onclick = popupWindow;
+            found = true;
+        });
+        if (found || attempts >= 30) {
+            clearInterval(timer);
+        }
     }, 1000);
 }
