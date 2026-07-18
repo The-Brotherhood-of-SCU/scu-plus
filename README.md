@@ -18,7 +18,7 @@
 ## 🖼 界面预览
 
 <div align="center">
-**全新杂志风主题，教务系统也能优雅**
+全新杂志风主题，教务系统也能优雅
 
 <img src="./README/new_theme.png" alt="新主题主页预览" width="90%" />
 <img src="./README/score.png" alt="分数看板" width="90%" />
