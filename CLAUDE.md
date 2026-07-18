@@ -23,6 +23,7 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 | `src/options.tsx` | Thin wrapper — delegates entirely to `src/tabs/setting.tsx`. |
 | `src/contents/id-scu.ts` | Content script on `id.scu.edu.cn`. Password-modify-page redirect (SPA-aware via history monkey-patching + MutationObserver), and ID portal OCR captcha. |
 | `src/contents/zhjw.ts` | **Main content script** on `zhjw.scu.edu.cn`. Dispatches to most feature modules based on URL path. |
+| `src/contents/zhjw-beautify.ts` | Injects the magazine theme at `document_start` (before first paint) to avoid a flash of the original styles. Reads a localStorage mirror of `beautifySwitch`/`beautifyColor` synchronously, then reconciles with real settings and watches for changes. |
 | `src/contents/zhjw-login.ts` | Content script on `zhjw.scu.edu.cn/*login*`. Redirects to unified auth (id.scu.edu.cn) when enabled. Runs at `document_start`. |
 | `src/contents/acm-scu.ts` | Content script on `acm.scu.edu.cn/teach/`. OCR captcha for the ACM teaching site. |
 

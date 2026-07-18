@@ -399,7 +399,7 @@ export function initScoreAnalysis(): void {
                 labels: ['必修学分', '选修学分', '任选学分'],
                 datasets: [{
                   data: [requiredCredits, totalCredits - requiredCredits - optionalCredits, optionalCredits],
-                  backgroundColor: ['#90EE90', '#ADD8E6', '#FFB6C1'],
+                  backgroundColor: ['#1e7b1e', '#2d687b', '#ec7284'],
                   hoverOffset: 4
                 }]
               },

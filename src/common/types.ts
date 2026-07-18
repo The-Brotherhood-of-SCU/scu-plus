@@ -24,7 +24,7 @@ export class SettingItem {
   skip2FASwitch: boolean;
   constructor() {
     this.beautifySwitch = false;
-    this.beautifyColor = "#caeae3";
+    this.beautifyColor = "#9e1b32";
     this.avatarSwitch = false;
     this.avatarSource = "qq";
     this.avatarInfo = "";

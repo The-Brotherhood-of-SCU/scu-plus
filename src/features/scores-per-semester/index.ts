@@ -102,13 +102,13 @@ export function initScoresPerSemester(): void {
             $(`#tab${i+1} > h4`, e => {
                 let span_credit_comp = document.createElement('span')
                 span_credit_comp.style.marginLeft='5px';
-                span_credit_comp.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:white;">必修学分:${result[i].credit_comp}</font></span>`
+                span_credit_comp.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">必修学分:${result[i].credit_comp}</font></span>`
                 let span_credit_elec = document.createElement('span')
                 span_credit_elec.style.marginLeft='5px';
-                span_credit_elec.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:white;">选修学分:${result[i].credit_elective}</font></span>`
+                span_credit_elec.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">选修学分:${result[i].credit_elective}</font></span>`
                 let span_credit_opt = document.createElement('span')
                 span_credit_opt.style.marginLeft='5px';
-                span_credit_opt.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:white;">任选学分:${result[i].credit_opt}</font></span>`
+                span_credit_opt.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">任选学分:${result[i].credit_opt}</font></span>`
 
                 let container = document.createElement('div')
                 container.innerHTML += `\u{1f3af}<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`

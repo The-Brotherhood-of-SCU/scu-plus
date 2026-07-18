@@ -136,7 +136,7 @@ async function inject() {
     let any_requiredCredits = data.reduce((sum, cur) => sum + (cur.attribute === "任选" ? cur.credit : 0), 0);
     let show_elememt = document.createElement("div");
     show_elememt.innerHTML = `
-    <span style="font-size:1.3rem;color:red;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
+    <span style="font-size:1.3rem;color:black;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
     `;
     show_elememt.querySelector("span")!.innerText += " \u{1f3af}by SCU+";
     $("#myTab > li", (e) => e.appendChild(show_elememt));

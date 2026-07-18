@@ -122,61 +122,6 @@ async function showDailyQuoteModal() {
   }, 8000);
 }
 
-export function injectBeautify(): void {
-  const $ = (selector: string, callback: (element: HTMLElement) => void) => {
-    const e = document.querySelector(selector) as HTMLElement;
-    if (e) {
-      try {
-        callback(e);
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-
-  $("#page-content-template", (widgetBox) => {
-    widgetBox.style.borderRadius = "20px";
-    widgetBox.style.border = `2px solid #96e6a1`;
-    widgetBox.style.backgroundColor = '#caeae3';
-    widgetBox.style.minHeight = "80vh";
-    widgetBox.style.margin = "15px";
-  });
-
-  for (const sheet of document.styleSheets) {
-    try {
-      for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
-        const rule = sheet.cssRules[i] as any;
-        if (rule.selectorText === '.green_background' || rule.selectorText === '.red_background') {
-          sheet.deleteRule(i);
-        }
-      }
-    } catch (e) {
-      console.warn('无法访问样式表', sheet.href);
-    }
-  }
-}
-
-export function injectCss(): void {
-  const css = document.createElement("style");
-  css.setAttribute("type", "text/css");
-  css.innerHTML = `
-    .table-striped>tbody>tr:nth-child(odd)>td,.table-striped>tbody>tr:nth-child(odd)>th {
-      background-color: #00000000 !important;
-    }
-    .table-hover>tbody>tr:hover>td,.table-hover>tbody>tr:hover>th {
-      background-color: #00000000 !important;
-    }
-  `;
-  document.head.appendChild(css);
-
-  if (window.location.href.match("/student/integratedQuery/scoreQuery/schemeScores/index")) {
-    const styles = document.getElementsByTagName("style");
-    for (const s of styles) {
-      s.innerHTML = s.innerHTML.replaceAll("#d4f0c6", "#00000000");
-    }
-  }
-}
-
 export function hideFailCourse(enabled: boolean): void {
   if (!enabled) return;
 
@@ -295,10 +240,7 @@ export async function initHomePage(): Promise<void> {
 
   injectNavbar(savedSettings);
 
-  if (savedSettings.beautifySwitch) {
-    injectBeautify();
-    injectCss();
-  }
+  // 杂志风主题由 contents/zhjw-beautify.ts 在 document_start 提前注入，此处不再重复
 
   injectSchoolSchedule();
   injectMenu();

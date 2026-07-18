@@ -194,8 +194,9 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
       >
 
         <Form.Item
-          label="美化开关"
+          label="美化开关（杂志风主题）"
           name="beautifySwitch"
+          tooltip="开启后将教务系统整体替换为现代杂志风主题：纸墨配色、衬线标题、三线表"
           valuePropName="checked"
         >
           <Switch />
@@ -276,10 +277,11 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
         </Form.Item>
         {showBeautifyField && (<>
           <Form.Item
-            label="美化颜色"
+            label="主题点缀色"
             name="beautifyColor"
+            tooltip="杂志风主题的点缀色，用于报头、栏目标记、链接等，默认锦绣红 #9e1b32"
           >
-            <Input placeholder="eg. #caeae3" />
+            <Input placeholder="eg. #9e1b32" />
           </Form.Item>
         </>)}
         <Form.Item
@@ -343,7 +345,7 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
           </Button>
           {showBeautifyField && (
             <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-              美化颜色：
+              主题点缀色：
               <ColorPicker value={setting.beautifyColor} onChangeComplete={
                 (color) => {
                   const newColor = color.toHexString();
