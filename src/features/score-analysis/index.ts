@@ -65,12 +65,20 @@ function extractData() {
   const rows = document.querySelectorAll("#page-content-template > div > div table tbody tr");
   return Array.from(rows).map(row => {
     const cells = row.querySelectorAll("td");
+    const scoreText = cells[5]?.textContent?.trim() || "";
+    const numericScore = parseInt(scoreText, 10);
+    const isNumeric = !isNaN(numericScore);
+    // 等级制课程（军训/劳动/素质课等）成绩为"优秀/良好/中等/及格/合格"，
+    // 无法参与 GPA/平均分计算，但其学分应计入统计；及格式等级视为通过
+    const GRADED_PASS = /^(优秀|良好|中等|及格|合格|通过)$/;
+    const passed = isNumeric ? numericScore >= 60 : GRADED_PASS.test(scoreText);
     return {
       attribute: cells[3]?.textContent?.trim() || "",
       credit: parseFloat(cells[4]?.textContent?.trim() || "0"),
-      score: parseInt(cells[5]?.textContent?.trim() || "0", 10)
+      score: isNumeric ? numericScore : NaN,
+      passed
     };
-  }).filter(item => !isNaN(item.credit) && !isNaN(item.score));
+  }).filter(item => !isNaN(item.credit) && (item.passed || !isNaN(item.score)));
 }
 
 function calculateWeightedAverage(data: { credit: number; value: number }[]) {
@@ -229,10 +237,12 @@ export function initScoreAnalysis(): void {
     if (canvasIsOpen) return;
     canvasIsOpen = true;
     const data = extractData();
-    const passed = data.filter(item => item.score >= 60);
+    const passed = data.filter(item => item.passed);
+    // GPA/平均分只能基于数值成绩计算，等级制课程仅计入学分统计
+    const numericPassed = passed.filter(item => !isNaN(item.score));
 
     // GPA 计算
-    const gpaData = passed.map(item => ({
+    const gpaData = numericPassed.map(item => ({
       credit: item.credit,
       value: getGPA(item.score)
     }));
@@ -241,7 +251,7 @@ export function initScoreAnalysis(): void {
     // 必修课统计
     const required = passed.filter(item => item.attribute === '必修');
     const requiredGPA = calculateWeightedAverage(
-      required.map(item => ({ credit: item.credit, value: getGPA(item.score) }))
+      required.filter(item => !isNaN(item.score)).map(item => ({ credit: item.credit, value: getGPA(item.score) }))
     );
     // 任选学分
     const optional = passed.filter(item => item.attribute === '任选');
@@ -253,7 +263,7 @@ export function initScoreAnalysis(): void {
 
 
     // 平均成绩
-    const scoreData = passed.map((item) => ({
+    const scoreData = numericPassed.map((item) => ({
       credit: item.credit,
       value: item.score,
     }));
@@ -261,7 +271,7 @@ export function initScoreAnalysis(): void {
 
     // 必修平均成绩
     const requiredScoreData = data
-      .filter((item) => item.attribute === "必修")
+      .filter((item) => item.attribute === "必修" && !isNaN(item.score))
       .map((item) => ({
         credit: item.credit,
         value: item.score,
@@ -386,7 +396,7 @@ export function initScoreAnalysis(): void {
                         type: 'line',
                         xMin: averageGPA,
                         xMax: averageGPA,
-                        borderColor: getThemeColor('--scu-ink', 'green'),
+                        borderColor: ink,
                         borderWidth: 2,
                         borderDash: [5, 5],
                         label: {

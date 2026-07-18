@@ -14,13 +14,14 @@ export async function injectMenu(): Promise<void> {
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  while (true) {
-    const menus = document.querySelector("#menus") as HTMLElement;
+  // 本脚本会在所有 iframe 中运行，而没有侧边栏的 frame 里 #menus 永远不存在，限制重试次数避免永久轮询
+  let menus: HTMLElement | null = null;
+  for (let i = 0; i < 30; i++) {
+    menus = document.querySelector("#menus") as HTMLElement;
     if (menus) break;
     await sleep(1000);
   }
-
-  const menus = document.querySelector("#menus") as HTMLElement;
+  if (!menus) return;
 
   xpathQuery(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "\u{1f3af}"; });
   const el1007001003 = document.getElementById("1007001003");

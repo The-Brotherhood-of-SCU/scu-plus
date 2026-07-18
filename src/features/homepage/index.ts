@@ -5,17 +5,9 @@ import { injectMenu } from "../menu";
 import { injectSchoolSchedule } from "../schedule";
 
 function updateCookie(key: string, value: string) {
-  const cookies = document.cookie
-    .split("; ")
-    .reduce((acc, cookie) => {
-      const [key, val] = cookie.split("=");
-      acc[decodeURIComponent(key)] = decodeURIComponent(val);
-      return acc;
-    }, {} as Record<string, string>);
-  cookies[key] = value;
-  for (const [k, v] of Object.entries(cookies)) {
-    document.cookie = `${encodeURIComponent(k)}=${encodeURIComponent(v)}; path=/`;
-  }
+  // 只写目标 cookie 即可；不要解析重写整个 cookie 串——
+  // split("=") 会截断含 = 的值，统一 path=/ 会改变其他 cookie 的作用域并丢失 expires
+  document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; path=/`;
 }
 
 export function injectDailyQuote(): void {

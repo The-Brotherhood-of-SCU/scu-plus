@@ -10,13 +10,10 @@ const scoreMapper = ["90~100", "85~89", "80~84", "76~79", "73~75", "70~72", "66~
 function getScoreRange(scoreValue: string) {
     if (scoreValue === "") return "暂无"
     if (scoreValue === "-999.999") return "未评教"
-    try {
-        let score = parseInt(scoreValue)
-        return scoreMapper[-20 - score]
-    } catch (e) {
-        console.log(e)
-        return `RAW:${scoreValue}`
-    }
+    let score = parseInt(scoreValue)
+    const range = scoreMapper[-20 - score]
+    // 编码值超出预期范围（或无法解析）时回退显示原始值，避免渲染 undefined
+    return range ?? `RAW:${scoreValue}`
 }
 
 function WarnUi() {
@@ -77,7 +74,12 @@ function generateInnerHtml(list: any[]): string {
 }
 
 function doReplace(data: any) {
-    const root = ReactDOM.createRoot(createSecondPageElement());
+    const container = createSecondPageElement();
+    if (!container) {
+        console.warn("SCU+: 找不到页面容器，隐藏成绩功能中止");
+        return;
+    }
+    const root = ReactDOM.createRoot(container);
     root.render(<WarnUi />);
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
         header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计\u{1f3af}</th><th>成绩状态\u{1f3af}</th></tr>";
@@ -85,8 +87,8 @@ function doReplace(data: any) {
     const body = document.getElementById("scoretbody")
     if(body==null)return
     body.setAttribute("id", "scoretbody_changed");
-    const scoreList = data[0]["list"]
-    if(scoreList.length==0)return;
+    const scoreList = data?.[0]?.list
+    if(!scoreList || scoreList.length==0)return;
     let contentHtml = generateInnerHtml(scoreList);
     body.innerHTML = contentHtml;
 }

@@ -1,18 +1,30 @@
 import { Actions } from "../../constants/actions"
 
 export async function injectSchoolSchedule(): Promise<void> {
-  const scheduleHtml = await chrome.runtime.sendMessage({
-    action: Actions.REQUEST,
-    url: "https://jwc.scu.edu.cn/cdxl.htm"
-  });
+  // 校历只注入顶部导航栏，子 iframe 中没有注入点，直接跳过（也避免每个 frame 重复请求）
+  if (window.top !== window.self) return;
 
-  if (!scheduleHtml.success) return;
+  let scheduleHtml: any;
+  try {
+    scheduleHtml = await chrome.runtime.sendMessage({
+      action: Actions.REQUEST,
+      url: "https://jwc.scu.edu.cn/cdxl.htm"
+    });
+  } catch (e) {
+    // 扩展上下文失效（如插件更新后旧页面未刷新）等情况，静默放弃
+    console.warn("SCU+: 获取校历失败", e);
+    return;
+  }
+
+  if (!scheduleHtml?.success) return;
 
   const _text = scheduleHtml.data as string;
-  const listDivText = _text.substring(
-    _text.indexOf("<div class=\"list\">"),
-    _text.indexOf("</div>", _text.indexOf("<div class=\"list\">")) + "</div>".length
-  );
+  const listStart = _text.indexOf("<div class=\"list\">");
+  // 页面结构变化时找不到目标节点，静默放弃而不是截取错误片段
+  if (listStart === -1) return;
+  const listEnd = _text.indexOf("</div>", listStart);
+  if (listEnd === -1) return;
+  const listDivText = _text.substring(listStart, listEnd + "</div>".length);
 
   const listDiv = document.createElement("div");
   listDiv.innerHTML = listDivText;
@@ -22,10 +34,12 @@ export async function injectSchoolSchedule(): Promise<void> {
 
   for (const li of lis) {
     const a = li.querySelector("a");
-    if (a) {
+    const href = a?.getAttribute("href");
+    if (a && href) {
       scheduleList.push({
         name: a.innerText,
-        link: "https://jwc.scu.edu.cn/" + a.getAttribute("href")
+        // href 可能是绝对地址或相对路径，用 URL 正确拼接
+        link: new URL(href, "https://jwc.scu.edu.cn/").href
       });
     }
   }

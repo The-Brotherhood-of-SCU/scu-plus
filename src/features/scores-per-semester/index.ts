@@ -16,7 +16,8 @@ function getCallback(): string {
     const scripts = document.head.querySelectorAll('script');
     let match = ""
     for (const i of scripts) {
-        if (i.type !== "text/javascript") {
+        // 无 type 属性的经典脚本 type 为 ""，也应参与匹配
+        if (i.type && i.type !== "text/javascript") {
             continue
         }
         const result = i.innerHTML.match(/\/student\/integratedQuery\/scoreQuery\/([^/]+)\/allPassingScores\/callback/);
@@ -36,7 +37,7 @@ async function countForScore(callback: string): Promise<scoreMap[]> {
     let data = await response.json();
     let scoresMap: scoreMap[] = [];
 
-    for (let term of data["lnList"]) {
+    for (let term of data?.lnList ?? []) {
         let totalWeightedScore = 0.0;
         let totalCredits = 0.0;
 
@@ -45,7 +46,7 @@ async function countForScore(callback: string): Promise<scoreMap[]> {
 
         let credit_comp=0,credit_elective=0,credit_opt=0;
 
-        term["cjList"].forEach((e: any) => {
+        (term["cjList"] ?? []).forEach((e: any) => {
             let cj = parseFloat(e["cj"]);
             let credit = parseFloat(e["credit"]);
 
@@ -60,16 +61,16 @@ async function countForScore(callback: string): Promise<scoreMap[]> {
                 totalWeightedScore += cj * credit;
             }
 
-            // 学分统计
+            // 学分统计（与上方加权平均口径一致，使用 parseFloat 保留 0.5 档小数学分）
             switch(e["courseAttributeName"]){
                 case "必修":
-                    credit_comp += parseInt(e["credit"]);
+                    credit_comp += credit;
                     break;
                 case "选修":
-                    credit_elective += parseInt(e["credit"]);
+                    credit_elective += credit;
                     break;
                 case "任选":
-                    credit_opt += parseInt(e["credit"])
+                    credit_opt += credit;
                     break;
             }
         });
@@ -117,5 +118,8 @@ export function initScoresPerSemester(): void {
                 e.append(span_credit_comp,span_credit_elec,span_credit_opt,container)
             })
         }
+    }).catch(e => {
+        // 会话过期返回登录页 HTML、接口结构变更等，静默降级
+        console.warn("SCU+: 学期成绩统计失败", e);
     })
 }
