@@ -5,6 +5,7 @@
 **四川大学教务系统增强插件**
 
 高颜值设计 × 实用功能，让你的教务系统焕然一新
+
 [![License](https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square)](./LICENSE)
 [![Plasmo](https://img.shields.io/badge/built%20with-Plasmo-orange?style=flat-square)](https://www.plasmo.com/)
 [![Stars](https://img.shields.io/github/stars/The-Brotherhood-of-SCU/scu-plus?style=flat-square)](https://github.com/The-Brotherhood-of-SCU/scu-plus/stargazers)
@@ -19,6 +20,7 @@
 
 <div align="center">
 全新杂志风主题，教务系统也能优雅
+
 
 <img src="./README/new_theme.png" alt="新主题主页预览" width="90%" />
 <img src="./README/score.png" alt="分数看板" width="90%" />
