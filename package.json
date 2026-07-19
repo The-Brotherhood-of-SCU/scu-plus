@@ -8,12 +8,6 @@
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
     "checkForUpdateLink": "https://api.github.com/repos/The-Brotherhood-of-SCU/scu-plus/releases/latest",
     "downloadProxyPrefix": "https://gh-proxy.org/",
-    "dailySentence": {
-        "link": "https://www.wudada.online/Api/ScSj",
-        "keys": [
-            "data"
-        ]
-    },
     "scripts": {
         "dev": "plasmo dev",
         "build": "plasmo build",
@@ -44,8 +38,6 @@
     "manifest": {
         "host_permissions": [
             "*://*.scu.edu.cn/*",
-            "https://server.jeanhua.cn/*",
-            "https://www.wudada.online/*",
             "https://api.github.com/*",
             "https://q1.qlogo.cn/*"
         ],

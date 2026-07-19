@@ -1,4 +1,4 @@
-export { checkVersion, $, $all, dailySentence, xpath_query as xpathQuery, createSecondPageElement, downloadCanvas, sleep, randomInt, UpdateCheckResult } from '../script/utils';
+export { checkVersion, $, $all, xpath_query as xpathQuery, createSecondPageElement, downloadCanvas, sleep, randomInt, UpdateCheckResult } from '../script/utils';
 export type { UpdateCheckInfo } from '../script/utils';
 
 export function waitForElement(selector: string, timeout = 10000): Promise<HTMLElement | null> {

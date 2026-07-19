@@ -20,7 +20,6 @@ export class SettingItem {
   avatarSwitch: boolean;
   avatarSource: string;
   avatarInfo: string;
-  dailyQuoteSwitch: boolean;
   failSwitch: boolean;
   passwordPopupSwitch: boolean;
   nameHideSwitch: boolean;
@@ -37,7 +36,6 @@ export class SettingItem {
     this.avatarSwitch = false;
     this.avatarSource = "qq";
     this.avatarInfo = "";
-    this.dailyQuoteSwitch = false;
     this.failSwitch = true;
     this.passwordPopupSwitch = true;
     this.nameHideSwitch = false;

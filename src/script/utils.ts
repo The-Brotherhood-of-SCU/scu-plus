@@ -4,7 +4,7 @@ import { UpdateCheckResult } from '../common/types';
 import type { UpdateCheckInfo } from '../common/types';
 import { Actions } from '../constants/actions';
 
-export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
+export { $, $all, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
 export type { UpdateCheckInfo }
 
 // Plasmo 构建期注入的环境变量（chrome / firefox / ...），仅补充类型声明
@@ -74,23 +74,6 @@ const $all = (selector: string, callback = (element: HTMLElement) => { }) => {
             }
         })
     }
-}
-
-/**
- * 获取每日一句
- * @returns 每日一句内容，失败返回 null
- */
-const dailySentence = async () => {
-    try {
-        const response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.dailySentence.link });
-        if (response?.success) {
-            return pkgMessage.dailySentence.keys.reduce((obj:any,key)=>obj?.[key],JSON.parse(response.data));
-        }
-    } catch (e) {
-        // 第三方接口返回非 JSON 或消息通道异常时，静默降级为不显示每日一句
-        console.warn("获取每日一句失败:", e);
-    }
-    return null;
 }
 
 /**

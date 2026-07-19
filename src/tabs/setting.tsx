@@ -238,13 +238,6 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
           </>
         )}
         <Form.Item
-          label="每日一句开关"
-          name="dailyQuoteSwitch"
-          valuePropName="checked"
-        >
-          <Switch />
-        </Form.Item>
-        <Form.Item
           label="挂科隐藏开关"
           name="failSwitch"
           valuePropName="checked"
