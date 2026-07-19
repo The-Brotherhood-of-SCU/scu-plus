@@ -101,21 +101,31 @@ export function initScoresPerSemester(): void {
     countForScore(callback).then(result => {
         for(let i=0; i < result.length; i++){
             $(`#tab${i+1} > h4`, e => {
-                let span_credit_comp = document.createElement('span')
-                span_credit_comp.style.marginLeft='5px';
-                span_credit_comp.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">必修学分:${result[i].credit_comp}</font></span>`
-                let span_credit_elec = document.createElement('span')
-                span_credit_elec.style.marginLeft='5px';
-                span_credit_elec.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">选修学分:${result[i].credit_elective}</font></span>`
-                let span_credit_opt = document.createElement('span')
-                span_credit_opt.style.marginLeft='5px';
-                span_credit_opt.innerHTML=`<span class="label label-purple" style="border-radius: 10px;"><font style="color:black;">任选学分:${result[i].credit_opt}</font></span>`
+                // 一个边框容器圈住所有 SCU+ 注入的统计标签，🎯 只放在最左边
+                const group = document.createElement('span')
+                group.style.cssText = 'display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;border:1px solid #d9534f;border-radius:8px;padding:2px 6px;margin-left:6px;vertical-align:middle;'
 
-                let container = document.createElement('div')
-                container.innerHTML += `\u{1f3af}<span class="label label-green" style="border-radius: 10px;"><font style="color:black;">平均成绩:${result[i].score.average.toFixed(2)}</font></span>`
-                container.innerHTML += `<span class="label label-grey" style="border-radius: 10px;"><font style="color:black;">必修成绩:${result[i].score.average_comp.toFixed(2)}</font></span>`
+                const marker = document.createElement('span')
+                marker.textContent = '\u{1f3af}'
+                marker.title = 'by SCU+'
+                group.appendChild(marker)
 
-                e.append(span_credit_comp,span_credit_elec,span_credit_opt,container)
+                // 统一用低饱和的浅色底，不再使用教务系统自带的彩色 label，避免突兀
+                const badge = (text: string) => {
+                    const s = document.createElement('span')
+                    s.style.cssText = 'background:rgba(0,0,0,0.05);color:#333;border-radius:10px;padding:1px 8px;font-size:12px;'
+                    s.textContent = text
+                    return s
+                }
+                group.append(
+                    badge(`必修学分:${result[i].credit_comp}`),
+                    badge(`选修学分:${result[i].credit_elective}`),
+                    badge(`任选学分:${result[i].credit_opt}`),
+                    badge(`平均成绩:${result[i].score.average.toFixed(2)}`),
+                    badge(`必修成绩:${result[i].score.average_comp.toFixed(2)}`)
+                )
+
+                e.appendChild(group)
             })
         }
     }).catch(e => {
