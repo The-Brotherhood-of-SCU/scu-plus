@@ -273,149 +273,102 @@ const injectExportFunc = () => {
         }
     }
 
-    // main: attach export buttons that perform a clone-based safe export
-    $('.right_top_oper', (e) => {
-        let btn = document.createElement("button");
-        btn.setAttribute('class', 'btn btn-info btn-xs btn-round');
-        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片\u{1f3af}`;
-        e.appendChild(btn);
-        btn.addEventListener('click', async () => {
-            const original = document.getElementById('courseTable') as HTMLElement;
-            if (!original) return;
-            const clonedTable = original.cloneNode(true) as HTMLElement;
-            // copy computed styles recursively
-            try {
-                copyComputedStyle(original, clonedTable);
-                const srcAll = Array.from(original.querySelectorAll('*')) as Element[];
-                const dstAll = Array.from(clonedTable.querySelectorAll('*')) as Element[];
-                const n = Math.min(srcAll.length, dstAll.length);
-                for (let i = 0; i < n; i++) {
-                    try { copyComputedStyle(srcAll[i], dstAll[i]); } catch (e) { }
-                }
-            } catch (e) { }
-
-            // create wrapper positioned at the original location
-            const wrapper = document.createElement('div');
-            const rect = original.getBoundingClientRect();
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = (rect.left + window.scrollX) + 'px';
-            wrapper.style.top = (rect.top + window.scrollY) + 'px';
-            wrapper.style.width = rect.width + 'px';
-            wrapper.style.height = rect.height + 'px';
-            wrapper.style.overflow = 'visible';
-            wrapper.style.zIndex = '99999';
-            wrapper.style.pointerEvents = 'none';
-            wrapper.style.opacity = '1';
-            wrapper.style.background = 'white';
-            wrapper.appendChild(clonedTable);
-
-            const sandboxId = 'scu-plus-export-sandbox';
-            let sandbox = document.getElementById(sandboxId) as HTMLElement;
-            if (!sandbox) {
-                sandbox = document.createElement('div');
-                sandbox.id = sandboxId;
-                sandbox.style.position = 'absolute';
-                sandbox.style.left = '0';
-                sandbox.style.top = '0';
-                sandbox.style.overflow = 'visible';
-                sandbox.style.zIndex = '99998';
-                sandbox.style.pointerEvents = 'none';
-                document.body.appendChild(sandbox);
+    // main: export the course table as an image via a clone-based safe export
+    async function exportCourseTableImage() {
+        const original = document.getElementById('courseTable') as HTMLElement;
+        if (!original) return;
+        const clonedTable = original.cloneNode(true) as HTMLElement;
+        // copy computed styles recursively
+        try {
+            copyComputedStyle(original, clonedTable);
+            const srcAll = Array.from(original.querySelectorAll('*')) as Element[];
+            const dstAll = Array.from(clonedTable.querySelectorAll('*')) as Element[];
+            const n = Math.min(srcAll.length, dstAll.length);
+            for (let i = 0; i < n; i++) {
+                try { copyComputedStyle(srcAll[i], dstAll[i]); } catch (e) { }
             }
+        } catch (e) { }
 
-            try {
-                sanitizeCloneResources(clonedTable);
-                // 先把 wrapper 插入 DOM，再计算并绝对化子项位置，避免未插入时 getBoundingClientRect 返回 0
-                sandbox.appendChild(wrapper);
-                absolutizeClonePositions(original, clonedTable, wrapper);
-                await downloadCanvas(wrapper, '课程表', 1);
-            } catch (e) {
-                console.error('[SCU+] export failed', e);
-            } finally {
-                try { sandbox.removeChild(wrapper); } catch (e) { }
-            }
-        });
-        let jsonBtn = document.createElement("button");
+        // create wrapper positioned at the original location
+        const wrapper = document.createElement('div');
+        const rect = original.getBoundingClientRect();
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = (rect.left + window.scrollX) + 'px';
+        wrapper.style.top = (rect.top + window.scrollY) + 'px';
+        wrapper.style.width = rect.width + 'px';
+        wrapper.style.height = rect.height + 'px';
+        wrapper.style.overflow = 'visible';
+        wrapper.style.zIndex = '99999';
+        wrapper.style.pointerEvents = 'none';
+        wrapper.style.opacity = '1';
+        wrapper.style.background = 'white';
+        wrapper.appendChild(clonedTable);
+
+        const sandboxId = 'scu-plus-export-sandbox';
+        let sandbox = document.getElementById(sandboxId) as HTMLElement;
+        if (!sandbox) {
+            sandbox = document.createElement('div');
+            sandbox.id = sandboxId;
+            sandbox.style.position = 'absolute';
+            sandbox.style.left = '0';
+            sandbox.style.top = '0';
+            sandbox.style.overflow = 'visible';
+            sandbox.style.zIndex = '99998';
+            sandbox.style.pointerEvents = 'none';
+            document.body.appendChild(sandbox);
+        }
+
+        try {
+            sanitizeCloneResources(clonedTable);
+            // 先把 wrapper 插入 DOM，再计算并绝对化子项位置，避免未插入时 getBoundingClientRect 返回 0
+            sandbox.appendChild(wrapper);
+            absolutizeClonePositions(original, clonedTable, wrapper);
+            await downloadCanvas(wrapper, '课程表', 1);
+        } catch (e) {
+            console.error('[SCU+] export failed', e);
+        } finally {
+            try { sandbox.removeChild(wrapper); } catch (e) { }
+        }
+    }
+
+    // helper: build the SCU+ export button group — one bordered box with a single 🎯 marker on the left
+    function createExportGroup() {
+        const group = document.createElement('span');
+        group.style.cssText = 'display:inline-flex;align-items:center;gap:2px;border:1px solid #d9534f;border-radius:8px;padding:2px 4px;margin:0 4px;vertical-align:middle;';
+
+        const marker = document.createElement('span');
+        marker.textContent = '\u{1f3af}';
+        marker.title = 'by SCU+';
+        group.appendChild(marker);
+
+        const imgBtn = document.createElement("button");
+        imgBtn.setAttribute('class', 'btn btn-info btn-xs btn-round');
+        imgBtn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片`;
+        imgBtn.addEventListener('click', exportCourseTableImage);
+        group.appendChild(imgBtn);
+
+        const jsonBtn = document.createElement("button");
         jsonBtn.setAttribute('class', 'btn btn-success btn-xs btn-round');
-        jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
-        e.appendChild(jsonBtn);
+        jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON`;
         jsonBtn.addEventListener('click', exportScheduleJson);
-        let icsBtn = document.createElement("button");
+        group.appendChild(jsonBtn);
+
+        const icsBtn = document.createElement("button");
         icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
-        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
-        e.appendChild(icsBtn);
+        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS`;
         icsBtn.addEventListener('click', exportScheduleIcs);
+        group.appendChild(icsBtn);
+
+        return group;
+    }
+
+    // main: attach the export button group
+    $('.right_top_oper', (e) => {
+        e.appendChild(createExportGroup());
     });
 
     $("#mainDIV > h4:nth-child(3)", (e) => {
-        let btn = document.createElement("button");
-        btn.setAttribute('class', 'btn btn-info btn-xs btn-round');
-        btn.innerHTML = `<i class="fa fa-cloud-download bigger-120"></i>导出课表图片\u{1f3af}`;
-        e.appendChild(btn);
-        btn.addEventListener('click', async () => {
-            const original = document.getElementById('courseTable') as HTMLElement;
-            if (!original) return;
-            const clonedTable = original.cloneNode(true) as HTMLElement;
-            try {
-                copyComputedStyle(original, clonedTable);
-                const srcAll = Array.from(original.querySelectorAll('*')) as Element[];
-                const dstAll = Array.from(clonedTable.querySelectorAll('*')) as Element[];
-                const n = Math.min(srcAll.length, dstAll.length);
-                for (let i = 0; i < n; i++) {
-                    try { copyComputedStyle(srcAll[i], dstAll[i]); } catch (e) { }
-                }
-            } catch (e) { }
-
-            const wrapper = document.createElement('div');
-            const rect = original.getBoundingClientRect();
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = (rect.left + window.scrollX) + 'px';
-            wrapper.style.top = (rect.top + window.scrollY) + 'px';
-            wrapper.style.width = rect.width + 'px';
-            wrapper.style.height = rect.height + 'px';
-            wrapper.style.overflow = 'visible';
-            wrapper.style.zIndex = '99999';
-            wrapper.style.pointerEvents = 'none';
-            wrapper.style.opacity = '1';
-            wrapper.style.background = 'white';
-            wrapper.appendChild(clonedTable);
-
-            const sandboxId = 'scu-plus-export-sandbox';
-            let sandbox = document.getElementById(sandboxId) as HTMLElement;
-            if (!sandbox) {
-                sandbox = document.createElement('div');
-                sandbox.id = sandboxId;
-                sandbox.style.position = 'absolute';
-                sandbox.style.left = '0';
-                sandbox.style.top = '0';
-                sandbox.style.overflow = 'visible';
-                sandbox.style.zIndex = '99998';
-                sandbox.style.pointerEvents = 'none';
-                document.body.appendChild(sandbox);
-            }
-
-            try {
-                sanitizeCloneResources(clonedTable);
-                // 先把 wrapper 插入 DOM，再计算并绝对化子项位置
-                sandbox.appendChild(wrapper);
-                absolutizeClonePositions(original, clonedTable, wrapper);
-                await downloadCanvas(wrapper, '课程表', 1);
-            } catch (e) {
-                console.error('[SCU+] export failed', e);
-            } finally {
-                try { sandbox.removeChild(wrapper); } catch (e) { }
-            }
-        })
-        let jsonBtn = document.createElement("button");
-        jsonBtn.setAttribute('class', 'btn btn-success btn-xs btn-round');
-        jsonBtn.innerHTML = `<i class="fa fa-copy bigger-120"></i>导出JSON\u{1f3af}`;
-        e.appendChild(jsonBtn);
-        jsonBtn.addEventListener('click', exportScheduleJson);
-        let icsBtn = document.createElement("button");
-        icsBtn.setAttribute('class', 'btn btn-warning btn-xs btn-round');
-        icsBtn.innerHTML = `<i class="fa fa-calendar bigger-120"></i>导出ICS\u{1f3af}`;
-        e.appendChild(icsBtn);
-        icsBtn.addEventListener('click', exportScheduleIcs);
+        e.appendChild(createExportGroup());
     })
 }
 
