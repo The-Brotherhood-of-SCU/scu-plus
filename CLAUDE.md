@@ -32,7 +32,7 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 Each feature follows an `init*` or `inject*` function pattern. They are pure DOM/JS injection modules — no framework rendering:
 
 - **`homepage/`** — UI beautification (border colors, CSS overrides), daily quote modal, fail-course toggling, custom GPA/fail text, password popup removal. Called unconditionally from `zhjw.ts`.
-- **`menu/`** — Injects custom sidebar menu entries (培养方案, SCU+ 设置, version check) into the教务 system's `#menus` element.
+- **`menu/`** — Injects custom sidebar menu entries (SCU+ 设置, version check) into the教务 system's `#menus` element.
 - **`navbar/`** — Top navbar avatar/name hiding via CSS injection.
 - **`score-analysis/`** — GPA calculation, credit-weighted scoring, score distribution charts (Chart.js).
 - **`course-filter/`** — Custom course selection filters on the选课 page.

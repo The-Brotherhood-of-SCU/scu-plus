@@ -39,11 +39,6 @@ export async function injectMenu(): Promise<void> {
   xpathQuery('//*[@id="1003000000"]/a/span', (e) => e.innerHTML = e.innerHTML.replace('教师课堂评价', '教师课堂评价\u{1f3af}'));
   xpathQuery('//*[@id="1003001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('教学评估', '教学评估\u{1f3af}'));
 
-  const peiyang = createMenuItem(MenuIds.TRAINING_PROGRAM, "fa-picture-o", "培养方案\u{1f3af}", [
-    { text: "培养方案查看", href: "//zhjw.scu.edu.cn/student/comprehensiveQuery/search/trainProgram/index" }
-  ]);
-  menus.appendChild(peiyang);
-
   const settingsBtn = createSettingsMenuItem();
   menus.appendChild(settingsBtn);
 
