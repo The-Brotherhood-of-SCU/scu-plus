@@ -695,6 +695,76 @@ td.green_background, td.green_background a, td.green_background span { color: va
 }
 
 /* ============================================================
+   SCU+ 品牌加载动画（替换 layer.js 的三点 GIF）
+   ============================================================ */
+.layui-layer-loading {
+  border-radius: 8px !important;
+}
+.layui-layer-loading .layui-layer-content {
+  background: none !important;
+  width: 148px !important;
+  height: 60px !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  overflow: visible !important;
+  color: var(--scu-accent) !important;
+}
+/* “SCU+”字标：锦绣红基底 + 流光扫过 */
+.layui-layer-loading .layui-layer-content::before {
+  content: "SCU+";
+  font-family: var(--scu-serif);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  background: linear-gradient(90deg,
+    var(--scu-accent) 0%, var(--scu-accent) 35%,
+    #e9b7c1 50%,
+    var(--scu-accent) 65%, var(--scu-accent) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: scu-plus-shine 1.6s linear infinite;
+}
+/* 三点依次点亮（单个元素 + box-shadow 画出三颗点） */
+.layui-layer-loading .layui-layer-content::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: scu-plus-dots 1.2s ease-in-out infinite;
+}
+@keyframes scu-plus-shine {
+  0% { background-position: 110% 0; }
+  100% { background-position: -110% 0; }
+}
+@keyframes scu-plus-dots {
+  0%, 100% { box-shadow: -11px 0 0 0 var(--scu-accent), 0 0 0 0 var(--scu-line), 11px 0 0 0 var(--scu-line); }
+  33%      { box-shadow: -11px 0 0 0 var(--scu-line), 0 0 0 0 var(--scu-accent), 11px 0 0 0 var(--scu-line); }
+  66%      { box-shadow: -11px 0 0 0 var(--scu-line), 0 0 0 0 var(--scu-line), 11px 0 0 0 var(--scu-accent); }
+}
+
+/* 视图内的行内加载占位（原 pageloading.gif）→ 锦绣红转圈 */
+.view-pre-loading {
+  background: none !important;
+  width: 22px !important;
+  height: 22px !important;
+  border: 2.5px solid var(--scu-line);
+  border-top-color: var(--scu-accent);
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: scu-plus-spin 0.8s linear infinite;
+}
+@keyframes scu-plus-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
    下拉菜单
    ============================================================ */
 .dropdown-menu {
