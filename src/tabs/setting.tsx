@@ -319,6 +319,13 @@ function DataSettingFragment({ isDirty, setIsDirty }: { isDirty: boolean; setIsD
         >
           <Switch />
         </Form.Item>
+        <Form.Item
+          label="进入教务主页时自动检查更新"
+          name="autoUpdateCheckSwitch"
+          tooltip="检测到新版本时会在页面右下角弹出提示，可直接跳转加速下载"
+        >
+          <Switch />
+        </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={async () => {
             const hasPermission = await checkAndRequestPermission(setting.ocrProvider);

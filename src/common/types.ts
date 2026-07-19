@@ -30,6 +30,7 @@ export class SettingItem {
   failedCourseCustomText: string;
   redirectLoginSwitch: boolean;
   skip2FASwitch: boolean;
+  autoUpdateCheckSwitch: boolean;
   constructor() {
     this.beautifySwitch = false;
     this.beautifyColor = "#9e1b32";
@@ -46,6 +47,7 @@ export class SettingItem {
     this.failedCourseCustomText = "";
     this.redirectLoginSwitch = false;
     this.skip2FASwitch = false;
+    this.autoUpdateCheckSwitch = true;
   }
   static equals(a: SettingItem | null | undefined, b: SettingItem | null | undefined): boolean {
     if (a === b) return true;

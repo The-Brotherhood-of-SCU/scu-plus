@@ -1,5 +1,7 @@
+import { Button, notification } from "antd";
+import { createElement } from "react";
 import { getSetting, SettingItem } from "../../script/config";
-import { dailySentence } from "../../script/utils";
+import { checkVersion, dailySentence, UpdateCheckResult } from "../../script/utils";
 import { injectNavbar } from "../navbar";
 import { injectMenu } from "../menu";
 import { injectSchoolSchedule } from "../schedule";
@@ -221,6 +223,36 @@ export function isHomePage(): boolean {
   return pathname === '/' || /^\/index(\.[a-zA-Z]+)?$/.test(pathname);
 }
 
+const UPDATE_CHECKED_SESSION_KEY = "scu-plus-update-checked";
+
+/**
+ * 进入教务主页时自动检查更新，有新版本则在右下角弹出提示（每个标签页会话只提示一次）
+ */
+async function autoCheckUpdate(): Promise<void> {
+  try {
+    if (sessionStorage.getItem(UPDATE_CHECKED_SESSION_KEY)) return;
+    sessionStorage.setItem(UPDATE_CHECKED_SESSION_KEY, "1");
+
+    const info = await checkVersion();
+    if (info.result !== UpdateCheckResult.NEW_VERSION_AVAILABLE) return;
+
+    notification.open({
+      message: "SCU+ 有新版本可用 🎉",
+      description: `检测到新版本 v${info.latestVersion}，点击下方按钮前往下载（已使用 gh-proxy 加速）。`,
+      btn: createElement(Button, {
+        type: "primary",
+        size: "small",
+        onClick: () => window.open(info.downloadUrl)
+      }, "立即下载"),
+      duration: 0,
+      placement: "bottomRight",
+    });
+  } catch (e) {
+    // 自动检查失败不应影响主页其他功能
+    console.warn("自动检查更新失败:", e);
+  }
+}
+
 export async function initHomePage(): Promise<void> {
   let savedSettings = await getSetting();
 
@@ -244,6 +276,10 @@ export async function initHomePage(): Promise<void> {
 
   if (savedSettings.dailyQuoteSwitch) {
     injectDailyQuote();
+  }
+
+  if (savedSettings.autoUpdateCheckSwitch) {
+    autoCheckUpdate();
   }
 
   hideFailCourse(savedSettings.failSwitch);
