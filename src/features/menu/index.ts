@@ -44,11 +44,6 @@ export async function injectMenu(): Promise<void> {
   ]);
   menus.appendChild(peiyang);
 
-  const courseScore = createMenuItem(MenuIds.COURSE_SCORE, "fa-check-square", "课程评分\u{1f3af}", [
-    { text: "选课通", href: "#" }
-  ]);
-  menus.appendChild(courseScore);
-
   const settingsBtn = createSettingsMenuItem();
   menus.appendChild(settingsBtn);
 

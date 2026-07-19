@@ -4,7 +4,6 @@ import { initCourseFilter } from "~features/course-filter"
 import { initScoreAnalysis } from "~features/score-analysis"
 import { initCourseTable } from "~features/course-table"
 import { initCourseEvaluation } from "~features/course-evaluation"
-import { initCourseScore } from "~features/course-score"
 import { initScoresPerSemester } from "~features/scores-per-semester"
 import { initEnhanceQuitCourse } from "~features/enhance-quit-course"
 import { initGetHiddenScore } from "~features/get-hidden-score"
@@ -34,10 +33,7 @@ const main = async () => {
   // 1. 全局加载的特性 (如导航栏、美化等)
   safeInit("homepage", initHomePage);
 
-  // 3. 选课通 (全局菜单注入)
-  safeInit("courseScore", initCourseScore);
-
-  // 4. 特定页面的特性
+  // 2. 特定页面的特性
   if (url.includes("/student/courseSelect/")) {
     // 选课相关
     safeInit("courseTable", initCourseTable);

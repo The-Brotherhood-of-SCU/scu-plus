@@ -32,10 +32,9 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 Each feature follows an `init*` or `inject*` function pattern. They are pure DOM/JS injection modules — no framework rendering:
 
 - **`homepage/`** — UI beautification (border colors, CSS overrides), daily quote modal, fail-course toggling, custom GPA/fail text, password popup removal. Called unconditionally from `zhjw.ts`.
-- **`menu/`** — Injects custom sidebar menu entries (培养方案, 选课通, SCU+ 设置, version check) into the教务 system's `#menus` element.
+- **`menu/`** — Injects custom sidebar menu entries (培养方案, SCU+ 设置, version check) into the教务 system's `#menus` element.
 - **`navbar/`** — Top navbar avatar/name hiding via CSS injection.
 - **`score-analysis/`** — GPA calculation, credit-weighted scoring, score distribution charts (Chart.js).
-- **`course-score/`** (选课通) — Course rating system with historical data stored in `localStorage`.
 - **`course-filter/`** — Custom course selection filters on the选课 page.
 - **`course-table/`** — Course table export to image (`@zumer/snapdom`).
 - **`course-evaluation/`** — One-click batch teaching evaluation.
@@ -74,6 +73,6 @@ content script → chrome.runtime.sendMessage({action: Actions.REQUEST, url, acc
 - **Content script config**: Each content script exports `export const config: PlasmoCSConfig = { matches: [...], run_at: ... }`. Plasmo uses this to generate the manifest. `zhjw.ts` uses `all_frames: true` because the教务 system serves many sub-pages inside iframes — features guard themselves with URL path checks to avoid running in unintended frames. Only use `all_frames: true` if the target site genuinely uses iframes for its main content.
 - **Settings are reactive-ish**: The `zhjw.ts` dispatcher reads settings once at page load. Features that need settings call `getSetting()` independently — the same cached instance is returned.
 - **Feature toggles**: Most features are gated behind `setting.*Switch` boolean flags. New features should follow the same pattern: add a switch to `SettingItem`, add a form field in `tabs/setting.tsx`, and check it before injecting.
-- **No framework in content scripts** (with exceptions): Most content script DOM manipulation is vanilla JS — no React rendering. However, a few features (`course-score`, `course-evaluation`, `get-hidden-score`) use `ReactDOM.createRoot()` to render React components into manually-created DOM containers within the host page. The popup and settings pages use React natively via Plasmo.
+- **No framework in content scripts** (with exceptions): Most content script DOM manipulation is vanilla JS — no React rendering. However, a few features (`course-evaluation`, `get-hidden-score`) use `ReactDOM.createRoot()` to render React components into manually-created DOM containers within the host page. The popup and settings pages use React natively via Plasmo.
 - **Settings import/export**: The settings page supports exporting settings as a JSON file and importing via drag-and-drop of a JSON file onto the settings form. This is handled in `tabs/setting.tsx` with `FileReader` and `JSON.parse`.
 - **Version check**: The popup checks for updates via the GitHub Releases API (`api.github.com/repos/.../releases/latest`, configured in `package.json` → `checkForUpdateLink`) through the background proxy. The release's zip asset download URL is prefixed with `downloadProxyPrefix` (gh-proxy.org) for faster downloads in China. Version comparison is in `script/utils.ts` → `checkVersion()`, which returns an `UpdateCheckInfo` (result enum + latest version + download URL).
