@@ -6,6 +6,14 @@ export enum UpdateCheckResult {
   CHECKING
 }
 
+export interface UpdateCheckInfo {
+  result: UpdateCheckResult;
+  /** 最新版本号（不含 v 前缀），仅在有新版本时存在 */
+  latestVersion?: string;
+  /** 新版本下载地址（已加 gh-proxy 前缀），仅在有新版本且 release 包含 zip 附件时存在 */
+  downloadUrl?: string;
+}
+
 export class SettingItem {
   beautifySwitch: boolean;
   beautifyColor: string;

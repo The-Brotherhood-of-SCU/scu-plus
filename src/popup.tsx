@@ -54,9 +54,10 @@ function HorizontalLine(props) {
 }
 function MainButton() {
   const [updateCheckState, setUpdateCheckState] = useState(UpdateCheckResult.UNKNOWN)
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
   const gotoDownloadPage = () => {
-    window.open(packagejson.download)
+    window.open(downloadUrl ?? packagejson.download)
   }
   //根据updateCheckState状态决定调用的函数
   const mainButtonFunctionManager = async () => {
@@ -66,7 +67,9 @@ function MainButton() {
       gotoDownloadPage();
     } else {
       setUpdateCheckState(UpdateCheckResult.CHECKING);
-      setUpdateCheckState(await checkVersion())
+      const info = await checkVersion();
+      setUpdateCheckState(info.result);
+      setDownloadUrl(info.downloadUrl ?? null);
     }
   }
   //根据updateCheckState状态决定显示的文本

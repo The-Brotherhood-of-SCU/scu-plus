@@ -142,17 +142,17 @@ function createSettingsMenuItem(): HTMLElement {
   };
 
   (li.querySelector("#checkVersionBtn") as HTMLElement).onclick = () => {
-    checkVersion().then(result => {
-      if (result === UpdateCheckResult.NEW_VERSION_AVAILABLE) {
+    checkVersion().then(info => {
+      if (info.result === UpdateCheckResult.NEW_VERSION_AVAILABLE) {
         confirm({
-          title: "检测到新版本，是否立即下载？",
+          title: `检测到新版本 v${info.latestVersion}，是否立即下载？`,
           okText: "确定",
           cancelText: "取消",
-          onOk: () => window.open(package_config.download)
+          onOk: () => window.open(info.downloadUrl ?? package_config.download)
         });
-      } else if (result === UpdateCheckResult.UP_TP_DATE) {
+      } else if (info.result === UpdateCheckResult.UP_TP_DATE) {
         message.info("已经是最新版本了");
-      } else if (result === UpdateCheckResult.NETWORK_ERROR) {
+      } else if (info.result === UpdateCheckResult.NETWORK_ERROR) {
         message.error("网络错误连接，请检查网络是否正常");
       } else {
         message.error("检查更新失败，请稍后再试");

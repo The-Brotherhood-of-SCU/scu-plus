@@ -1,33 +1,42 @@
 import { snapdom } from '@zumer/snapdom';
 import pkgMessage from '../../package.json';
 import { UpdateCheckResult } from '../common/types';
+import type { UpdateCheckInfo } from '../common/types';
 import { Actions } from '../constants/actions';
 
 export { $, $all, dailySentence, xpath_query, createSecondPageElement, downloadCanvas, sleep, randomInt, checkVersion, UpdateCheckResult }
+export type { UpdateCheckInfo }
+
+// Plasmo 构建期注入的环境变量（chrome / firefox / ...），仅补充类型声明
+declare const process: { env: { PLASMO_BROWSER?: string } };
 
 /**
- * 检查插件是否有新版本可用
- * @returns Promise<UpdateCheckResult> 版本检查结果
+ * 通过 GitHub Releases API 检查插件是否有新版本可用
+ * @returns Promise<UpdateCheckInfo> 版本检查结果，有新版本时附带下载地址（gh-proxy 加速）
  */
-async function checkVersion () : Promise<UpdateCheckResult>{
+async function checkVersion () : Promise<UpdateCheckInfo>{
     try {
-        let newest_config = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdatePkgLink,accept:'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' });
-        if (!newest_config?.success) {
-            // alert("无法获取更新，请检查网络问题！");
-            return UpdateCheckResult.NETWORK_ERROR;
+        let response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdateLink, accept: 'application/vnd.github+json' });
+        if (!response?.success) {
+            return { result: UpdateCheckResult.NETWORK_ERROR };
         }
-        const json = JSON.parse(newest_config.data);
-        if (pkgMessage.version != json.version && json.version != null) {
-            return UpdateCheckResult.NEW_VERSION_AVAILABLE;
+        const release = JSON.parse(response.data);
+        const latestVersion = (release.tag_name ?? "").replace(/^v/i, "");
+        if (!latestVersion || latestVersion === pkgMessage.version) {
+            return { result: UpdateCheckResult.UP_TP_DATE };
         }
-        else {
-            // alert("🎯SCU+已是最新版本!");
-            return UpdateCheckResult.UP_TP_DATE;
-        }
+        // 从 release 附件中找对应浏览器的 zip 包，下载链接加 gh-proxy 前缀加速；找不到附件则回退到 release 页面
+        const assets: { name?: string; browser_download_url?: string }[] = Array.isArray(release.assets) ? release.assets : [];
+        const zipAssets = assets.filter(a => a?.browser_download_url?.endsWith(".zip"));
+        const zipAsset = zipAssets.find(a => a.name?.includes(process.env.PLASMO_BROWSER)) ?? zipAssets[0];
+        const downloadUrl = zipAsset
+            ? pkgMessage.downloadProxyPrefix + zipAsset.browser_download_url
+            : release.html_url ?? pkgMessage.download;
+        return { result: UpdateCheckResult.NEW_VERSION_AVAILABLE, latestVersion, downloadUrl };
     } catch (e) {
-        // gitee 反爬/限流时可能返回非 JSON 的 HTML 错误页，或消息通道被回收
+        // GitHub API 限流/网络异常时可能返回非 JSON 内容，或消息通道被回收
         console.warn("检查更新失败:", e);
-        return UpdateCheckResult.NETWORK_ERROR;
+        return { result: UpdateCheckResult.NETWORK_ERROR };
     }
 }
 
