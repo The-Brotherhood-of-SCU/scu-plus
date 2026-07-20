@@ -281,6 +281,79 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   border-color: var(--scu-line-strong) !important;
 }
 
+/* ---- 收起状态 (menu-min) ---- */
+/* 1) 图标居中 —— 使用 Ace Admin 原生行高，仅去除水平 padding */
+#sidebar.menu-min .nav-list > li > a {
+  padding: 6px 0 !important;
+  text-align: center !important;
+  line-height: 24px !important;
+}
+#sidebar.menu-min .nav-list > li > a .menu-icon {
+  display: block !important;
+  margin: 0 auto !important;
+  float: none !important;
+  width: auto !important;
+  font-size: 13px !important;
+}
+/* 隐藏文字与箭头，仅保留图标 */
+#sidebar.menu-min .nav-list > li > a .menu-text,
+#sidebar.menu-min .nav-list > li > a .arrow {
+  display: none !important;
+}
+
+/* 2) 鼠标悬停弹出菜单（flyout）—— 仅作用在 li 的直接 .submenu 子级，
+      避免污染设置项内的嵌套子菜单。 */
+#sidebar.menu-min .nav-list > li > .submenu {
+  background: var(--scu-surface) !important;
+  border: 1px solid var(--scu-line) !important;
+  border-radius: 4px !important;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.1) !important;
+  padding: 8px 0 !important;
+  min-width: 160px !important;
+  position: absolute;
+  left: 100%;
+  z-index: 999;
+  /* 强制顶部对齐，覆盖 Ace Admin JS 可能设置的错误 inline top */
+  top: -42px !important;
+}
+#sidebar.menu-min .nav-list > li > .submenu > li > a {
+  padding: 8px 18px !important;
+  background: transparent !important;
+  color: var(--scu-ink-soft) !important;
+  white-space: nowrap !important;
+}
+#sidebar.menu-min .nav-list > li > .submenu > li > a:hover {
+  color: var(--scu-accent) !important;
+  background: var(--scu-accent-soft) !important;
+}
+#sidebar.menu-min .nav-list > li > .submenu > li.active > a {
+  border-left: 3px solid var(--scu-accent) !important;
+  font-weight: 600;
+}
+/* 兼容 Ace Admin 可能生成的独立弹窗元素（非 .submenu 路径） */
+#sidebar.menu-min [class*="popup"],
+#sidebar.menu-min [class*="flyout"],
+#sidebar.menu-min .popover,
+#sidebar.menu-min .tooltip {
+  background: var(--scu-surface) !important;
+  border: 1px solid var(--scu-line) !important;
+  border-radius: 4px !important;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* 3) 弹出式 tooltip（当菜单项无子菜单时，Ace Admin 可能生成独立 tooltip） */
+#sidebar.menu-min .nav-list > li > .tooltip,
+#sidebar.menu-min .nav-list > li > .popover {
+  background: var(--scu-surface) !important;
+  border: 1px solid var(--scu-line) !important;
+  border-radius: 4px !important;
+}
+#sidebar.menu-min .nav-list > li > .tooltip .tooltip-inner {
+  background: var(--scu-surface) !important;
+  color: var(--scu-ink) !important;
+  border-radius: 4px !important;
+}
+
 /* ============================================================
    页面主体
    ============================================================ */
