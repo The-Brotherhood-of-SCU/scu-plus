@@ -230,8 +230,20 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   font-weight: 600;
   border-left-color: var(--scu-accent) !important;
 }
-#sidebar .nav-list > li.active > a::before,
-#sidebar .nav-list > li.active > a::after { display: none !important; }
+/* 顶层 li 的右侧竖条指示器（直连子代才生效） */
+#sidebar .nav-list > li.active::after,
+#sidebar.no-skin .nav-list > li.active::after {
+  border-color: var(--scu-accent) !important;
+  border-right-color: var(--scu-accent) !important;
+}
+/* 注意：不能使用 > 子代选择器，因为 li.active 可能在子菜单中（非 .nav-list 直接子代）
+   li.active > a::after 是右侧小三角指示器，改为主题色；highlight 的大三角用 ::before 隐藏 */
+#sidebar .nav-list li.active > a::after {
+  border-right-color: var(--scu-accent) !important;
+}
+#sidebar .nav-list li.active > a::before {
+  display: none !important;
+}
 #sidebar .nav-list .menu-icon { color: var(--scu-ink-faint) !important; }
 #sidebar .nav-list > li.active > a .menu-icon,
 #sidebar .nav-list > li > a:hover .menu-icon { color: var(--scu-accent) !important; }
