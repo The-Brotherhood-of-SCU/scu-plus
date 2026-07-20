@@ -441,7 +441,7 @@ h1.header, h2.header, h3.header, h4.header, h5.header, .header {
 }
 .table > thead > tr > th,
 .table > thead > tr > td {
-  background: transparent !important;
+  background: var(--scu-surface) !important;
   border: none !important;
   border-top: 1.5px solid var(--scu-ink) !important;
   border-bottom: 1px solid var(--scu-ink) !important;
@@ -549,14 +549,12 @@ td.green_background, td.green_background a, td.green_background span { color: va
   background: var(--scu-surface) !important;
 }
 .btn-primary, .btn.btn-primary {
-  background: var(--scu-ink) !important;
-  border-color: var(--scu-ink) !important;
-  color: var(--scu-surface) !important;
-}
-.btn-primary:hover, .btn-primary:focus {
   background: var(--scu-accent) !important;
   border-color: var(--scu-accent) !important;
   color: #fff !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+  opacity: .85 !important;
 }
 .btn-info, .btn.btn-info {
   background: var(--scu-surface) !important;
@@ -568,11 +566,13 @@ td.green_background, td.green_background a, td.green_background span { color: va
   color: var(--scu-accent) !important;
 }
 .btn-success, .btn.btn-success {
-  background: var(--scu-surface) !important;
-  border-color: var(--scu-c2) !important;
-  color: var(--scu-c2) !important;
+  background: var(--scu-accent) !important;
+  border-color: var(--scu-accent) !important;
+  color: #fff !important;
 }
-.btn-success:hover { background: var(--scu-c2) !important; color: #fff !important; }
+.btn-success:hover {
+  opacity: .85 !important;
+}
 .btn-danger, .btn.btn-danger {
   background: var(--scu-surface) !important;
   border-color: var(--scu-accent) !important;
@@ -590,6 +590,13 @@ td.green_background, td.green_background a, td.green_background span { color: va
 .btn.btn-white.btn-primary:hover, .btn.btn-white.btn-primary:focus { color: #fff !important; }
 .btn-link, .btn.btn-link { background: transparent !important; border: none !important; color: var(--scu-accent) !important; }
 .btn.disabled, .btn[disabled] { opacity: .5 !important; }
+
+/* 评教列表 —— 非 btn-info 的按钮（即"评估"）用主题色 */
+#codeTable .btn:not(.btn-info) {
+  background: var(--scu-accent) !important;
+  border-color: var(--scu-accent) !important;
+  color: #fff !important;
+}
 
 /* ============================================================
    标签 / 徽章 —— 低饱和杂志色

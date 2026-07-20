@@ -6,41 +6,29 @@ function injectBtnStyle() {
     styleSheet.innerHTML = `
         .scu-plus-button {
             display: inline-block !important;
-            padding: 6px 12px !important;
-            font-family: 'Arial', sans-serif !important;
-            font-size: 16px !important;
+            padding: 6px 14px !important;
+            font-size: 14px !important;
             font-weight: 600 !important;
             line-height: 1.5 !important;
-            color: #ffffff !important;
+            color: #fff !important;
             text-align: center !important;
             text-decoration: none !important;
-            text-transform: none !important;
-            letter-spacing: 0.5px !important;
-            background-color: #4a6bff !important;
-            border: 2px solid transparent !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+            letter-spacing: 0.04em !important;
+            background: var(--scu-accent) !important;
+            border: 1px solid var(--scu-accent) !important;
+            border-radius: 2px !important;
             cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            transition: all .12s ease !important;
             position: relative !important;
             overflow: hidden !important;
         }
 
         .scu-plus-button:hover {
-            background-color: #3a5bef !important;
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15) !important;
-            transform: translateY(-2px) !important;
+            opacity: .85 !important;
         }
 
         .scu-plus-button:active {
-            background-color: #2a4bdf !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-            transform: translateY(0) !important;
-        }
-
-        .scu-plus-button:focus {
-            outline: none !important;
-            border-color: rgba(255, 255, 255, 0.5) !important;
+            opacity: 1 !important;
         }
 
         .scu-plus-button::after {
@@ -50,7 +38,7 @@ function injectBtnStyle() {
             left: 50% !important;
             width: 5px !important;
             height: 5px !important;
-            background: rgba(255, 255, 255, 0.5) !important;
+            background: rgba(255, 255, 255, 0.4) !important;
             opacity: 0 !important;
             border-radius: 100% !important;
             transform: scale(1, 1) translate(-50%, -50%) !important;
@@ -78,7 +66,7 @@ function injectBtnStyle() {
 function updateEvalButtonText(running: boolean) {
     const btn = document.querySelector('.scu-plus-button') as HTMLButtonElement;
     if (btn) {
-        btn.innerHTML = running ? '<span style="color:var(--scu-accent,#9e1b32)">✦</span>暂停评教' : '<span style="color:var(--scu-accent,#9e1b32)">✦</span>一键评教';
+        btn.innerHTML = running ? '<span style="color:#fff">✦</span>暂停评教' : '<span style="color:#fff">✦</span>一键评教';
     }
 }
 
@@ -296,7 +284,7 @@ export function initCourseEvaluation(): void {
         injectBtnStyle()
         let btn = document.createElement("button");
         btn.className = 'scu-plus-button';
-        btn.innerHTML = isRunningEvaluation ? '<span style="color:var(--scu-accent,#9e1b32)">✦</span>暂停评教' : '<span style="color:var(--scu-accent,#9e1b32)">✦</span>一键评教';
+        btn.innerHTML = isRunningEvaluation ? '<span style="color:#fff">✦</span>暂停评教' : '<span style="color:#fff">✦</span>一键评教';
         btn.onclick = () => RunningEvaluation(localStorage.getItem("isRunningEvaluation") !== "true");
         e.appendChild(btn);
         // 仅在评教进行中才恢复执行；未在评教时按钮文案已正确设置，无需调用（否则会误弹"已暂停"提示）

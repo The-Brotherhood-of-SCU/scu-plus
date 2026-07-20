@@ -103,7 +103,7 @@ export function initScoresPerSemester(): void {
             $(`#tab${i+1} > h4`, e => {
                 // 一个边框容器圈住所有 SCU+ 注入的统计标签，✦ 只放在最左边
                 const group = document.createElement('span')
-                group.style.cssText = 'display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;border:1px solid #d9534f;border-radius:8px;padding:2px 6px;margin-left:6px;vertical-align:middle;'
+                group.style.cssText = 'display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;border:1px solid var(--scu-accent,#9e1b32);border-radius:8px;padding:2px 6px;margin-left:6px;vertical-align:middle;'
 
                 const marker = document.createElement('span')
                 marker.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span>'

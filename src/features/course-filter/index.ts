@@ -314,19 +314,19 @@ export function initCourseFilter(): void {
     
     const panel: HTMLDivElement = document.createElement('div');
     panel.id = 'scu-filter-panel';
-    panel.style.cssText = 'position:fixed;right:20px;top:100px;z-index:10000;border:2px solid #1976d2;background:white;padding:0;border-radius:8px;min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,0.12);';
+    panel.style.cssText = 'position:fixed;right:20px;top:100px;z-index:10000;border:2px solid var(--scu-accent,#9e1b32);background:var(--scu-surface,#fff);padding:0;border-radius:8px;min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,0.12);';
 
     panel.innerHTML = `
-      <div id="scu-filter-header" style="background:#1976d2;color:white;padding:8px 10px;border-radius:5px 5px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
+      <div id="scu-filter-header" style="background:var(--scu-accent,#9e1b32);color:#fff;padding:8px 10px;border-radius:5px 5px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
         <span id="scu-filter-title"></span>
         <button id="scu-filter-toggle" style="background:transparent;border:none;color:white;font-size:16px;cursor:pointer;">－</button>
       </div>
       <div id="scu-filter-body" style="padding:10px;">
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
-          <button id="cf-time" style="width:100%;background:#2196F3;color:white;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">时间</button>
-          <button id="cf-campus" style="width:100%;background:#8bc34a;color:white;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">校区</button>
-          <button id="cf-restrict" style="width:100%;background:#9c27b0;color:white;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">限制</button>
-          <button id="cf-teacher" style="width:100%;background:#ffc107;color:#333;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">老师</button>
+          <button id="cf-time" style="width:100%;background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">时间</button>
+          <button id="cf-campus" style="width:100%;background:var(--scu-c2,#4caf50);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">校区</button>
+          <button id="cf-restrict" style="width:100%;background:var(--scu-ink,#333);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">限制</button>
+          <button id="cf-teacher" style="width:100%;background:var(--scu-c4,#ff9800);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">老师</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <label style="display:flex;align-items:center;gap:6px;">
@@ -344,8 +344,8 @@ export function initCourseFilter(): void {
     
     ball = document.createElement('div');
     ball.id = 'scu-filter-ball';
-    ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:#1976d2;border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:white;font-size:28px;';
-    ball.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span>';
+    ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:var(--scu-accent,#9e1b32);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:#fff;font-size:28px;';
+    ball.innerHTML = '<span style="color:#fff">✦</span>';
     document.body.appendChild(ball);
 
     // 事件绑定
@@ -401,7 +401,7 @@ export function initCourseFilter(): void {
 
     // 程序化设置标题文本
     const titleEl = document.getElementById('scu-filter-title') as HTMLElement | null;
-    if (titleEl) titleEl.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span> 选课筛选';
+    if (titleEl) titleEl.innerHTML = '<span style="color:#fff">✦</span> 选课筛选';
 
     // 拖拽功能
     const header = document.getElementById('scu-filter-header') as HTMLElement | null;
@@ -463,9 +463,9 @@ export function initCourseFilter(): void {
         </tbody>
       </table>
       <div style="text-align:right;margin-top:8px;">
-        <button id="cf-time-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button>
-        <button id="cf-time-clear" style="background:red;color:white;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">清空</button>
-        <button id="cf-time-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;">关闭</button>
+        <button id="cf-time-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button>
+        <button id="cf-time-clear" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">清空</button>
+        <button id="cf-time-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;">关闭</button>
       </div>
     `;
     
@@ -526,7 +526,7 @@ export function initCourseFilter(): void {
     modal.innerHTML = `
       <div style="font-weight:bold;margin-bottom:8px;">校区筛选</div>
       <select id="cf-campus-select" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;">${['<option value="">全部校区</option>'].concat(CAMPUS_LIST.map(c => `<option value="${c}" ${campusFilterValue === c ? 'selected' : ''}>${c}</option>`)).join('')}</select>
-      <div style="text-align:right;margin-top:8px;"><button id="cf-campus-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-campus-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <div style="text-align:right;margin-top:8px;"><button id="cf-campus-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-campus-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);
@@ -570,9 +570,9 @@ export function initCourseFilter(): void {
     modal.innerHTML = `
       <div style="font-weight:bold;margin-bottom:8px;">教师筛选（黑/白名单）</div>
       <div style="margin-bottom:6px;"><label><input type="radio" name="cf-t-mode" value="white" checked> 白名单</label> <label style="margin-left:12px;"><input type="radio" name="cf-t-mode" value="black"> 黑名单</label></div>
-      <div style="display:flex;gap:8px;margin-bottom:6px;"><select id="cf-teacher-select" style="flex:1;padding:6px;">${teacherOptions}</select><button id="cf-teacher-add" style="background:#1976d2;color:white;border:none;padding:6px;border-radius:4px;">添加</button></div>
-      <div id="cf-teacher-list" style="background:#f9f9f9;padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;"></div>
-      <div style="text-align:right;"><button id="cf-teacher-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-teacher-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <div style="display:flex;gap:8px;margin-bottom:6px;"><select id="cf-teacher-select" style="flex:1;padding:6px;">${teacherOptions}</select><button id="cf-teacher-add" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px;border-radius:4px;">添加</button></div>
+      <div id="cf-teacher-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;"></div>
+      <div style="text-align:right;"><button id="cf-teacher-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-teacher-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);
@@ -702,10 +702,10 @@ export function initCourseFilter(): void {
         <div style="flex:1;position:relative;">
           <div id="cf-restrict-select-display" data-value="全部" style="padding:6px;border:1px solid #ddd;border-radius:4px;min-height:38px;cursor:pointer;white-space:normal;word-break:break-word;overflow:hidden;">全部</div>
         </div>
-        <button id="cf-restrict-add" style="background:#1976d2;color:white;border:none;padding:8px 10px;border-radius:4px;white-space:nowrap;">添加</button>
+        <button id="cf-restrict-add" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:8px 10px;border-radius:4px;white-space:nowrap;">添加</button>
       </div>
-      <div id="cf-restrict-list" style="background:#f9f9f9;padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;white-space:normal;word-break:break-word;overflow-wrap:break-word;max-height:40vh;overflow:auto;"></div>
-      <div style="text-align:right;"><button id="cf-restrict-ok" style="background:#1976d2;color:white;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-restrict-cancel" style="background:#ccc;color:#000;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <div id="cf-restrict-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;white-space:normal;word-break:break-word;overflow-wrap:break-word;max-height:40vh;overflow:auto;"></div>
+      <div style="text-align:right;"><button id="cf-restrict-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-restrict-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);

@@ -334,7 +334,7 @@ const injectExportFunc = () => {
     // helper: build the SCU+ export button group — one bordered box with a single ✦ marker on the left
     function createExportGroup() {
         const group = document.createElement('span');
-        group.style.cssText = 'display:inline-flex;align-items:center;gap:2px;border:1px solid #d9534f;border-radius:8px;padding:2px 4px;margin:0 4px;vertical-align:middle;';
+        group.style.cssText = 'display:inline-flex;align-items:center;gap:2px;border:1px solid var(--scu-accent,#9e1b32);border-radius:8px;padding:2px 4px;margin:0 4px;vertical-align:middle;';
 
         const marker = document.createElement('span');
         marker.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span>';
