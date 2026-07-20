@@ -867,9 +867,8 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
   letter-spacing: 0.1em;
 }
 /* 大节 / 节次 标签列 —— 纸色衬底 + 衬线 */
-#courseTable > tbody > tr > td[rowspan],
-#courseTable > tbody > tr > td:first-child,
-#courseTable > tbody > tr > td:nth-child(2) {
+#courseTable > tbody > tr > th[rowspan],
+#courseTable > tbody > tr > th {
   background: #faf8f2 !important;
   font-family: var(--scu-serif) !important;
   color: var(--scu-ink-soft) !important;
