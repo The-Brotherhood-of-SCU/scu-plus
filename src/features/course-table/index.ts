@@ -147,7 +147,7 @@ async function inject() {
     show_elememt.innerHTML = `
     <span style="font-size:1.3rem;color:black;">必修学分: ${requiredCredits}&nbsp;&nbsp;选修学分: ${n_requiredCredits}&nbsp;&nbsp;任选学分: ${any_requiredCredits}</span>
     `;
-    show_elememt.querySelector("span")!.innerText += " \u{1f3af}by SCU+";
+    show_elememt.querySelector("span")!.insertAdjacentHTML("beforeend", '<span style="color:var(--scu-accent,#9e1b32)">✦</span> by SCU+');
     $("#myTab > li", (e) => e.appendChild(show_elememt));
 }
 
@@ -331,13 +331,13 @@ const injectExportFunc = () => {
         }
     }
 
-    // helper: build the SCU+ export button group — one bordered box with a single 🎯 marker on the left
+    // helper: build the SCU+ export button group — one bordered box with a single ✦ marker on the left
     function createExportGroup() {
         const group = document.createElement('span');
         group.style.cssText = 'display:inline-flex;align-items:center;gap:2px;border:1px solid #d9534f;border-radius:8px;padding:2px 4px;margin:0 4px;vertical-align:middle;';
 
         const marker = document.createElement('span');
-        marker.textContent = '\u{1f3af}';
+        marker.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span>';
         marker.title = 'by SCU+';
         group.appendChild(marker);
 

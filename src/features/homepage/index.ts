@@ -146,7 +146,7 @@ async function autoCheckUpdate(): Promise<void> {
 export async function initHomePage(): Promise<void> {
   let savedSettings = await getSetting();
 
-  console.log("SCU+插件加载成功\u{1f3af}");
+  console.log("SCU+插件加载成功✦");
 
   if (savedSettings.passwordPopupSwitch) {
     removePasswordPopup();

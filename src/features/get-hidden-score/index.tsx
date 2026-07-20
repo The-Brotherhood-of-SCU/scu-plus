@@ -82,7 +82,7 @@ function doReplace(data: any) {
     const root = ReactDOM.createRoot(container);
     root.render(<WarnUi />);
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
-        header.innerHTML = "<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计\u{1f3af}</th><th>成绩状态\u{1f3af}</th></tr>";
+        header.innerHTML = '<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计<span style="color:var(--scu-accent,#9e1b32)">✦</span></th><th>成绩状态<span style="color:var(--scu-accent,#9e1b32)">✦</span></th></tr>';
     })
     const body = document.getElementById("scoretbody")
     if(body==null)return

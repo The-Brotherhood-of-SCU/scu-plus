@@ -345,8 +345,7 @@ export function initCourseFilter(): void {
     ball = document.createElement('div');
     ball.id = 'scu-filter-ball';
     ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:#1976d2;border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:white;font-size:28px;';
-    // 使用 Unicode 转义设置 emoji，避免编码导致的乱码
-    ball.textContent = '\u{1F3AF}';
+    ball.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span>';
     document.body.appendChild(ball);
 
     // 事件绑定
@@ -400,9 +399,9 @@ export function initCourseFilter(): void {
       });
     }
 
-    // 程序化设置标题文本，使用 Unicode 转义确保不被构建过程破坏
+    // 程序化设置标题文本
     const titleEl = document.getElementById('scu-filter-title') as HTMLElement | null;
-    if (titleEl) titleEl.textContent = '\u{1F3AF} 选课筛选';
+    if (titleEl) titleEl.innerHTML = '<span style="color:var(--scu-accent,#9e1b32)">✦</span> 选课筛选';
 
     // 拖拽功能
     const header = document.getElementById('scu-filter-header') as HTMLElement | null;

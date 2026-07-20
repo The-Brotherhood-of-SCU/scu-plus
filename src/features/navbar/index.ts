@@ -17,7 +17,7 @@ export function injectNavbar(settings: SettingItem): void {
         title.innerText = "四川大学教务管理系统";
       } else {
         title.style.color = "black";
-        title.innerText = `四川大学教务管理系统(SCU+ v${package_config.version})\u{1f3af}`;
+        title.innerHTML = `四川大学教务管理系统(SCU+ v${package_config.version})<span style="color:var(--scu-accent,#9e1b32)">✦</span>`;
       }
     });
 

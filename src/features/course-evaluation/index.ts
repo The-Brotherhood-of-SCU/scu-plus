@@ -78,7 +78,7 @@ function injectBtnStyle() {
 function updateEvalButtonText(running: boolean) {
     const btn = document.querySelector('.scu-plus-button') as HTMLButtonElement;
     if (btn) {
-        btn.innerText = running ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
+        btn.innerHTML = running ? '<span style="color:var(--scu-accent,#9e1b32)">✦</span>暂停评教' : '<span style="color:var(--scu-accent,#9e1b32)">✦</span>一键评教';
     }
 }
 
@@ -296,7 +296,7 @@ export function initCourseEvaluation(): void {
         injectBtnStyle()
         let btn = document.createElement("button");
         btn.className = 'scu-plus-button';
-        btn.innerText = isRunningEvaluation ? "\u{1f3af}暂停评教" : "\u{1f3af}一键评教";
+        btn.innerHTML = isRunningEvaluation ? '<span style="color:var(--scu-accent,#9e1b32)">✦</span>暂停评教' : '<span style="color:var(--scu-accent,#9e1b32)">✦</span>一键评教';
         btn.onclick = () => RunningEvaluation(localStorage.getItem("isRunningEvaluation") !== "true");
         e.appendChild(btn);
         // 仅在评教进行中才恢复执行；未在评教时按钮文案已正确设置，无需调用（否则会误弹"已暂停"提示）

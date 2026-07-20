@@ -23,21 +23,21 @@ export async function injectMenu(): Promise<void> {
   }
   if (!menus) return;
 
-  xpathQuery(`//*[@id="1007000000"]/a/span`, (e) => { e.innerText += "\u{1f3af}"; });
+  xpathQuery(`//*[@id="1007000000"]/a/span`, (e) => { e.insertAdjacentHTML("beforeend", '<span style="color:var(--scu-accent,#9e1b32)">✦</span>'); });
   const el1007001003 = document.getElementById("1007001003");
   if (el1007001003?.children[0]) {
-    el1007001003.children[0].innerHTML = el1007001003.children[0].innerHTML.replace("方案成绩", "方案成绩\u{1f3af}");
+    el1007001003.children[0].innerHTML = el1007001003.children[0].innerHTML.replace("方案成绩", '方案成绩<span style="color:var(--scu-accent,#9e1b32)">✦</span>');
   }
-  xpathQuery('//*[@id="1007001001"]/a', e => e.innerHTML = e.innerHTML.replace('全部及格成绩', '全部及格成绩\u{1f3af}'));
-  xpathQuery('//*[@id="1002002001"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期课表', '本学期课表\u{1f3af}'));
-  xpathQuery('//*[@id="1002000000"]/a/span', (e) => e.innerText += '\u{1f3af}');
-  xpathQuery('//*[@id="1007001005"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期成绩', '本学期成绩\u{1f3af}'));
-  xpathQuery('//*[@id="1002001003"]/a', (e) => e.innerHTML = e.innerHTML.replace('选课结果', '选课结果\u{1f3af}'));
-  xpathQuery('//*[@id="1002001004"]/a', (e) => e.innerHTML = e.innerHTML.replace('退课', '退课\u{1f3af}'));
-  xpathQuery('//*[@id="1002001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('选课', '选课\u{1f3af}'));
-  xpathQuery('//*[@id="1002002002"]/a', (e) => e.innerHTML = e.innerHTML.replace('历年学期课表', '历年学期课表\u{1f3af}'));
-  xpathQuery('//*[@id="1003000000"]/a/span', (e) => e.innerHTML = e.innerHTML.replace('教师课堂评价', '教师课堂评价\u{1f3af}'));
-  xpathQuery('//*[@id="1003001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('教学评估', '教学评估\u{1f3af}'));
+  xpathQuery('//*[@id="1007001001"]/a', e => e.innerHTML = e.innerHTML.replace('全部及格成绩', '全部及格成绩<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002002001"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期课表', '本学期课表<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002000000"]/a/span', (e) => e.insertAdjacentHTML("beforeend", '<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1007001005"]/a', (e) => e.innerHTML = e.innerHTML.replace('本学期成绩', '本学期成绩<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002001003"]/a', (e) => e.innerHTML = e.innerHTML.replace('选课结果', '选课结果<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002001004"]/a', (e) => e.innerHTML = e.innerHTML.replace('退课', '退课<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('选课', '选课<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1002002002"]/a', (e) => e.innerHTML = e.innerHTML.replace('历年学期课表', '历年学期课表<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1003000000"]/a/span', (e) => e.innerHTML = e.innerHTML.replace('教师课堂评价', '教师课堂评价<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
+  xpathQuery('//*[@id="1003001002"]/a', (e) => e.innerHTML = e.innerHTML.replace('教学评估', '教学评估<span style="color:var(--scu-accent,#9e1b32)">✦</span>'));
 
   const settingsBtn = createSettingsMenuItem();
   menus.appendChild(settingsBtn);
@@ -91,7 +91,7 @@ function createSettingsMenuItem(): HTMLElement {
   li.innerHTML = `
     <a href="#" class="dropdown-toggle">
       <i class="menu-icon fa fa-pencil-square-o"></i>
-      <span class="menu-text"> 设置\u{1f3af} </span>
+      <span class="menu-text"> 设置<span style="color:var(--scu-accent,#9e1b32)">✦</span> </span>
       <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>

@@ -53,7 +53,7 @@ export async function injectSchoolSchedule(): Promise<void> {
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="icon-calendar"></i>
-        <span>校历查看\u{1f3af}</span>
+        <span>校历查看<span style="color:var(--scu-accent,#9e1b32)">✦</span></span>
       </a>
       <ul class="dropdown-menu" style="min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
         ${injectHtml}
