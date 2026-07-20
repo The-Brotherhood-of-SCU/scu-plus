@@ -41,14 +41,29 @@ function keepStyleLast(style: HTMLStyleElement): void {
   orderGuard = null;
   if (document.readyState !== "loading") return;
 
+  // 仅观察 <head> 的子节点变化（link、style、script 等被添加/移除），
+  // 不再监视整棵 document 树，避免大量 DOM 变更触发无效样式重算。
   const guard = new MutationObserver(() => {
-    const host = document.head || document.documentElement;
+    const host = document.head;
     if (!host) return;
     if (style.parentElement !== host || host.lastElementChild !== style) {
       host.appendChild(style);
     }
   });
-  guard.observe(document.documentElement, { childList: true, subtree: true });
+
+  // document_start 极早期 <head> 可能尚未创建，先观察 <html> 直子节点等它出现
+  if (document.head) {
+    guard.observe(document.head, { childList: true });
+  } else {
+    const headWaiter = new MutationObserver(() => {
+      if (document.head) {
+        headWaiter.disconnect();
+        guard.observe(document.head, { childList: true });
+      }
+    });
+    headWaiter.observe(document.documentElement, { childList: true });
+  }
+
   orderGuard = guard;
   document.addEventListener(
     "DOMContentLoaded",

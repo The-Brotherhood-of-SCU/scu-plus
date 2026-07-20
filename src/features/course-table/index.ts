@@ -120,7 +120,11 @@ function hideKbtAndObserve() {
             }
         }
     });
-    observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+    // 仅观察 <body> 以监听动态注入的浮层/iframe，
+    // 不再监视 <head> 或 <html> 属性的变更，避免在复杂页面（如选课、教室查询）中
+    // 因大量 DOM 操作触发无效回调导致性能下降。
+    const targetNode = document.body || document.documentElement;
+    observer.observe(targetNode, { childList: true, subtree: true });
 }
 
 // 注入学分统计
