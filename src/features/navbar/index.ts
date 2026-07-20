@@ -27,6 +27,15 @@ export function injectNavbar(settings: SettingItem): void {
           <small>欢迎您，</small>
           ${settings.nameHideText}
         `;
+        // 确保父容器不裁剪替换后的内容
+        const parent = e.parentElement;
+        if (parent) {
+          parent.style.overflow = "visible";
+          const grandparent = parent.parentElement;
+          if (grandparent) {
+            grandparent.style.overflow = "visible";
+          }
+        }
       });
     }
   });

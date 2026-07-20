@@ -91,6 +91,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   border-left: 1px solid var(--scu-line) !important;
   height: 45px !important;
   line-height: 45px !important;
+  overflow: visible !important;
 }
 #navbar .ace-nav > li > a {
   background: transparent !important;
@@ -103,6 +104,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   display: block !important;
   white-space: nowrap !important;
   transition: color .15s ease;
+  overflow: visible !important;
 }
 #navbar .ace-nav > li > a:hover,
 #navbar .ace-nav > li > a:focus,
@@ -164,6 +166,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   font-weight: 700 !important;
   color: var(--scu-ink) !important;
   letter-spacing: 0.04em;
+  overflow: visible !important;
 }
 #navbar .ace-nav .user-info small {
   display: block !important;
