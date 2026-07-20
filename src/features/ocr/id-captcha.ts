@@ -1,10 +1,12 @@
+import { ocrLocal, warmupLocalOcr } from "~features/ocr/local-ocr";
 import { getSetting } from "~script/config";
-import { ocr_external } from "~script/ocr_external";
 
 export async function initIdCaptchaOcr(): Promise<void> {
   const savedSettings = await getSetting();
-  const provider = (savedSettings.ocrProvider || "").trim();
-  if (!provider) return;
+  if (!savedSettings.ocrSwitch) return;
+
+  // 后台预加载本地模型，消除首次识别的加载延迟
+  warmupLocalOcr();
 
   let running = false;
   let timer: number | null = null;
@@ -115,9 +117,8 @@ export async function initIdCaptchaOcr(): Promise<void> {
       }
       if (src === lastRecognizedSrc && input.value.trim().length === 4) return;
 
-      const resultRaw = await ocr_external(img, provider);
+      const resultRaw = await ocrLocal(img);
       const result = String(resultRaw || "").replace(/\s+/g, "");
-      console.log("ocr:", result);
 
       if (result.length !== 4) {
         if (retryCount < 3) {
@@ -133,7 +134,7 @@ export async function initIdCaptchaOcr(): Promise<void> {
       input.dispatchEvent(new Event("change", { bubbles: true }));
       lastRecognizedSrc = src;
     } catch (e) {
-      // OCR provider may temporarily fail, keep silent and wait for next trigger.
+      // 本地 OCR 偶发失败（如图片未加载完成），保持静默等待下次触发。
     } finally {
       running = false;
     }

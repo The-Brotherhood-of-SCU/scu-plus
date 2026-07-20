@@ -25,7 +25,6 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 | `src/contents/zhjw.ts` | **Main content script** on `zhjw.scu.edu.cn`. Dispatches to most feature modules based on URL path. |
 | `src/contents/zhjw-beautify.ts` | Injects the magazine theme at `document_start` (before first paint) to avoid a flash of the original styles. Reads a localStorage mirror of `beautifySwitch`/`beautifyColor` synchronously, then reconciles with real settings and watches for changes. |
 | `src/contents/zhjw-login.ts` | Content script on `zhjw.scu.edu.cn/*login*`. Redirects to unified auth (id.scu.edu.cn) when enabled. Runs at `document_start`. |
-| `src/contents/acm-scu.ts` | Content script on `acm.scu.edu.cn/teach/`. OCR captcha for the ACM teaching site. |
 
 ### Feature Modules (`src/features/`)
 
@@ -42,14 +41,13 @@ Each feature follows an `init*` or `inject*` function pattern. They are pure DOM
 - **`get-hidden-score/`** — Intercepts score table data before the official release date.
 - **`scores-per-semester/`** — Per-semester score aggregation view.
 - **`redirect-login/`** — Redirects the old教务 login page to unified auth.
-- **`ocr/`** — Captcha image detection + OCR submission (id-captcha for unified auth, acm-captcha for ACM site). Sends base64 image to user-configured OCR endpoint.
+- **`ocr/`** — Fully-local captcha OCR for the unified auth login (id-captcha). `model.ts` is a dependency-free CNN inference engine (parses the `.scuocr` binary weight format, folds BatchNorm into conv layers at load, fused ReLU, preallocated buffers); `local-ocr.ts` loads the bundled `assets/model.scuocr` (via Plasmo `url:` import) and preprocesses the captcha `<img>` through a canvas (top-left 80×26 crop, or upscale if smaller). Low-confidence results return an empty string so the caller refreshes the captcha. The model only covers the id.scu.edu.cn captcha style (4 chars, `0-9a-z`, case-insensitive).
 - **`schedule/`** — Fetches the academic calendar (校历) from `jwc.scu.edu.cn/cdxl.htm` via background proxy and injects it into the top navbar.
 
 ### Shared Code
 
 - **`src/script/config.ts`** — Settings CRUD backed by `@plasmohq/storage`. Returns `SettingItem` with defaults. In-memory cache avoids repeated storage reads. Also re-exports `SettingItem` for convenience (features can `import { getSetting, SettingItem } from "~script/config"`).
 - **`src/script/utils.ts`** — Shared DOM helpers (`$`, `$all`, `xpath_query`), daily quote fetcher, version checker, course-table image download, and misc utilities (`sleep`, `randomInt`).
-- **`src/script/ocr_external.ts`** — Converts an `<img>` element to base64 via canvas, POSTs to the user-configured OCR endpoint, and returns the recognized text. Called directly by OCR features (uses `fetch()` directly — see Communication Flow below).
 - **`src/common/index.ts`** — Re-exports from `utils.ts` + adds a `waitForElement()` helper. Most features import from `~common` rather than `~script/utils` directly.
 - **`src/common/types.ts`** — `SettingItem` class (all user-configurable toggles/values with defaults), `CourseData` and `ScoreData` interfaces.
 - **`src/constants/actions.ts`** — Message action enum for `chrome.runtime.sendMessage`.
@@ -65,7 +63,9 @@ content script → chrome.runtime.sendMessage({action: Actions.REQUEST, url, acc
               → responds with {success, data} or {success: false, error}
 ```
 
-**Exception — OCR**: The OCR feature calls `fetch()` directly from the content script because the user grants optional host permissions (`chrome.permissions.request`) for their OCR provider endpoint. The settings page (`tabs/setting.tsx`) has a `checkAndRequestPermission()` helper that handles this flow. Same-origin fetches (e.g., `get-hidden-score` fetching from `zhjw.scu.edu.cn`) also use `fetch()` directly — no proxy needed.
+Same-origin fetches (e.g., `get-hidden-score` fetching from `zhjw.scu.edu.cn`) also use `fetch()` directly — no proxy needed.
+
+**Exception — OCR**: The captcha OCR runs fully on-device (bundled CNN weights, no network at all), so it needs neither the proxy nor extra host permissions.
 
 ## Key Patterns
 

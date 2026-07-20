@@ -201,32 +201,6 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
       placement: location,
     });
   };
-  const testOcr = async () => {
-    // 检查权限
-    const hasPermission = await checkAndRequestPermission(setting.ocrProvider);
-    if (!hasPermission) {
-      notificationApi.warning({
-        message: '权限不足',
-        description: '请在弹窗中允许访问该 OCR 服务器，否则无法测试。',
-        placement: 'topRight',
-      });
-      return;
-    }
-
-    if (await testOcrUrl(setting.ocrProvider)) {
-      notificationApi.success({
-        message: '测试成功',
-        description: 'OCR服务可用',
-        placement: 'topRight',
-      });
-    } else {
-      notificationApi.error({
-        message: '测试失败',
-        description: 'OCR服务不可用',
-        placement: 'topRight',
-      });
-    }
-  }
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -452,11 +426,12 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
         <SectionTitle>登录与安全</SectionTitle>
         <div className="scu-setting-card">
           <Form.Item
-            label="输入OCR服务提供者"
-            name="ocrProvider"
-            tooltip="输入OCR接口后将用于在登陆时自动输入验证码，建议和下面将 '四川大学教务管理系统登录' 重定向到 '统一登陆' 功能一起使用"
+            label="自动识别并填写验证码（内置本地 OCR）"
+            name="ocrSwitch"
+            valuePropName="checked"
+            tooltip="开启后将在统一身份认证登录页自动识别并填写验证码。识别由内置模型在本地完成，无需联网、无需配置第三方服务"
           >
-            <Input placeholder="eg. https://example.com/ocr" />
+            <Switch />
           </Form.Item>
           <Form.Item
             label="将 '四川大学教务管理系统登录' 重定向到 '统一登陆'"
@@ -496,10 +471,6 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
         <SectionTitle>操作</SectionTitle>
         <div className="scu-setting-card scu-setting-actions">
           <Button type="primary" onClick={async () => {
-            const hasPermission = await checkAndRequestPermission(setting.ocrProvider);
-            if (!hasPermission) {
-              message.error("未获得 OCR 服务器访问权限，功能可能受限");
-            }
             saveSettingWithUpdates(setting);
             initialSettingRef.current = setting;
             success();
@@ -509,9 +480,6 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
           </Button>
           <Button onClick={handleReset}>
             恢复默认
-          </Button>
-          <Button onClick={testOcr}>
-            测试OCR服务
           </Button>
           <Button onClick={() => {
             const jsonData = JSON.stringify(setting, null, 2);
@@ -554,46 +522,4 @@ function TitleFragment({ isDirty }: { isDirty: boolean }) {
   );
 }
 
-async function checkAndRequestPermission(url: string): Promise<boolean> {
-  if (!url || url.trim() === "") return true;
-  try {
-    const origin = new URL(url).origin + "/*";
-    const hasPermission = await chrome.permissions.contains({
-      origins: [origin]
-    });
-    if (hasPermission) return true;
-
-    // 动态申请权限
-    const granted = await chrome.permissions.request({
-      origins: [origin]
-    });
-    return granted;
-  } catch (e) {
-    console.error("Permission request failed:", e);
-    return false;
-  }
-}
-
-async function testOcrUrl(url: string): Promise<boolean> {
-  try {
-    const base64 = "iVBORw0KGgoAAAANSUhEUgAAAFAAAAAaCAIAAACvsEzwAAABRklEQVR42uXY0QkCMQwG4IC+inP4pFu4jYhvzuAKTuJyWjgoJUnTv2k9Wq5UODws+S5tLkiP2/27pUHhsylzT/AUD476xjq+mboHOriZWKB2uOfnRZ1TgpGIEXAY+9dOznHBVVlqAR/fhzCL34dg5PSdsnBBjUdRaiO4uMICk+bcg2ivLK1gNb0OMOPlwNfPaZluswUGC5h6K+5he4WVwYUMIwUsdys9tMYKEcaEKjhSpRk/0mVwbjkjvWrR+iu4ykxVVQ5JrwNsXINg3ExVVQ5JL9vSRjS5xEowQ7aYVwKr0XQHx1LcARwjLmpzYKTxyNVtHJw2Kq3gZa31wfFtJGfRLNl1YHC4wWr75QCne5vJ/wIGB9hLqzakA2EZLndaIwwDhiRZFktPlZ4FnJo9W3rS//qYmRw/ntTsLFozmpvASDczsvkHRcX3dhTbFZ0AAAAASUVORK5CYII=";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ img: base64 }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return !!data; // Return true if we get a valid response
-  } catch (error) {
-    console.error('OCR test failed:', error);
-    return false;
-  }
-}
 export default SettingPage

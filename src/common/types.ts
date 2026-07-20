@@ -24,14 +24,14 @@ export class SettingItem {
   passwordPopupSwitch: boolean;
   nameHideSwitch: boolean;
   nameHideText: string;
-  ocrProvider: string;
+  ocrSwitch: boolean;
   gpaCustomText: string;
   failedCourseCustomText: string;
   redirectLoginSwitch: boolean;
   skip2FASwitch: boolean;
   autoUpdateCheckSwitch: boolean;
   constructor() {
-    this.beautifySwitch = false;
+    this.beautifySwitch = true;
     this.beautifyColor = "#9e1b32";
     this.avatarSwitch = false;
     this.avatarSource = "qq";
@@ -40,7 +40,7 @@ export class SettingItem {
     this.passwordPopupSwitch = true;
     this.nameHideSwitch = false;
     this.nameHideText = "";
-    this.ocrProvider = "";
+    this.ocrSwitch = true;
     this.gpaCustomText = "";
     this.failedCourseCustomText = "";
     this.redirectLoginSwitch = false;

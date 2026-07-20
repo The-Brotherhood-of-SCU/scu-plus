@@ -32,7 +32,7 @@
 ### 🛡️ 隐私与安全
 
 - 🔒 **智能隐私保护** — 自动隐藏姓名、学号、证件照，一键切换
-- 🔑 **登录简化** — OCR 验证码识别 + 统一认证重定向登录
+- 🔑 **登录简化** — 内置本地 OCR 验证码识别（零配置、离线可用）+ 统一认证重定向登录
 - ⚠️ **退课提醒** — 退课前展示课程名称，避免误操作
 
 ### 📈 学业数据可视化
@@ -77,30 +77,23 @@
 | 功能 | 使用场景 | 操作说明 |
 | --- | --- | --- |
 | 配置同步 | 多设备切换使用 | 设置页 → 导入 / 导出配置 |
-| 自动 OCR 服务 | 自动识别验证码 | 设置页 → 输入 OCR 服务提供者 |
-
-<details>
-<summary>🔍 <b>自行部署 OCR 服务（可选）</b></summary>
-
-若需自行部署 OCR 服务，请参考 👉 [OCR 配置维基文档](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/设置#ocr-配置)
-
-</details>
+| 自动填写验证码 | 统一身份认证登录页 | 内置本地 OCR 模型，默认开启，无需任何配置 |
 
 ---
 
 ## 💡 常见问题（FAQ）
 
 <details>
-<summary><b>Q1：为什么需要 OCR 服务？</b></summary>
+<summary><b>Q1：验证码识别需要联网吗？</b></summary>
 
-用于自动识别统一认证登录验证码。服务端代码位于 [scu-plus-ocr](https://github.com/The-Brotherhood-of-SCU/scu-plus-ocr) 仓库。
+不需要。统一认证登录验证码由插件内置的轻量级 CNN 模型在本地识别（模型约 450KB，移植自 [scu_ocr_lite_dart](https://github.com/The-Brotherhood-of-SCU/scu_ocr_lite_dart)），全程不发起任何网络请求。
 
 </details>
 
 <details>
 <summary><b>Q2：插件会上传个人数据吗？</b></summary>
 
-不会。除 OCR 服务外，所有数据处理均在本地完成。
+不会。所有数据处理均在本地完成。
 
 </details>
 
