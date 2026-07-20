@@ -98,7 +98,6 @@ export async function initIdCaptchaOcr(): Promise<void> {
 
       const input = getCaptchaInput(form);
       if (!input || !isVisible(input)) return;
-      if (input.value.trim().length > 0) return;
 
       const img = getCaptchaImage(form, input);
       if (!img || !isVisible(img)) return;
@@ -111,19 +110,30 @@ export async function initIdCaptchaOcr(): Promise<void> {
 
       const src = img.currentSrc || img.src || "";
       if (src !== lastCaptchaSrc) {
+        // 验证码已刷新：若输入框里是上次自动填入的结果，先清空再重新识别
+        if (lastRecognizedSrc && input.value.trim().length === 4) {
+          input.value = "";
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
         lastCaptchaSrc = src;
         lastRecognizedSrc = "";
         retryCount = 0;
       }
+      // 输入框已有内容且并非本插件填入（用户手动输入）→ 不打扰
+      if (input.value.trim().length > 0 && !lastRecognizedSrc) return;
+      // 当前验证码已识别且结果仍在输入框 → 跳过
       if (src === lastRecognizedSrc && input.value.trim().length === 4) return;
 
       const resultRaw = await ocrLocal(img);
       const result = String(resultRaw || "").replace(/\s+/g, "");
 
       if (result.length !== 4) {
+        // 识别置信度过低：稍作延迟再换一张，给新验证码的加载留出时间，
+        // 避免在新图就位前把重试次数烧在旧图上（本地 OCR 几乎是瞬时返回）
         if (retryCount < 3) {
           retryCount++;
-          img.click();
+          window.setTimeout(() => img.click(), 350);
         }
         return;
       }
