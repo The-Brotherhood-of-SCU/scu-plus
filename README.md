@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎯 SCU+
+# ✦ SCU-Plus
 
 **四川大学教务系统增强插件**
 
@@ -124,16 +124,8 @@
 
 ---
 
-<div align="center">
+## 💖 致谢
 
-### 💖 致谢
+感谢所有为 **SCU-Plus** 做出贡献的开发者与社区成员！
+[![contributors](https://contrib.rocks/image?repo=The-Brotherhood-of-SCU/scu-plus)](https://github.com/The-Brotherhood-of-SCU/scu-plus/graphs/contributors)
 
-感谢所有为 **SCU+** 做出贡献的开发者与社区成员！
-
-<a href="https://github.com/The-Brotherhood-of-SCU/scu-plus/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=The-Brotherhood-of-SCU/scu-plus" alt="Contributors" />
-</a>
-
-<sub>由 <a href="https://github.com/The-Brotherhood-of-SCU">The Brotherhood of SCU</a> ❤️ 倾情打造</sub>
-
-</div>
