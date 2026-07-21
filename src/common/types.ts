@@ -17,6 +17,8 @@ export interface UpdateCheckInfo {
 export class SettingItem {
   beautifySwitch: boolean;
   beautifyColor: string;
+  /** 深色模式："auto" 跟随系统 | "light" 浅色 | "dark" 深色 */
+  beautifyDarkMode: string;
   avatarSwitch: boolean;
   avatarSource: string;
   avatarInfo: string;
@@ -33,6 +35,7 @@ export class SettingItem {
   constructor() {
     this.beautifySwitch = true;
     this.beautifyColor = "#9e1b32";
+    this.beautifyDarkMode = "auto";
     this.avatarSwitch = false;
     this.avatarSource = "qq";
     this.avatarInfo = "";

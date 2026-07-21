@@ -46,7 +46,7 @@ export async function injectSchoolSchedule(): Promise<void> {
 
   let injectHtml = "";
   for (const schedule of scheduleList) {
-    injectHtml += `<li><a href="${schedule.link}" target="_blank" style="color:#333;padding:8px 20px;">${schedule.name}</a></li>`;
+    injectHtml += `<li><a href="${schedule.link}" target="_blank" style="color:var(--scu-ink-soft,#333);padding:8px 20px;">${schedule.name}</a></li>`;
   }
 
   const fullHtml = `

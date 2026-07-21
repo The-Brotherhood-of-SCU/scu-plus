@@ -303,7 +303,7 @@ export function initCourseFilter(): void {
       
       rows.forEach(row => {
         (row as HTMLElement).style.display = allFit ? '' : 'none';
-        (row as HTMLElement).style.background = allFit ? '#e3f7ff' : '';
+        (row as HTMLElement).style.background = allFit ? 'var(--scu-accent-soft, #e3f7ff)' : '';
       });
     });
   }
@@ -317,16 +317,16 @@ export function initCourseFilter(): void {
     panel.style.cssText = 'position:fixed;right:20px;top:100px;z-index:10000;border:2px solid var(--scu-accent,#9e1b32);background:var(--scu-surface,#fff);padding:0;border-radius:8px;min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,0.12);';
 
     panel.innerHTML = `
-      <div id="scu-filter-header" style="background:var(--scu-accent,#9e1b32);color:#fff;padding:8px 10px;border-radius:5px 5px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
+      <div id="scu-filter-header" style="background:var(--scu-accent-fill,#9e1b32);color:var(--scu-paper,#fff);padding:8px 10px;border-radius:5px 5px 0 0;cursor:move;display:flex;justify-content:space-between;align-items:center;">
         <span id="scu-filter-title"></span>
-        <button id="scu-filter-toggle" style="background:transparent;border:none;color:white;font-size:16px;cursor:pointer;">－</button>
+        <button id="scu-filter-toggle" style="background:transparent;border:none;color:var(--scu-paper,#fff);font-size:16px;cursor:pointer;">－</button>
       </div>
       <div id="scu-filter-body" style="padding:10px;">
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
-          <button id="cf-time" style="width:100%;background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">时间</button>
-          <button id="cf-campus" style="width:100%;background:var(--scu-c2,#4caf50);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">校区</button>
-          <button id="cf-restrict" style="width:100%;background:var(--scu-ink,#333);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">限制</button>
-          <button id="cf-teacher" style="width:100%;background:var(--scu-c4,#ff9800);color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">老师</button>
+          <button id="cf-time" style="width:100%;background:var(--scu-accent-fill,#9e1b32);color:var(--scu-paper,#fff);border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">时间</button>
+          <button id="cf-campus" style="width:100%;background:var(--scu-c2,#4caf50);color:var(--scu-paper,#fff);border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">校区</button>
+          <button id="cf-restrict" style="width:100%;background:var(--scu-ink,#333);color:var(--scu-paper,#fff);border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">限制</button>
+          <button id="cf-teacher" style="width:100%;background:var(--scu-c4,#ff9800);color:var(--scu-paper,#fff);border:none;padding:8px;border-radius:4px;cursor:pointer;text-align:left;">老师</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <label style="display:flex;align-items:center;gap:6px;">
@@ -344,8 +344,8 @@ export function initCourseFilter(): void {
     
     ball = document.createElement('div');
     ball.id = 'scu-filter-ball';
-    ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:var(--scu-accent,#9e1b32);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:#fff;font-size:28px;';
-    ball.innerHTML = '<span style="color:#fff">✦</span>';
+    ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:var(--scu-accent-fill,#9e1b32);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:var(--scu-paper,#fff);font-size:28px;';
+    ball.innerHTML = '<span style="color:var(--scu-paper,#fff)">✦</span>';
     document.body.appendChild(ball);
 
     // 事件绑定
@@ -401,7 +401,7 @@ export function initCourseFilter(): void {
 
     // 程序化设置标题文本
     const titleEl = document.getElementById('scu-filter-title') as HTMLElement | null;
-    if (titleEl) titleEl.innerHTML = '<span style="color:#fff">✦</span> 选课筛选';
+    if (titleEl) titleEl.innerHTML = '<span style="color:var(--scu-paper,#fff)">✦</span> 选课筛选';
 
     // 拖拽功能
     const header = document.getElementById('scu-filter-header') as HTMLElement | null;
@@ -445,13 +445,13 @@ export function initCourseFilter(): void {
     
     modal = document.createElement('div');
     modal.id = 'cf-time-modal';
-    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:white;padding:14px;border-radius:8px;border:1px solid #ddd;';
-    
+    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:14px;border-radius:8px;border:1px solid var(--scu-line,#ddd);';
+
     const gridDaysHeader: string = gridDays.map(d => `<th>周${d}</th>`).join('');
     const rowsHtml: string = gridSections.map((sec, sIdx) => `
       <tr>
         <td>${sec.label}</td>
-        ${gridDays.map((_, dIdx) => `<td class="cf-cell" data-day="${dIdx}" data-sec="${sIdx}" style="min-width:34px;cursor:pointer;background:${selectedTimeGrid[dIdx][sIdx] ? '#4caf50' : '#f0f0f0'}">${selectedTimeGrid[dIdx][sIdx] ? '✔️' : ''}</td>`).join('')}
+        ${gridDays.map((_, dIdx) => `<td class="cf-cell" data-day="${dIdx}" data-sec="${sIdx}" style="min-width:34px;cursor:pointer;background:${selectedTimeGrid[dIdx][sIdx] ? 'var(--scu-c2,#4caf50)' : 'var(--scu-label-default-bg,#f0f0f0)'}">${selectedTimeGrid[dIdx][sIdx] ? '✔️' : ''}</td>`).join('')}
       </tr>`).join('');
 
     modal.innerHTML = `
@@ -463,8 +463,8 @@ export function initCourseFilter(): void {
         </tbody>
       </table>
       <div style="text-align:right;margin-top:8px;">
-        <button id="cf-time-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button>
-        <button id="cf-time-clear" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">清空</button>
+        <button id="cf-time-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button>
+        <button id="cf-time-clear" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">清空</button>
         <button id="cf-time-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;">关闭</button>
       </div>
     `;
@@ -476,7 +476,7 @@ export function initCourseFilter(): void {
         const day: number = parseInt(this.getAttribute('data-day')!);
         const sec: number = parseInt(this.getAttribute('data-sec')!);
         selectedTimeGrid[day][sec] = !selectedTimeGrid[day][sec];
-        this.style.background = selectedTimeGrid[day][sec] ? '#4caf50' : '#f0f0f0';
+        this.style.background = selectedTimeGrid[day][sec] ? 'var(--scu-c2,#4caf50)' : 'var(--scu-label-default-bg,#f0f0f0)';
         this.innerHTML = selectedTimeGrid[day][sec] ? '✔️' : '';
       });
     });
@@ -505,7 +505,7 @@ export function initCourseFilter(): void {
       clearBtn.onclick = () => {
         selectedTimeGrid = Array(7).fill(null).map(() => Array(gridSections.length).fill(false));
         modal!.querySelectorAll('.cf-cell').forEach(cell => {
-          (cell as HTMLElement).style.background = '#f0f0f0';
+          (cell as HTMLElement).style.background = 'var(--scu-label-default-bg,#f0f0f0)';
           cell.innerHTML = '';
         });
         if (useFilter) {
@@ -521,12 +521,12 @@ export function initCourseFilter(): void {
     
     modal = document.createElement('div');
     modal.id = 'cf-campus-modal';
-    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:white;padding:12px;border-radius:8px;border:1px solid #ddd;min-width:220px;';
-    
+    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:220px;';
+
     modal.innerHTML = `
       <div style="font-weight:bold;margin-bottom:8px;">校区筛选</div>
-      <select id="cf-campus-select" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;">${['<option value="">全部校区</option>'].concat(CAMPUS_LIST.map(c => `<option value="${c}" ${campusFilterValue === c ? 'selected' : ''}>${c}</option>`)).join('')}</select>
-      <div style="text-align:right;margin-top:8px;"><button id="cf-campus-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-campus-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <select id="cf-campus-select" style="width:100%;padding:6px;border:1px solid var(--scu-line,#ddd);border-radius:4px;">${['<option value="">全部校区</option>'].concat(CAMPUS_LIST.map(c => `<option value="${c}" ${campusFilterValue === c ? 'selected' : ''}>${c}</option>`)).join('')}</select>
+      <div style="text-align:right;margin-top:8px;"><button id="cf-campus-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-campus-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);
@@ -563,16 +563,16 @@ export function initCourseFilter(): void {
     
     modal = document.createElement('div');
     modal.id = 'cf-teacher-modal';
-    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:white;padding:12px;border-radius:8px;border:1px solid #ddd;min-width:320px;max-width:90vw;width:min(720px,90vw);max-height:80vh;overflow:auto;box-sizing:border-box;';
-    
+    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:320px;max-width:90vw;width:min(720px,90vw);max-height:80vh;overflow:auto;box-sizing:border-box;';
+
     const teacherOptions: string = Array.from(allTeachersSet).map(t => `<option value="${t}">${t}</option>`).join('');
-    
+
     modal.innerHTML = `
       <div style="font-weight:bold;margin-bottom:8px;">教师筛选（黑/白名单）</div>
       <div style="margin-bottom:6px;"><label><input type="radio" name="cf-t-mode" value="white" checked> 白名单</label> <label style="margin-left:12px;"><input type="radio" name="cf-t-mode" value="black"> 黑名单</label></div>
-      <div style="display:flex;gap:8px;margin-bottom:6px;"><select id="cf-teacher-select" style="flex:1;padding:6px;">${teacherOptions}</select><button id="cf-teacher-add" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px;border-radius:4px;">添加</button></div>
+      <div style="display:flex;gap:8px;margin-bottom:6px;"><select id="cf-teacher-select" style="flex:1;padding:6px;">${teacherOptions}</select><button id="cf-teacher-add" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px;border-radius:4px;">添加</button></div>
       <div id="cf-teacher-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;"></div>
-      <div style="text-align:right;"><button id="cf-teacher-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-teacher-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <div style="text-align:right;"><button id="cf-teacher-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-teacher-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);
@@ -585,7 +585,7 @@ export function initCourseFilter(): void {
     
     function renderList(): void {
       const arr: string[] = mode === 'white' ? whiteCopy : blackCopy;
-      listDiv.innerHTML = arr.length === 0 ? '<span style="color:#999">暂无名单</span>' : arr.map((t, idx) => `
+      listDiv.innerHTML = arr.length === 0 ? '<span style="color:var(--scu-ink-faint,#999)">暂无名单</span>' : arr.map((t, idx) => `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span>${t}</span>
           <button data-idx="${idx}" class="cf-t-rem" style="background:#f44336;color:#fff;border:none;border-radius:3px;padding:2px 8px;">移除</button>
@@ -659,7 +659,7 @@ export function initCourseFilter(): void {
     
     modal = document.createElement('div');
     modal.id = 'cf-restrict-modal';
-    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:white;padding:12px;border-radius:8px;border:1px solid #ddd;min-width:280px;max-width:92vw;width:min(920px,92vw);max-height:86vh;overflow:auto;box-sizing:border-box;';
+    modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:280px;max-width:92vw;width:min(920px,92vw);max-height:86vh;overflow:auto;box-sizing:border-box;';
 
     // Build a teacher-like multi-item selector: dedupe similar restrictions using fuzzy matching
     const optionsArr: string[] = [];
@@ -700,12 +700,12 @@ export function initCourseFilter(): void {
       <div style="font-weight:bold;margin-bottom:8px;">选课限制筛选</div>
       <div style="margin-bottom:8px;display:flex;gap:8px;align-items:flex-start;">
         <div style="flex:1;position:relative;">
-          <div id="cf-restrict-select-display" data-value="全部" style="padding:6px;border:1px solid #ddd;border-radius:4px;min-height:38px;cursor:pointer;white-space:normal;word-break:break-word;overflow:hidden;">全部</div>
+          <div id="cf-restrict-select-display" data-value="全部" style="padding:6px;border:1px solid var(--scu-line,#ddd);border-radius:4px;min-height:38px;cursor:pointer;white-space:normal;word-break:break-word;overflow:hidden;">全部</div>
         </div>
-        <button id="cf-restrict-add" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:8px 10px;border-radius:4px;white-space:nowrap;">添加</button>
+        <button id="cf-restrict-add" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:8px 10px;border-radius:4px;white-space:nowrap;">添加</button>
       </div>
       <div id="cf-restrict-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;white-space:normal;word-break:break-word;overflow-wrap:break-word;max-height:40vh;overflow:auto;"></div>
-      <div style="text-align:right;"><button id="cf-restrict-ok" style="background:var(--scu-accent,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-restrict-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
+      <div style="text-align:right;"><button id="cf-restrict-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-restrict-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
     
     document.body.appendChild(modal);
@@ -713,7 +713,7 @@ export function initCourseFilter(): void {
     // create options container on body (fixed) to avoid being clipped by modal overflow
     const optionsDiv: HTMLDivElement = document.createElement('div');
     optionsDiv.id = 'cf-restrict-options';
-    optionsDiv.style.cssText = 'display:none;position:fixed;left:0;top:0;width:320px;background:white;border:1px solid #ddd;border-radius:4px;max-height:60vh;overflow:auto;z-index:20001;box-shadow:0 4px 12px rgba(0,0,0,0.08);';
+    optionsDiv.style.cssText = 'display:none;position:fixed;left:0;top:0;width:320px;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);border:1px solid var(--scu-line,#ddd);border-radius:4px;max-height:60vh;overflow:auto;z-index:20001;box-shadow:0 4px 12px rgba(0,0,0,0.08);';
     document.body.appendChild(optionsDiv);
 
     const listDiv = document.getElementById('cf-restrict-list') as HTMLElement | null;
@@ -723,7 +723,7 @@ export function initCourseFilter(): void {
     function renderList(): void {
       if (!listDiv) return;
       if (localRestrictions.length === 0) {
-        listDiv.innerHTML = '<span style="color:#999">暂无筛选条件</span>';
+        listDiv.innerHTML = '<span style="color:var(--scu-ink-faint,#999)">暂无筛选条件</span>';
         return;
       }
       listDiv.innerHTML = localRestrictions.map((t, idx) => {
@@ -764,7 +764,7 @@ export function initCourseFilter(): void {
       optionsArr.forEach(o => {
         const item: HTMLDivElement = document.createElement('div');
         item.className = 'cf-restrict-option';
-        item.style.cssText = 'padding:8px;border-bottom:1px solid #f0f0f0;cursor:pointer;white-space:normal;word-break:break-word;overflow-wrap:break-word;';
+        item.style.cssText = 'padding:8px;border-bottom:1px solid var(--scu-line,#f0f0f0);cursor:pointer;white-space:normal;word-break:break-word;overflow-wrap:break-word;';
         // display text: standalone semicolon -> '无', otherwise show without trailing semicolons
         let displayText: string = o;
         if (o === '；' || o === ';') {

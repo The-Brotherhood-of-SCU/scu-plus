@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { checkVersion, UpdateCheckResult } from "~/script/utils"
 import { getSetting } from "~/script/config"
+import { DARK_COLORS, LIGHT_COLORS, isDarkModeEffective, mixWithWhite, normalizeDarkMode } from "~features/beautify/palette"
 import packagejson from "package.json"
 import "style.css"
 
@@ -20,31 +21,36 @@ const openLink = (link: string) => {
 const normalizeAccent = (color: string | undefined | null): string =>
   color && /^#[0-9a-f]{6}$/i.test(color.trim()) ? color.trim() : DEFAULT_ACCENT
 
-/* 杂志风调色板 —— 与 features/beautify/theme.ts 保持一致 */
-const palette = {
-  paper: "#f4f2ec",
-  surface: "#fffdf8",
-  ink: "#1d1c1a",
-  inkSoft: "#57564f",
-  inkFaint: "#8f8e85",
-  line: "#e4e0d4",
-  serif: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif',
-}
-
 function IndexPopup() {
   const [accent, setAccent] = useState(DEFAULT_ACCENT)
+  const [dark, setDark] = useState(false)
 
   useEffect(() => {
-    getSetting().then((s) => setAccent(normalizeAccent(s.beautifyColor)))
+    getSetting().then((s) => {
+      setAccent(normalizeAccent(s.beautifyColor))
+      setDark(isDarkModeEffective(normalizeDarkMode(s.beautifyDarkMode)))
+    })
   }, [])
 
+  /* 杂志风调色板 —— 与 features/beautify/theme.ts 保持一致，按深色模式切换 */
+  const palette = dark ? DARK_COLORS : LIGHT_COLORS
+  // 深色模式下点缀色调亮：文字用色提亮 0.38，按钮填充色仅提 0.15 保住白字对比度
+  const textAccent = dark ? mixWithWhite(accent, 0.38) : accent
+  const fillAccent = dark ? mixWithWhite(accent, 0.15) : accent
+
   const css = `
+    :root {
+      color-scheme: ${dark ? "dark" : "light"};
+    }
+    html, body {
+      background: ${palette.paper};
+    }
     .scu-popup {
       width: 320px;
       background: ${palette.paper};
       color: ${palette.ink};
-      font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      border-top: 3px solid ${accent};
+      font-family: ${palette.sans};
+      border-top: 3px solid ${textAccent};
       padding: 0;
     }
     .scu-popup .masthead {
@@ -59,7 +65,7 @@ function IndexPopup() {
       letter-spacing: 0.12em;
     }
     .scu-popup .masthead .brand em {
-      color: ${accent};
+      color: ${textAccent};
       font-style: normal;
     }
     .scu-popup .masthead .tagline {
@@ -105,8 +111,8 @@ function IndexPopup() {
       color: ${palette.surface};
     }
     .scu-popup .btn.primary {
-      background: ${accent};
-      border-color: ${accent};
+      background: ${fillAccent};
+      border-color: ${fillAccent};
       color: #fff;
     }
     .scu-popup .btn.primary:hover {
@@ -136,8 +142,8 @@ function IndexPopup() {
       border-bottom: 1px solid ${palette.line};
     }
     .scu-popup .footer a:hover {
-      color: ${accent};
-      border-bottom-color: ${accent};
+      color: ${textAccent};
+      border-bottom-color: ${textAccent};
     }
   `
 
@@ -160,7 +166,7 @@ function IndexPopup() {
         <div className="section-label">设置</div>
         <div className="btn-row">
           <button className="btn" onClick={gotoSettingPage}>插件设置</button>
-          <MainButton accent={accent} />
+          <MainButton accent={textAccent} dark={dark} inkSoft={palette.inkSoft} />
         </div>
 
         <div className="footer">
@@ -172,7 +178,7 @@ function IndexPopup() {
   )
 }
 
-function MainButton({ accent }: { accent: string }) {
+function MainButton({ accent, dark, inkSoft }: { accent: string; dark: boolean; inkSoft: string }) {
   const [updateCheckState, setUpdateCheckState] = useState(UpdateCheckResult.UNKNOWN)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
@@ -200,15 +206,17 @@ function MainButton({ accent }: { accent: string }) {
     [UpdateCheckResult.CHECKING]: "正在检查…",
     [UpdateCheckResult.NETWORK_ERROR]: "检查失败"
   };
-  // 状态语义色：新版本用主题点缀色，其余沿用杂志配色盘
+  // 状态语义色：新版本用主题点缀色，其余沿用杂志配色盘（深色模式用调亮版）
   const updateCheckStateColor: { [key in UpdateCheckResult]: string } = {
     [UpdateCheckResult.NEW_VERSION_AVAILABLE]: accent,
-    [UpdateCheckResult.UP_TP_DATE]: "#3f6b4f",
-    [UpdateCheckResult.UNKNOWN]: palette.inkSoft,
-    [UpdateCheckResult.CHECKING]: "#a5673f",
-    [UpdateCheckResult.NETWORK_ERROR]: "#9e1b32"
+    [UpdateCheckResult.UP_TP_DATE]: dark ? "#71a382" : "#3f6b4f",
+    [UpdateCheckResult.UNKNOWN]: inkSoft,
+    [UpdateCheckResult.CHECKING]: dark ? "#cf9261" : "#a5673f",
+    [UpdateCheckResult.NETWORK_ERROR]: dark ? accent : "#9e1b32"
   };
   const color = updateCheckStateColor[updateCheckState]
+  // 深色模式下悬停填充的是调亮后的浅色，文字需用深色保证可读
+  const hoverTextColor = dark ? DARK_COLORS.paper : "#fff"
   return (
     <button
       className="btn"
@@ -216,7 +224,7 @@ function MainButton({ accent }: { accent: string }) {
       style={{ borderColor: color, color }}
       onMouseEnter={(e) => {
         e.currentTarget.style.background = color
-        e.currentTarget.style.color = "#fff"
+        e.currentTarget.style.color = hoverTextColor
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = ""

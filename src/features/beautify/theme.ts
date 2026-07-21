@@ -14,6 +14,8 @@ export const MAGAZINE_THEME_CSS = `
   --scu-line-strong: #c9c4b4;
   --scu-accent: #9e1b32;            /* 锦绣红 — 可通过设置更改 */
   --scu-accent-soft: rgba(158, 27, 50, 0.06);
+  --scu-accent-fill: #9e1b32;        /* 填充按钮底色（深色模式下由 JS 调亮） */
+  --scu-accent-line: rgba(158, 27, 50, 0.22);
   --scu-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
   --scu-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   /* 杂志配色盘（课表色块等） */
@@ -23,6 +25,60 @@ export const MAGAZINE_THEME_CSS = `
   --scu-c4: #a5673f;
   --scu-c5: #6b4f7c;
   --scu-c6: #4f6366;
+  /* 组件级配色（深色模式下由下方覆盖块替换） */
+  --scu-sidebar-bg: #f8f6f0;
+  --scu-rowhead-bg: #faf8f2;
+  --scu-surface-dim: #f0ede5;
+  --scu-row-hover: rgba(29, 28, 26, 0.028);
+  --scu-tools-bg: rgba(255, 253, 248, 0.92);
+  --scu-selection-bg: rgba(158, 27, 50, 0.16);
+  --scu-shadow-rgb: 29, 28, 26;
+  --scu-label-success-bg: #edf3ee;
+  --scu-label-success-border: rgba(63, 107, 79, 0.25);
+  --scu-label-warning-bg: #f7f0e3;
+  --scu-label-warning-border: rgba(165, 103, 63, 0.25);
+  --scu-label-info-bg: #edf3f6;
+  --scu-label-info-border: rgba(47, 93, 124, 0.22);
+  --scu-label-default-bg: #f1efe8;
+  --scu-label-purple-bg: #f1edf5;
+}
+
+/* ============================================================
+   深色模式 —— 暖炭纸 · 米白墨（beautifyDarkMode = dark / auto 且系统深色）
+   JS 在 <html> 上设置 data-scu-theme="dark" 后生效；
+   --scu-accent 系列由 JS 按模式写入调亮后的值。
+   ============================================================ */
+:root[data-scu-theme="dark"] {
+  color-scheme: dark;
+  --scu-paper: #171615;
+  --scu-surface: #201f1d;
+  --scu-ink: #e6e3da;
+  --scu-ink-soft: #b5b2a8;
+  --scu-ink-faint: #84827a;
+  --scu-line: #35332e;
+  --scu-line-strong: #4c4a43;
+  /* 杂志配色盘 —— 同色系调亮 */
+  --scu-c2: #71a382;
+  --scu-c3: #6b9ec4;
+  --scu-c4: #cf9261;
+  --scu-c5: #a182b8;
+  --scu-c6: #82a0a4;
+  /* 组件级配色 */
+  --scu-sidebar-bg: #1c1b19;
+  --scu-rowhead-bg: #242320;
+  --scu-surface-dim: #2a2925;
+  --scu-row-hover: rgba(230, 227, 218, 0.05);
+  --scu-tools-bg: rgba(32, 31, 29, 0.92);
+  --scu-selection-bg: rgba(230, 227, 218, 0.18);
+  --scu-shadow-rgb: 0, 0, 0;
+  --scu-label-success-bg: rgba(113, 163, 130, 0.14);
+  --scu-label-success-border: rgba(113, 163, 130, 0.32);
+  --scu-label-warning-bg: rgba(207, 146, 97, 0.14);
+  --scu-label-warning-border: rgba(207, 146, 97, 0.32);
+  --scu-label-info-bg: rgba(107, 158, 196, 0.14);
+  --scu-label-info-border: rgba(107, 158, 196, 0.32);
+  --scu-label-default-bg: rgba(230, 227, 218, 0.08);
+  --scu-label-purple-bg: rgba(161, 130, 184, 0.14);
 }
 
 /* ---------- 全局基调 ---------- */
@@ -35,7 +91,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 ::selection {
-  background: rgba(158, 27, 50, 0.16);
+  background: var(--scu-selection-bg);
 }
 a { color: inherit; }
 a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
@@ -201,7 +257,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
    侧边栏 —— 目录栏
    ============================================================ */
 #sidebar {
-  background: #f8f6f0 !important;
+  background: var(--scu-sidebar-bg) !important;
   border-right: 1px solid var(--scu-line) !important;
 }
 #sidebar::before { display: none !important; }
@@ -307,7 +363,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   background: var(--scu-surface) !important;
   border: 1px solid var(--scu-line) !important;
   border-radius: 4px !important;
-  box-shadow: 2px 2px 12px rgba(0,0,0,0.1) !important;
+  box-shadow: 2px 2px 12px rgba(var(--scu-shadow-rgb), 0.12) !important;
   padding: 8px 0 !important;
   min-width: 160px !important;
   position: absolute;
@@ -338,7 +394,7 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   background: var(--scu-surface) !important;
   border: 1px solid var(--scu-line) !important;
   border-radius: 4px !important;
-  box-shadow: 2px 2px 12px rgba(0,0,0,0.1) !important;
+  box-shadow: 2px 2px 12px rgba(var(--scu-shadow-rgb), 0.12) !important;
 }
 
 /* 3) 弹出式 tooltip（当菜单项无子菜单时，Ace Admin 可能生成独立 tooltip） */
@@ -398,7 +454,7 @@ h1.header, h2.header, h3.header, h4.header, h5.header, .header {
   background: var(--scu-surface) !important;
   border: 1px solid var(--scu-line) !important;
   border-radius: 3px !important;
-  box-shadow: 0 1px 3px rgba(29,28,26,0.05) !important;
+  box-shadow: 0 1px 3px rgba(var(--scu-shadow-rgb),0.05) !important;
   margin-bottom: 18px !important;
 }
 .widget-box > .widget-header,
@@ -539,7 +595,7 @@ h1.header, h2.header, h3.header, h4.header, h5.header, .header {
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th { background: transparent !important; }
 .table-hover > tbody > tr:hover > td,
-.table-hover > tbody > tr:hover > th { background: rgba(29,28,26,0.028) !important; }
+.table-hover > tbody > tr:hover > th { background: var(--scu-row-hover) !important; }
 .table-bordered, .table-bordered > thead > tr > th, .table-bordered > tbody > tr > td {
   border: none !important;
 }
@@ -622,8 +678,8 @@ td.green_background, td.green_background a, td.green_background span { color: va
   background: var(--scu-surface) !important;
 }
 .btn-primary, .btn.btn-primary {
-  background: var(--scu-accent) !important;
-  border-color: var(--scu-accent) !important;
+  background: var(--scu-accent-fill) !important;
+  border-color: var(--scu-accent-fill) !important;
   color: #fff !important;
 }
 .btn-primary:hover, .btn-primary:focus {
@@ -639,8 +695,8 @@ td.green_background, td.green_background a, td.green_background span { color: va
   color: var(--scu-accent) !important;
 }
 .btn-success, .btn.btn-success {
-  background: var(--scu-accent) !important;
-  border-color: var(--scu-accent) !important;
+  background: var(--scu-accent-fill) !important;
+  border-color: var(--scu-accent-fill) !important;
   color: #fff !important;
 }
 .btn-success:hover {
@@ -651,7 +707,7 @@ td.green_background, td.green_background a, td.green_background span { color: va
   border-color: var(--scu-accent) !important;
   color: var(--scu-accent) !important;
 }
-.btn-danger:hover { background: var(--scu-accent) !important; color: #fff !important; }
+.btn-danger:hover { background: var(--scu-accent-fill) !important; color: #fff !important; }
 .btn-warning, .btn.btn-warning {
   background: var(--scu-surface) !important;
   border-color: var(--scu-c4) !important;
@@ -666,8 +722,8 @@ td.green_background, td.green_background a, td.green_background span { color: va
 
 /* 评教列表 —— 非 btn-info 的按钮（即"评估"）用主题色 */
 #codeTable .btn:not(.btn-info) {
-  background: var(--scu-accent) !important;
-  border-color: var(--scu-accent) !important;
+  background: var(--scu-accent-fill) !important;
+  border-color: var(--scu-accent-fill) !important;
   color: #fff !important;
 }
 
@@ -683,13 +739,13 @@ td.green_background, td.green_background a, td.green_background span { color: va
   text-shadow: none !important;
   border: 1px solid transparent !important;
 }
-.label-success, .badge-success { background: #edf3ee !important; color: var(--scu-c2) !important; border-color: rgba(63,107,79,.25) !important; }
-.label-danger, .label-pink, .badge-danger { background: var(--scu-accent-soft) !important; color: var(--scu-accent) !important; border-color: rgba(158,27,50,.22) !important; }
-.label-warning, .badge-warning, .label-yellow { background: #f7f0e3 !important; color: var(--scu-c4) !important; border-color: rgba(165,103,63,.25) !important; }
-.label-info, .badge-info { background: #edf3f6 !important; color: var(--scu-c3) !important; border-color: rgba(47,93,124,.22) !important; }
-.label-default { background: #f1efe8 !important; color: var(--scu-ink-soft) !important; border-color: var(--scu-line) !important; }
-.label-grey { background: #f1efe8 !important; color: var(--scu-ink-soft) !important; }
-.label-purple { background: #f1edf5 !important; color: var(--scu-c5) !important; }
+.label-success, .badge-success { background: var(--scu-label-success-bg) !important; color: var(--scu-c2) !important; border-color: var(--scu-label-success-border) !important; }
+.label-danger, .label-pink, .badge-danger { background: var(--scu-accent-soft) !important; color: var(--scu-accent) !important; border-color: var(--scu-accent-line) !important; }
+.label-warning, .badge-warning, .label-yellow { background: var(--scu-label-warning-bg) !important; color: var(--scu-c4) !important; border-color: var(--scu-label-warning-border) !important; }
+.label-info, .badge-info { background: var(--scu-label-info-bg) !important; color: var(--scu-c3) !important; border-color: var(--scu-label-info-border) !important; }
+.label-default { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; border-color: var(--scu-line) !important; }
+.label-grey { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; }
+.label-purple { background: var(--scu-label-purple-bg) !important; color: var(--scu-c5) !important; }
 
 /* ============================================================
    选项卡
@@ -748,7 +804,7 @@ td.green_background, td.green_background a, td.green_background span { color: va
 .modal-content {
   border: 1px solid var(--scu-line) !important;
   border-radius: 3px !important;
-  box-shadow: 0 12px 40px rgba(29,28,26,0.16) !important;
+  box-shadow: 0 12px 40px rgba(var(--scu-shadow-rgb),0.16) !important;
   background: var(--scu-surface) !important;
 }
 .modal-header { border-bottom: 1px solid var(--scu-line) !important; background: transparent !important; }
@@ -764,7 +820,7 @@ td.green_background, td.green_background a, td.green_background span { color: va
 .layui-layer {
   border: 1px solid var(--scu-line) !important;
   border-radius: 3px !important;
-  box-shadow: 0 12px 40px rgba(29,28,26,0.16) !important;
+  box-shadow: 0 12px 40px rgba(var(--scu-shadow-rgb),0.16) !important;
   background: var(--scu-surface) !important;
 }
 .layui-layer-title {
@@ -866,7 +922,7 @@ td.green_background, td.green_background a, td.green_background span { color: va
   background: var(--scu-surface) !important;
   border: 1px solid var(--scu-line) !important;
   border-radius: 2px !important;
-  box-shadow: 0 6px 24px rgba(29,28,26,0.10) !important;
+  box-shadow: 0 6px 24px rgba(var(--scu-shadow-rgb),0.10) !important;
   padding: 4px 0 !important;
 }
 .dropdown-menu > li > a {
@@ -907,7 +963,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
 }
 .chosen-drop, .chosen-container .chosen-drop {
   border: 1px solid var(--scu-line) !important;
-  box-shadow: 0 6px 24px rgba(29,28,26,0.10) !important;
+  box-shadow: 0 6px 24px rgba(var(--scu-shadow-rgb),0.10) !important;
   background: var(--scu-surface) !important;
 }
 .chosen-results li.highlighted {
@@ -961,7 +1017,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
 /* 大节 / 节次 标签列 —— 纸色衬底 + 衬线 */
 #courseTable > tbody > tr > th[rowspan],
 #courseTable > tbody > tr > th {
-  background: #faf8f2 !important;
+  background: var(--scu-rowhead-bg) !important;
   font-family: var(--scu-serif) !important;
   color: var(--scu-ink-soft) !important;
   letter-spacing: 0.1em;
@@ -974,7 +1030,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
   border: 1px solid var(--scu-line-strong) !important;
   border-left: 3px solid var(--scu-c1) !important;
   border-radius: 3px !important;
-  box-shadow: 0 1px 4px rgba(29,28,26,0.08) !important;
+  box-shadow: 0 1px 4px rgba(var(--scu-shadow-rgb),0.08) !important;
   padding: 6px 8px !important;
   overflow: hidden;
 }
@@ -1005,7 +1061,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
   font-size: 11px !important;
   text-shadow: none !important;
 }
-.class_div .tools { background: rgba(255,253,248,0.92) !important; }
+.class_div .tools { background: var(--scu-tools-bg) !important; }
 .class_div .tools a { color: var(--scu-ink-soft) !important; }
 .class_div .tools a:hover { color: var(--scu-accent) !important; }
 

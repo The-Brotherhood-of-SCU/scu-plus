@@ -14,8 +14,8 @@ function injectBtnStyle() {
             text-align: center !important;
             text-decoration: none !important;
             letter-spacing: 0.04em !important;
-            background: var(--scu-accent) !important;
-            border: 1px solid var(--scu-accent) !important;
+            background: var(--scu-accent-fill, var(--scu-accent)) !important;
+            border: 1px solid var(--scu-accent-fill, var(--scu-accent)) !important;
             border-radius: 2px !important;
             cursor: pointer !important;
             transition: all .12s ease !important;

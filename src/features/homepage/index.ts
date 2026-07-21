@@ -25,7 +25,7 @@ export function hideFailCourse(enabled: boolean): void {
       notpass.style.display = "None";
       const noticeText = document.createElement("div");
       noticeText.innerText = "点击显示";
-      noticeText.style.color = "black";
+      noticeText.style.color = "var(--scu-ink, black)";
       notpass.parentNode?.appendChild(noticeText);
 
       noticeText.onclick = () => {

@@ -26,6 +26,8 @@ const MIRROR_KEY = "scu-plus:beautify"
 interface BeautifyMirror {
   on: boolean
   color?: string
+  /** 深色模式设置（"auto" | "light" | "dark"），旧镜像缺失时按 "auto" 处理 */
+  dark?: string
 }
 
 function readMirror(): BeautifyMirror | null {
@@ -36,7 +38,8 @@ function readMirror(): BeautifyMirror | null {
     if (typeof parsed?.on !== "boolean") return null
     return {
       on: parsed.on,
-      color: typeof parsed.color === "string" ? parsed.color : undefined
+      color: typeof parsed.color === "string" ? parsed.color : undefined,
+      dark: typeof parsed.dark === "string" ? parsed.dark : undefined
     }
   } catch {
     return null
@@ -51,9 +54,9 @@ function writeMirror(mirror: BeautifyMirror): void {
   }
 }
 
-function applyAndMirror(on: boolean, color?: string): void {
-  applyBeautify(on, color)
-  writeMirror({ on, color })
+function applyAndMirror(on: boolean, color?: string, dark?: string): void {
+  applyBeautify(on, color, dark)
+  writeMirror({ on, color, dark })
 }
 
 function boot(): void {
@@ -62,7 +65,7 @@ function boot(): void {
 
   // 2) 异步校准真实设置（首次启用、跨标签页修改、镜像被清除等情况）
   getSetting()
-    .then((s) => applyAndMirror(s.beautifySwitch, s.beautifyColor))
+    .then((s) => applyAndMirror(s.beautifySwitch, s.beautifyColor, s.beautifyDarkMode))
     .catch((e) => console.warn("SCU+: 读取美化设置失败，保持镜像状态", e))
 
   // 3) 设置页保存后实时同步，无需等下次导航
@@ -70,7 +73,7 @@ function boot(): void {
     setting: (change) => {
       const next = change?.newValue as Partial<SettingItem> | undefined
       if (!next || typeof next.beautifySwitch !== "boolean") return
-      applyAndMirror(next.beautifySwitch, next.beautifyColor)
+      applyAndMirror(next.beautifySwitch, next.beautifyColor, next.beautifyDarkMode)
     }
   })
 }
@@ -82,7 +85,7 @@ function earlyInject(): boolean {
   if (!document.documentElement) return false
   const mirror = readMirror()
   if (!mirror?.on) return false
-  applyBeautify(true, mirror.color)
+  applyBeautify(true, mirror.color, mirror.dark)
   return true
 }
 

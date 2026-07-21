@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react"
-import { Form, Switch, Input, Button, Spin, Select, message, notification, ColorPicker, ConfigProvider, } from 'antd';
+import { Form, Switch, Input, Button, Spin, Select, message, notification, ColorPicker, ConfigProvider, theme as antdTheme, } from 'antd';
 import { getSetting, saveSetting } from "~script/config";
 import { SettingItem } from "../common/types";
 import { Modal } from 'antd';
 import type { NotificationPlacement } from "antd/es/notification/interface";
 import React from "react";
 import { Actions } from "../constants/actions";
+import { LIGHT_COLORS, DARK_COLORS, mixWithWhite, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette";
 import packagejson from "package.json"
 
 const DEFAULT_ACCENT = "#9e1b32"
@@ -14,26 +15,43 @@ const DEFAULT_ACCENT = "#9e1b32"
 const normalizeAccent = (color: string | undefined | null): string =>
   color && /^#[0-9a-f]{6}$/i.test(color.trim()) ? color.trim() : DEFAULT_ACCENT
 
-const SERIF = '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif'
-const SANS = 'system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif'
+const SERIF = LIGHT_COLORS.serif
+const SANS = LIGHT_COLORS.sans
 
-/** 杂志风全局样式 —— 与 features/beautify/theme.ts 同源的纸墨朱配色 */
+/** 杂志风全局样式 —— 与 features/beautify/theme.ts 同源的纸墨朱配色，支持深色模式 */
 const MAGAZINE_CSS = `
+  :root {
+    --scu-page-bg: ${LIGHT_COLORS.paper};
+    --scu-surface: ${LIGHT_COLORS.surface};
+    --scu-ink: ${LIGHT_COLORS.ink};
+    --scu-ink-soft: ${LIGHT_COLORS.inkSoft};
+    --scu-ink-faint: ${LIGHT_COLORS.inkFaint};
+    --scu-line: ${LIGHT_COLORS.line};
+  }
+  :root[data-scu-theme="dark"] {
+    color-scheme: dark;
+    --scu-page-bg: ${DARK_COLORS.paper};
+    --scu-surface: ${DARK_COLORS.surface};
+    --scu-ink: ${DARK_COLORS.ink};
+    --scu-ink-soft: ${DARK_COLORS.inkSoft};
+    --scu-ink-faint: ${DARK_COLORS.inkFaint};
+    --scu-line: ${DARK_COLORS.line};
+  }
   html, body {
-    background: #f4f2ec;
+    background: var(--scu-page-bg);
   }
   body {
     font-family: ${SANS};
-    color: #1d1c1a;
+    color: var(--scu-ink);
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
     background: rgba(158, 27, 50, 0.16);
   }
   .scu-setting-masthead {
-    background: #fffdf8;
+    background: var(--scu-surface);
     border-top: 3px solid var(--scu-accent, ${DEFAULT_ACCENT});
-    border-bottom: 1px solid #1d1c1a;
+    border-bottom: 1px solid var(--scu-ink);
     padding: 18px 24px 14px;
   }
   .scu-setting-masthead-inner {
@@ -48,7 +66,7 @@ const MAGAZINE_CSS = `
     font-size: 24px;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #1d1c1a;
+    color: var(--scu-ink);
   }
   .scu-setting-masthead .brand em {
     color: var(--scu-accent, ${DEFAULT_ACCENT});
@@ -62,7 +80,7 @@ const MAGAZINE_CSS = `
   }
   .scu-setting-masthead .version {
     font-size: 12px;
-    color: #8f8e85;
+    color: var(--scu-ink-faint);
     letter-spacing: 0.08em;
   }
   .scu-setting-body {
@@ -79,7 +97,7 @@ const MAGAZINE_CSS = `
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #1d1c1a;
+    color: var(--scu-ink);
   }
   .scu-setting-section::before {
     content: "";
@@ -91,22 +109,22 @@ const MAGAZINE_CSS = `
   .scu-setting-section::after {
     content: "";
     flex: 1;
-    border-top: 1px solid #e4e0d4;
+    border-top: 1px solid var(--scu-line);
   }
   .scu-setting-card {
-    background: #fffdf8;
-    border: 1px solid #e4e0d4;
+    background: var(--scu-surface);
+    border: 1px solid var(--scu-line);
     padding: 18px 22px 6px;
   }
-  /* antd 细节微调：贴合纸面风格 */
+  /* antd 细节微调：贴合纸面风格（深色模式交由 darkAlgorithm 处理） */
   .scu-setting-card .ant-form-item-label > label {
-    color: #57564f;
+    color: var(--scu-ink-soft);
     letter-spacing: 0.02em;
   }
-  .scu-setting-card .ant-input,
-  .scu-setting-card .ant-select .ant-select-selector,
-  .scu-setting-card .ant-input-outlined {
-    background: #fffdf8;
+  :root:not([data-scu-theme="dark"]) .scu-setting-card .ant-input,
+  :root:not([data-scu-theme="dark"]) .scu-setting-card .ant-select .ant-select-selector,
+  :root:not([data-scu-theme="dark"]) .scu-setting-card .ant-input-outlined {
+    background: ${LIGHT_COLORS.surface};
   }
   .scu-setting-actions {
     display: flex;
@@ -122,7 +140,7 @@ const MAGAZINE_CSS = `
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #57564f;
+    color: var(--scu-ink-soft);
     font-size: 13px;
   }
 `
@@ -130,23 +148,64 @@ const MAGAZINE_CSS = `
 function SettingPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [accent, setAccent] = useState(DEFAULT_ACCENT);
+  const [darkMode, setDarkMode] = useState<DarkModeSetting>("auto");
+  const [systemDark, setSystemDark] = useState(() => {
+    try {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    } catch {
+      return false;
+    }
+  });
+
+  // "auto" 模式下跟踪系统深浅色变化，实时切换设置页
+  useEffect(() => {
+    let mq: MediaQueryList | null = null;
+    try {
+      mq = window.matchMedia("(prefers-color-scheme: dark)");
+    } catch {
+      return;
+    }
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    setSystemDark(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const resolvedDark = darkMode === "dark" || (darkMode === "auto" && systemDark);
+
+  // 通过 <html> 属性切换 MAGAZINE_CSS 的深浅色变量（与教务页面主题同一机制）
+  useEffect(() => {
+    const root = document.documentElement;
+    if (resolvedDark) {
+      root.setAttribute("data-scu-theme", "dark");
+    } else {
+      root.removeAttribute("data-scu-theme");
+    }
+    return () => root.removeAttribute("data-scu-theme");
+  }, [resolvedDark]);
+
+  // 深色模式下点缀色调亮：文字用色提亮 0.38，antd 主色（按钮底）仅提 0.15 保住白字对比度
+  const textAccent = resolvedDark ? mixWithWhite(accent, 0.38) : accent;
+  const fillAccent = resolvedDark ? mixWithWhite(accent, 0.15) : accent;
+
   return (
     <ConfigProvider
       theme={{
+        algorithm: resolvedDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary: accent,
-          colorInfo: accent,
-          colorLink: accent,
+          colorPrimary: fillAccent,
+          colorInfo: fillAccent,
+          colorLink: textAccent,
           borderRadius: 2,
           fontFamily: SANS,
         },
       }}
     >
       <style>{MAGAZINE_CSS}</style>
-      <div style={{ ["--scu-accent" as any]: accent }}>
+      <div style={{ ["--scu-accent" as any]: textAccent }}>
         <TitleFragment isDirty={isDirty} />
         <div className="scu-setting-body">
-          <DataSettingFragment isDirty={isDirty} setIsDirty={setIsDirty} setAccent={setAccent} />
+          <DataSettingFragment isDirty={isDirty} setIsDirty={setIsDirty} setAccent={setAccent} setDarkMode={setDarkMode} />
         </div>
       </div>
     </ConfigProvider>
@@ -175,9 +234,11 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <div className="scu-setting-section">{children}</div>
 }
 
-function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: boolean; setIsDirty: (dirty: boolean) => void; setAccent: (color: string) => void }) {
+function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { isDirty: boolean; setIsDirty: (dirty: boolean) => void; setAccent: (color: string) => void; setDarkMode: (mode: DarkModeSetting) => void }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [notificationApi, contextHolder2] = notification.useNotification();
+  // hook 形式的 Modal 才能吃到 ConfigProvider 的深色主题（静态 Modal.confirm 不读 context）
+  const [modalApi, modalContextHolder] = Modal.useModal();
   const [setting, setSetting] = useState<SettingItem>();
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -211,6 +272,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
       setShowNameHideField(!!savedSettings.nameHideSwitch);
       setShowBeautifyField(!!savedSettings.beautifySwitch);
       setAccent(normalizeAccent(savedSettings.beautifyColor));
+      setDarkMode(normalizeDarkMode(savedSettings.beautifyDarkMode));
       initialSettingRef.current = savedSettings;
     };
 
@@ -242,6 +304,9 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
     if (changedValues.beautifyColor !== undefined) {
       setAccent(normalizeAccent(changedValues.beautifyColor));
     }
+    if (changedValues.beautifyDarkMode !== undefined) {
+      setDarkMode(normalizeDarkMode(changedValues.beautifyDarkMode));
+    }
     if (SettingItem.equals(initialSetting, newConfig)) {
       //unchanged logically
       setIsDirty(false);
@@ -255,7 +320,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
     return <LoadingFragment />;
   }
   const handleReset = () => {
-    Modal.confirm({
+    modalApi.confirm({
       title: '确认恢复默认设置？',
       content: '这将重置所有设置为默认值，且无法撤销。',
       okText: '确认',
@@ -269,6 +334,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
         setShowBeautifyField(!!data.beautifySwitch);
         setShowNameHideField(!!data.nameHideSwitch);
         setAccent(normalizeAccent(data.beautifyColor));
+        setDarkMode(normalizeDarkMode(data.beautifyDarkMode));
         initialSettingRef.current = data;
         setIsDirty(false);
         messageApi.success('已恢复默认设置');
@@ -301,6 +367,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
                 setShowBeautifyField(!!jsonData.beautifySwitch);
                 setShowNameHideField(!!jsonData.nameHideSwitch);
                 setAccent(normalizeAccent(jsonData.beautifyColor));
+                setDarkMode(normalizeDarkMode(jsonData.beautifyDarkMode));
                 initialSettingRef.current = jsonData;
                 setIsDirty(false);
                 messageApi.success('配置文件导入成功（已保存）');
@@ -316,6 +383,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
       }}>
       {contextHolder}
       {contextHolder2}
+      {modalContextHolder}
       <Form
         form={form}
         initialValues={setting}
@@ -333,6 +401,17 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent }: { isDirty: bool
             <Switch />
           </Form.Item>
           {showBeautifyField && (<>
+            <Form.Item
+              label="深色模式"
+              name="beautifyDarkMode"
+              tooltip="杂志风主题的深色模式。「跟随系统」将在系统处于深色模式时自动切换，教务页面与插件界面同时生效"
+            >
+              <Select>
+                <Select.Option value="auto">跟随系统</Select.Option>
+                <Select.Option value="light">浅色</Select.Option>
+                <Select.Option value="dark">深色</Select.Option>
+              </Select>
+            </Form.Item>
             <Form.Item
               label="主题点缀色"
               name="beautifyColor"

@@ -113,7 +113,7 @@ export function initScoresPerSemester(): void {
                 // 统一用低饱和的浅色底，不再使用教务系统自带的彩色 label，避免突兀
                 const badge = (text: string) => {
                     const s = document.createElement('span')
-                    s.style.cssText = 'background:rgba(0,0,0,0.05);color:#333;border-radius:10px;padding:1px 8px;font-size:12px;'
+                    s.style.cssText = 'background:var(--scu-accent-soft,rgba(0,0,0,0.05));color:var(--scu-ink,#333);border-radius:10px;padding:1px 8px;font-size:12px;'
                     s.textContent = text
                     return s
                 }

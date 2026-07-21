@@ -23,7 +23,7 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 | `src/options.tsx` | Thin wrapper — delegates entirely to `src/tabs/setting.tsx`. |
 | `src/contents/id-scu.ts` | Content script on `id.scu.edu.cn`. Password-modify-page redirect (SPA-aware via history monkey-patching + MutationObserver), and ID portal OCR captcha. |
 | `src/contents/zhjw.ts` | **Main content script** on `zhjw.scu.edu.cn`. Dispatches to most feature modules based on URL path. |
-| `src/contents/zhjw-beautify.ts` | Injects the magazine theme at `document_start` (before first paint) to avoid a flash of the original styles. Reads a localStorage mirror of `beautifySwitch`/`beautifyColor` synchronously, then reconciles with real settings and watches for changes. |
+| `src/contents/zhjw-beautify.ts` | Injects the magazine theme at `document_start` (before first paint) to avoid a flash of the original styles. Reads a localStorage mirror of `beautifySwitch`/`beautifyColor`/`beautifyDarkMode` synchronously, then reconciles with real settings and watches for changes. |
 | `src/contents/zhjw-login.ts` | Content script on `zhjw.scu.edu.cn/*login*`. Redirects to unified auth (id.scu.edu.cn) when enabled. Runs at `document_start`. |
 
 ### Feature Modules (`src/features/`)
@@ -31,6 +31,7 @@ This is a **Plasmo** browser extension (v0.90.5). Plasmo handles the manifest ge
 Each feature follows an `init*` or `inject*` function pattern. They are pure DOM/JS injection modules — no framework rendering:
 
 - **`homepage/`** — UI beautification (border colors, CSS overrides), daily quote modal, fail-course toggling, custom GPA/fail text, password popup removal. Called unconditionally from `zhjw.ts`.
+- **`beautify/`** — The magazine theme itself. `theme.ts` holds the full CSS (all colors as `--scu-*` variables, with a `:root[data-scu-theme="dark"]` override block for dark mode); `index.ts` injects/removes it and resolves the dark mode setting (`beautifyDarkMode`: `"auto"` follows the OS via `matchMedia` listener, `"light"`, `"dark"`), setting `data-scu-theme` on `<html>` and brightening the user accent in dark mode; `palette.ts` is the shared palette/mode-resolution module also used by `popup.tsx` and `tabs/setting.tsx` (both support dark mode too). Injected UI in other features should use `var(--scu-*, fallback)` so it adapts automatically.
 - **`menu/`** — Injects custom sidebar menu entries (SCU+ 设置, version check) into the教务 system's `#menus` element.
 - **`navbar/`** — Top navbar avatar/name hiding via CSS injection.
 - **`score-analysis/`** — GPA calculation, credit-weighted scoring, score distribution charts (Chart.js).

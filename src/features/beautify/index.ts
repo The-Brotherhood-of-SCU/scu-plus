@@ -1,4 +1,10 @@
 import { MAGAZINE_THEME_CSS } from "./theme";
+import {
+  isDarkModeEffective,
+  mixWithWhite,
+  normalizeDarkMode,
+  type DarkModeSetting
+} from "./palette";
 
 const THEME_STYLE_ID = "scu-plus-magazine-theme";
 
@@ -75,22 +81,81 @@ function keepStyleLast(style: HTMLStyleElement): void {
   );
 }
 
+/** 当前注入参数 —— 系统主题变化时按相同参数重算深浅色 */
+let currentAccent: string = DEFAULT_ACCENT_COLOR;
+let currentMode: DarkModeSetting = "auto";
+
+let mediaQuery: MediaQueryList | null = null;
+let mediaListener: ((e: MediaQueryListEvent) => void) | null = null;
+
+/**
+ * 按当前模式计算深浅色并写入 <html>：
+ * data-scu-theme 属性切换 CSS 变量覆盖块；深色模式下点缀色混合白色调亮。
+ */
+function applyThemeMode(): void {
+  const dark = isDarkModeEffective(currentMode);
+  const root = document.documentElement;
+  if (dark) {
+    root.setAttribute("data-scu-theme", "dark");
+  } else {
+    root.removeAttribute("data-scu-theme");
+  }
+
+  const accentText = dark ? mixWithWhite(currentAccent, 0.38) : currentAccent;
+  const accentFill = dark ? mixWithWhite(currentAccent, 0.15) : currentAccent;
+  root.style.setProperty("--scu-accent", accentText);
+  root.style.setProperty("--scu-accent-soft", hexToRgba(accentText, dark ? 0.16 : 0.06));
+  root.style.setProperty("--scu-accent-line", hexToRgba(accentText, dark ? 0.4 : 0.22));
+  root.style.setProperty("--scu-accent-fill", accentFill);
+  root.style.setProperty("--scu-c1", accentText);
+}
+
+/** "auto" 模式下监听系统主题变化，实时切换深浅色 */
+function bindMediaListener(): void {
+  unbindMediaListener();
+  if (currentMode !== "auto") return;
+  try {
+    mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaListener = () => applyThemeMode();
+    mediaQuery.addEventListener("change", mediaListener);
+  } catch {
+    // 极少数环境不支持 matchMedia 监听，保持当前解析结果即可
+  }
+}
+
+function unbindMediaListener(): void {
+  if (mediaQuery && mediaListener) {
+    try {
+      mediaQuery.removeEventListener("change", mediaListener);
+    } catch {
+      // 忽略解绑异常
+    }
+  }
+  mediaQuery = null;
+  mediaListener = null;
+}
+
 /**
  * 注入杂志风主题。
  *
  * - 全量 CSS 覆盖（!important），追加为文档中最后一个样式，
  *   后于站点自身样式表生效。
  * - 点缀色取自用户设置的 beautifyColor，写入 :root 的 --scu-accent 变量，
- *   并同步生成 6% 透明度的柔和底色 --scu-accent-soft 与课表色块 --scu-c1。
+ *   并同步生成柔和底色 --scu-accent-soft、边框 --scu-accent-line、
+ *   填充按钮底色 --scu-accent-fill 与课表色块 --scu-c1。
+ * - 深色模式（darkMode = "dark"，或 "auto" 且系统为深色）：
+ *   在 <html> 上设置 data-scu-theme="dark" 切换 CSS 变量覆盖块，
+ *   并将点缀色调亮以保证暗底可读性；"auto" 时监听系统主题实时切换。
  * - 幂等：重复调用不会叠加多个 <style>。
  * - 可在 document_start 调用（<head> 尚未创建时挂到 documentElement 下，
  *   并由 orderGuard 保证解析过程中始终位于末尾）。
  */
-export function injectBeautify(accentColor?: string): void {
+export function injectBeautify(accentColor?: string, darkMode?: string): void {
   const host = document.head || document.documentElement;
   if (!host) return; // document_start 极早期根元素可能尚未创建，调用方负责重试
 
-  const accent = normalizeAccent(accentColor);
+  currentAccent = normalizeAccent(accentColor);
+  currentMode = normalizeDarkMode(darkMode);
 
   document.getElementById(THEME_STYLE_ID)?.remove();
 
@@ -100,10 +165,8 @@ export function injectBeautify(accentColor?: string): void {
   host.appendChild(style);
   keepStyleLast(style);
 
-  const root = document.documentElement;
-  root.style.setProperty("--scu-accent", accent);
-  root.style.setProperty("--scu-accent-soft", hexToRgba(accent, 0.06));
-  root.style.setProperty("--scu-c1", accent);
+  applyThemeMode();
+  bindMediaListener();
 }
 
 /**
@@ -112,20 +175,24 @@ export function injectBeautify(accentColor?: string): void {
 export function removeBeautify(): void {
   orderGuard?.disconnect();
   orderGuard = null;
+  unbindMediaListener();
   document.getElementById(THEME_STYLE_ID)?.remove();
 
   const root = document.documentElement;
+  root.removeAttribute("data-scu-theme");
   root.style.removeProperty("--scu-accent");
   root.style.removeProperty("--scu-accent-soft");
+  root.style.removeProperty("--scu-accent-line");
+  root.style.removeProperty("--scu-accent-fill");
   root.style.removeProperty("--scu-c1");
 }
 
 /**
  * 根据开关应用或移除主题（幂等）。
  */
-export function applyBeautify(enabled: boolean, accentColor?: string): void {
+export function applyBeautify(enabled: boolean, accentColor?: string, darkMode?: string): void {
   if (enabled) {
-    injectBeautify(accentColor);
+    injectBeautify(accentColor, darkMode);
   } else {
     removeBeautify();
   }
