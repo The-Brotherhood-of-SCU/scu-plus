@@ -1,5 +1,7 @@
 import { MAGAZINE_THEME_CSS } from "./theme";
 import {
+  DARK_COLORS,
+  LIGHT_COLORS,
   isDarkModeEffective,
   mixWithWhite,
   normalizeDarkMode,
@@ -101,6 +103,15 @@ function applyThemeMode(): void {
     root.removeAttribute("data-scu-theme");
   }
 
+  // 画布背景兜底：页面内容不足一屏时，可视区剩余部分的背景取自 <html>。
+  // 行内 !important + 具体色值（而非 var()），即使站点在 DOMContentLoaded
+  // 之后注入的样式压过主题表、或主题表被移除导致变量未解析，也不会露出白底。
+  root.style.setProperty(
+    "background-color",
+    dark ? DARK_COLORS.paper : LIGHT_COLORS.paper,
+    "important"
+  );
+
   const accentText = dark ? mixWithWhite(currentAccent, 0.38) : currentAccent;
   const accentFill = dark ? mixWithWhite(currentAccent, 0.15) : currentAccent;
   root.style.setProperty("--scu-accent", accentText);
@@ -146,6 +157,8 @@ function unbindMediaListener(): void {
  * - 深色模式（darkMode = "dark"，或 "auto" 且系统为深色）：
  *   在 <html> 上设置 data-scu-theme="dark" 切换 CSS 变量覆盖块，
  *   并将点缀色调亮以保证暗底可读性；"auto" 时监听系统主题实时切换。
+ * - 同时在 <html> 行内写入具体背景色（!important），保证内容不足
+ *   一屏时画布底色仍为主题纸色，不随站点样式或变量缺失露出白底。
  * - 幂等：重复调用不会叠加多个 <style>。
  * - 可在 document_start 调用（<head> 尚未创建时挂到 documentElement 下，
  *   并由 orderGuard 保证解析过程中始终位于末尾）。
@@ -180,6 +193,7 @@ export function removeBeautify(): void {
 
   const root = document.documentElement;
   root.removeAttribute("data-scu-theme");
+  root.style.removeProperty("background-color");
   root.style.removeProperty("--scu-accent");
   root.style.removeProperty("--scu-accent-soft");
   root.style.removeProperty("--scu-accent-line");

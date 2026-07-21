@@ -416,6 +416,10 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
 .main-content, .main-content-inner, .page-content {
   background: var(--scu-paper) !important;
 }
+/* ACE 主容器背景伪元素（z-index:-2 铺满全高的白底）—— 内容不足一屏时露出的白块即源于此 */
+.main-container::before {
+  background: var(--scu-paper) !important;
+}
 #page-content-template {
   background: transparent !important;
   border: none !important;
@@ -602,6 +606,10 @@ h1.header, h2.header, h3.header, h4.header, h5.header, .header {
 /* 表头行灰渐变、斑马行底色一并抹除（Bootstrap/ACE 设在 tr 上） */
 .table > thead > tr { background: transparent !important; background-image: none !important; }
 .table-striped > tbody > tr, .table-striped > tbody > tr:nth-of-type(odd) { background: transparent !important; background-image: none !important; }
+/* 选中/高亮行（评教列表等）—— 站点浅绿底 #E4EFC9 带 !important，深色模式下文字不可读 */
+table .highlight td, table .highlight th {
+  background: var(--scu-accent-soft) !important;
+}
 
 /* ============================================================
    档案信息栅格（ACE profile）—— 去蓝底，杂志标签栏
@@ -729,8 +737,10 @@ td.green_background, td.green_background a, td.green_background span { color: va
 
 /* ============================================================
    标签 / 徽章 —— 低饱和杂志色
+   body 前缀提高优先级：站点在 h4/.header 等上下文中用 (0,1,1) 级
+   !important 规则把标签文字设成深色，深色模式下会压过本节规则。
    ============================================================ */
-.label, .badge {
+body .label, body .badge {
   border-radius: 2px !important;
   font-size: 11px !important;
   font-weight: 500 !important;
@@ -739,13 +749,21 @@ td.green_background, td.green_background a, td.green_background span { color: va
   text-shadow: none !important;
   border: 1px solid transparent !important;
 }
-.label-success, .badge-success { background: var(--scu-label-success-bg) !important; color: var(--scu-c2) !important; border-color: var(--scu-label-success-border) !important; }
-.label-danger, .label-pink, .badge-danger { background: var(--scu-accent-soft) !important; color: var(--scu-accent) !important; border-color: var(--scu-accent-line) !important; }
-.label-warning, .badge-warning, .label-yellow { background: var(--scu-label-warning-bg) !important; color: var(--scu-c4) !important; border-color: var(--scu-label-warning-border) !important; }
-.label-info, .badge-info { background: var(--scu-label-info-bg) !important; color: var(--scu-c3) !important; border-color: var(--scu-label-info-border) !important; }
-.label-default { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; border-color: var(--scu-line) !important; }
-.label-grey { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; }
-.label-purple { background: var(--scu-label-purple-bg) !important; color: var(--scu-c5) !important; }
+body .label-success, body .badge-success { background: var(--scu-label-success-bg) !important; color: var(--scu-c2) !important; border-color: var(--scu-label-success-border) !important; }
+body .label-danger, body .label-pink, body .badge-danger { background: var(--scu-accent-soft) !important; color: var(--scu-accent) !important; border-color: var(--scu-accent-line) !important; }
+body .label-warning, body .badge-warning, body .label-yellow { background: var(--scu-label-warning-bg) !important; color: var(--scu-c4) !important; border-color: var(--scu-label-warning-border) !important; }
+body .label-info, body .badge-info { background: var(--scu-label-info-bg) !important; color: var(--scu-c3) !important; border-color: var(--scu-label-info-border) !important; }
+body .label-default { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; border-color: var(--scu-line) !important; }
+body .label-grey { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; }
+body .label-purple { background: var(--scu-label-purple-bg) !important; color: var(--scu-c5) !important; }
+/* 站点在标签内嵌 <font style="color:black">，行内黑色在深色模式下不可读 —— 继承标签主题色 */
+body .label font, body .badge font { color: inherit !important; }
+/* 兜底：深色模式下任何内联黑色 <font> 一律提升为主题墨色（黑字暗底必然不可读） */
+:root[data-scu-theme="dark"] font[style*="color:black"],
+:root[data-scu-theme="dark"] font[style*="color: black"],
+:root[data-scu-theme="dark"] font[color="black"] {
+  color: var(--scu-ink) !important;
+}
 
 /* ============================================================
    选项卡
@@ -779,6 +797,23 @@ td.green_background, td.green_background a, td.green_background span { color: va
   box-shadow: none !important;
 }
 .tab-content { background: transparent !important; border: none !important; }
+
+/* 学期选项卡容器（全部及格成绩等页面）—— Bootstrap2 navbar-static 结构，
+   #navbarExample 带行内 style="background:#ffffff"，需 !important 压制 */
+#navbarExample, .navbar-static {
+  background: var(--scu-surface) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.navbar-inner {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
 
 /* ============================================================
    警告条
@@ -1096,6 +1131,21 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
   border-color: var(--scu-ink) !important;
 }
 .fc-event { background: var(--scu-accent-soft) !important; border-color: var(--scu-accent) !important; color: var(--scu-ink) !important; border-radius: 2px !important; }
+
+/* ============================================================
+   zTree 树控件（培养方案查看等）—— 节点 <a> 带行内 color:#333，
+   控件自身链接色在深色模式下同样不可读，统一强制主题色
+   ============================================================ */
+.ztree li a, .ztree li a:visited, .ztree li a span {
+  color: var(--scu-ink) !important;
+  text-shadow: none !important;
+}
+.ztree li a:hover { color: var(--scu-accent) !important; background: transparent !important; }
+.ztree li a.curSelectedNode {
+  color: var(--scu-accent) !important;
+  background: var(--scu-accent-soft) !important;
+  border: none !important;
+}
 
 /* ============================================================
    其他 ACE 杂项

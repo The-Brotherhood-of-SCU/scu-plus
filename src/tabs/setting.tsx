@@ -294,7 +294,6 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { 
   }, [isDirty]);
 
   const handleFormChange = (changedValues: Partial<SettingItem>) => {
-    const initialSetting = initialSettingRef.current;
     // 直接基于当前 state 计算，避免依赖 setState updater 的立即执行（React 不保证）
     const newConfig = { ...setting, ...changedValues } as SettingItem;
     setSetting(newConfig);
@@ -307,7 +306,25 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { 
     if (changedValues.beautifyDarkMode !== undefined) {
       setDarkMode(normalizeDarkMode(changedValues.beautifyDarkMode));
     }
-    if (SettingItem.equals(initialSetting, newConfig)) {
+    // 外观类设置即时持久化：设置页本身会实时预览，若还要点“保存”，
+    // 教务页面就会停留在旧设置上（看起来像是“不生效/仍跟随系统”）。
+    // 只落盘 beautify 三件套并同步基准值，其余字段仍走“保存”按钮，
+    // 未保存标记（isDirty）的判断不受影响。
+    const initialSetting = initialSettingRef.current;
+    if (initialSetting &&
+      (changedValues.beautifySwitch !== undefined ||
+        changedValues.beautifyColor !== undefined ||
+        changedValues.beautifyDarkMode !== undefined)) {
+      const persisted = {
+        ...initialSetting,
+        beautifySwitch: newConfig.beautifySwitch,
+        beautifyColor: newConfig.beautifyColor,
+        beautifyDarkMode: newConfig.beautifyDarkMode
+      } as SettingItem;
+      saveSetting(persisted);
+      initialSettingRef.current = persisted;
+    }
+    if (SettingItem.equals(initialSettingRef.current, newConfig)) {
       //unchanged logically
       setIsDirty(false);
     } else {
@@ -395,7 +412,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { 
           <Form.Item
             label="美化开关（杂志风主题）"
             name="beautifySwitch"
-            tooltip="开启后将教务系统整体替换为现代杂志风主题：纸墨配色、衬线标题、三线表"
+            tooltip="开启后将教务系统整体替换为现代杂志风主题：纸墨配色、衬线标题、三线表。外观类设置修改后立即生效，无需点击保存"
             valuePropName="checked"
           >
             <Switch />
@@ -404,7 +421,7 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { 
             <Form.Item
               label="深色模式"
               name="beautifyDarkMode"
-              tooltip="杂志风主题的深色模式。「跟随系统」将在系统处于深色模式时自动切换，教务页面与插件界面同时生效"
+              tooltip="杂志风主题的深色模式，修改后立即生效。「跟随系统」将在系统处于深色模式时自动切换，教务页面与插件界面同时生效"
             >
               <Select>
                 <Select.Option value="auto">跟随系统</Select.Option>
