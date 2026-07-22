@@ -1,5 +1,4 @@
-import { Button, notification } from "antd";
-import { createElement } from "react";
+import { notification } from "~script/notice";
 import { getSetting, SettingItem } from "../../script/config";
 import { checkVersion, UpdateCheckResult } from "../../script/utils";
 import { injectNavbar } from "../navbar";
@@ -126,14 +125,15 @@ async function autoCheckUpdate(): Promise<void> {
     const info = await checkVersion();
     if (info.result !== UpdateCheckResult.NEW_VERSION_AVAILABLE) return;
 
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "scu-notice-btn";
+    downloadBtn.textContent = "立即下载";
+    downloadBtn.onclick = () => window.open(info.downloadUrl);
+
     notification.open({
       message: "SCU+ 有新版本可用 🎉",
-      description: `检测到新版本 v${info.latestVersion}，点击下方按钮前往下载（已使用 gh-proxy 加速）。`,
-      btn: createElement(Button, {
-        type: "primary",
-        size: "small",
-        onClick: () => window.open(info.downloadUrl)
-      }, "立即下载"),
+      description: `检测到新版本 v${info.latestVersion}，点击下方按钮前往下载。`,
+      btn: downloadBtn,
       duration: 0,
       placement: "bottomRight",
     });

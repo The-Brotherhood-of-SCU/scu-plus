@@ -1,5 +1,5 @@
 import { $, downloadCanvas } from "~script/utils";
-import { message } from "antd";
+import { message } from "~script/notice";
 import { exportScheduleIcs, parsePlanCode, COURSE_SCHEDULE_API } from "./ics";
 
 function extractData(): { attribute: string; credit: number }[] {

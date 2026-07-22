@@ -1,7 +1,4 @@
-import ReactDOM from "react-dom/client";
 import { $, createSecondPageElement } from "~script/utils";
-import { Alert } from 'antd';
-import React from "react";
 
 const pattern = /student\/integratedQuery\/scoreQuery\/.{10}\/thisTermScores\/data/;
 
@@ -16,21 +13,29 @@ function getScoreRange(scoreValue: string) {
     return range ?? `RAW:${scoreValue}`
 }
 
-function WarnUi() {
-    const warningContent = (
-        <>
-            <p style={{ textIndent: '2em' }}>该页面展示的'成绩估计'使用了综合教务系统返回的<span style={{ color: 'red' }}>【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
-            <p style={{ textIndent: '2em' }}>并且，此处显示的成绩<span style={{ color: 'red' }}>并不是最终成绩</span>。因此，请<span style={{ color: 'red' }}>不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
-            <p style={{ textIndent: '2em' }}>否则，老师一旦和教务处反映，这些冗余信息就有<span style={{ color: 'red' }}>被移除</span>的风险！</p>
-        </>
-    );
-
-    return <Alert
-        title="SCU+ 警告"
-        description={warningContent}
-        type="warning"
-        showIcon
-        closable />;
+/** 警告横幅（替代 antd Alert，warning 风格、可关闭），颜色走 --scu-* 变量适配深色模式 */
+function createWarnBanner(): HTMLElement {
+    const banner = document.createElement("div");
+    banner.style.cssText = [
+        "display:flex", "align-items:flex-start", "gap:10px",
+        "background:var(--scu-label-warning-bg,#f7f0e3)",
+        "border:1px solid var(--scu-label-warning-border,rgba(165,103,63,0.35))",
+        "border-radius:8px", "padding:12px 16px", "margin:8px 0",
+        "color:var(--scu-ink,#1d1c1a)",
+        'font:14px/1.6 var(--scu-sans,system-ui,"PingFang SC","Microsoft YaHei",sans-serif)',
+    ].join(";");
+    banner.innerHTML = `
+        <span style="color:#c9862b;flex:none;font-style:normal;">⚠</span>
+        <div style="flex:1;">
+            <div style="font-weight:600;margin-bottom:4px;">SCU+ 警告</div>
+            <p style="text-indent:2em;margin:0 0 4px;">该页面展示的'成绩估计'使用了综合教务系统返回的<span style="color:red;">【冗余】信息</span>，如果综合教务系统删除了这些冗余信息，那么这个功能就报废了，我们将无法再获取到这些信息！</p>
+            <p style="text-indent:2em;margin:0 0 4px;">并且，此处显示的成绩<span style="color:red;">并不是最终成绩</span>。因此，请<span style="color:red;">不要</span>使用本页面展示的这些'成绩估计'和您的任课老师沟通</p>
+            <p style="text-indent:2em;margin:0;">否则，老师一旦和教务处反映，这些冗余信息就有<span style="color:red;">被移除</span>的风险！</p>
+        </div>
+        <span class="scu-plus-warn-close" style="cursor:pointer;color:var(--scu-ink-faint,#8f8e85);flex:none;">✕</span>
+    `;
+    banner.querySelector(".scu-plus-warn-close")!.addEventListener("click", () => banner.remove());
+    return banner;
 }
 
 function generateInnerHtml(list: any[]): string {
@@ -40,8 +45,8 @@ function generateInnerHtml(list: any[]): string {
         tContent += `<td>${v.id.courseNumber}</td>`;
         tContent += "<td >" + (v.coureSequenceNumber == null ? "" : (v.coureSequenceNumber == 'NONE' ? "" : v.coureSequenceNumber)) + "</td>";
         tContent += `<td >${v.courseName}</td>`;
-        tContent += `<td >${v.credit}</td>`;
-        tContent += `<td >${v.coursePropertyName}</td>`;
+        tContent += `<td>${v.credit}</td>`;
+        tContent += `<td>${v.coursePropertyName}</td>`;
         if (v.inputStatusCode == "05") {
             if (v.courseScore == "-999.999") {
                 tContent += "<td>未评估</td>";
@@ -79,8 +84,7 @@ function doReplace(data: any) {
         console.warn("SCU+: 找不到页面容器，隐藏成绩功能中止");
         return;
     }
-    const root = ReactDOM.createRoot(container);
-    root.render(<WarnUi />);
+    container.appendChild(createWarnBanner());
     $("#timeline-1 > div > div > div > div > table > thead", (header) => {
         header.innerHTML = '<tr><th>课程号</th><th>课序号</th><th>课程名</th><th>学分</th><th>课程属性</th><th>成绩</th><th>未通过原因</th><th>英文课程名</th><th>成绩估计<span style="color:var(--scu-accent,#9e1b32)">✦</span></th><th>成绩状态<span style="color:var(--scu-accent,#9e1b32)">✦</span></th></tr>';
     })
@@ -115,7 +119,7 @@ export async function initGetHiddenScore(): Promise<void> {
         const response = await fetch(firstMatch);
         const data = await response.json();
         console.log("获取成绩数据成功");
-        
+
         if (document.readyState === "complete") {
             doReplace(data);
         } else {

@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message } from "~script/notice";
 
 // ── 节次-时间映射 ──────────────────────────────────────────────
 

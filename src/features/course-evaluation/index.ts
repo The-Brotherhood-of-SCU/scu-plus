@@ -1,4 +1,4 @@
-import { message } from "antd"
+import { message } from "~script/notice"
 import { xpath_query, randomInt } from "~script/utils"
 
 function injectBtnStyle() {

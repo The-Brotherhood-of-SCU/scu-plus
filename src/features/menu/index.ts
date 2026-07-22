@@ -1,5 +1,5 @@
 import { checkVersion, UpdateCheckResult } from "../../common"
-import { message, Modal } from "antd"
+import { confirm, message } from "~script/notice"
 import package_config from "../../../package.json"
 import { Actions } from "../../constants/actions"
 import { MenuIds } from "../../constants/menuIds"
@@ -83,8 +83,6 @@ function createMenuItem(id: string, icon: string, title: string, items: { text: 
 }
 
 function createSettingsMenuItem(): HTMLElement {
-  const { confirm } = Modal;
-
   const li = document.createElement("li");
   li.setAttribute('id', MenuIds.SETTINGS);
   li.setAttribute('onclick', "rootMenuClick(this);");
