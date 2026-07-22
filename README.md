@@ -127,5 +127,6 @@
 ## 💖 致谢
 
 感谢所有为 **SCU-Plus** 做出贡献的开发者与社区成员！
+
 [![contributors](https://contrib.rocks/image?repo=The-Brotherhood-of-SCU/scu-plus)](https://github.com/The-Brotherhood-of-SCU/scu-plus/graphs/contributors)
 
