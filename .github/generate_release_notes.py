@@ -1,84 +1,57 @@
 import os
-import subprocess
 import re
 import json
 
-duplicated=[]
 
-def filter(commit:str)->bool:
-    lower=commit.lower()
-    if lower in duplicated:
-        return True
-    duplicated.append(lower)
-    pattern=r"updates? \(.+?\)"
-    if re.search(pattern,lower):
-        return True
-    return False
-
-def get_release_notes():
-    # 定义通用的subprocess参数
-    subprocess_kwargs = {
-        'shell': True,
-        'text': True,
-        'encoding': 'utf-8'
-    }
-    
-    # 获取上一个tag
-    try:
-        commit_id = subprocess.check_output(
-            "git rev-list --tags --skip=1 --max-count=1",
-            **subprocess_kwargs
-        ).strip()
-        prev_tag = subprocess.check_output(
-            f"git describe --abbrev=0 --tags {commit_id}",
-            **subprocess_kwargs
-        ).strip()
-    except subprocess.CalledProcessError as e:
-        prev_tag = None
-    
-    print(f"prev_tag: {prev_tag}")
-
-    # 根据是否有上一个tag获取commit日志
-    if not prev_tag:
-        notes = subprocess.check_output(
-            "git log --pretty=format:\"- %s (%an)\" --no-merges",
-            **subprocess_kwargs
-        )
-    else:
-        notes = subprocess.check_output(
-            f"git log {prev_tag}..HEAD --pretty=format:\"- %s (%an)\" --no-merges",
-            **subprocess_kwargs
-        )
-    #filter "update"
-    notes = "\n".join([note for note in notes.split("\n") if not filter(note)])
-    
-    return f"### 主要更新\n\n{notes}"
-
-def set_version_env():
-    """从package.json读取版本号并设置到GitHub Actions环境变量env.title"""
+def get_version() -> str:
+    """从package.json读取版本号"""
     with open('package.json', 'r', encoding='utf-8') as f:
-        version = json.load(f)['version']
-    
-    print(f"version: {version}")
+        return json.load(f)['version']
 
-    if "GITHUB_ENV" in os.environ:
-        with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
-            f.write(f"title=scu+ {version}\n")
+
+def get_release_notes(version: str) -> str:
+    """从CHANGELOG.md中提取对应版本的更新内容"""
+    with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # 匹配 "## [x.y.z] - date" 到下一个 "## [" 之间的内容
+    pattern = rf"^## \[{re.escape(version)}\] - .*?$(.+?)(?=^## \[|\Z)"
+    match = re.search(pattern, content, re.MULTILINE | re.DOTALL)
+    if not match:
+        print(f"warning: CHANGELOG.md 中未找到版本 {version} 的更新记录")
+        return ""
+
+    notes = match.group(1).strip()
+    # 去掉空的小节标题（如 "### Added" 下没有任何条目）
+    notes = re.sub(r"### \w+\s*(?=### |\Z)", "", notes).strip()
+    return notes
+
+
+def set_env(key: str, value: str):
+    """追加写入 GitHub Actions 环境变量"""
+    if "GITHUB_ENV" not in os.environ:
+        print("GITHUB_ENV not found. Env not exported.")
+        return
+    with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
+        f.write(f"{key}<<EOF\n{value}\nEOF\n")
+
 
 if __name__ == "__main__":
     import sys
     import io
-    
+
     # Set stdout to use UTF-8 encoding
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    
-    release_notes = "请下载 chrome-mv3-prod.zip 文件\n\n目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"+get_release_notes()
+
+    version = get_version()
+    print(f"version: {version}")
+
+    release_notes = (
+        "请下载 chrome-mv3-prod.zip 文件\n\n"
+        "目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"
+        + get_release_notes(version)
+    )
     print(release_notes)
-    
-    set_version_env()
-    
-    if "GITHUB_ENV" in os.environ:
-        with open(os.environ["GITHUB_ENV"], "a", encoding='utf-8') as f:
-            f.write(f"release_notes<<EOF\n{release_notes}\nEOF\n")
-    else:
-        print("GITHUB_ENV not found. Release notes not exported.")
+
+    set_env("title", f"scu+ {version}")
+    set_env("release_notes", release_notes)

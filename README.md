@@ -62,7 +62,7 @@
 
 | 步骤 | 操作说明 |
 | --- | --- |
-| 1️⃣ **下载插件** | [前往 Releases](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases) 下载 `chrome-mv3-prod.zip` |
+| 1️⃣ **下载插件** | [前往 Releases](https://github.com/The-Brotherhood-of-SCU/scu-plus/releases/latest) 下载 `chrome-mv3-prod.zip` |
 | 2️⃣ **访问扩展页面** | 地址栏输入 `chrome://extensions` |
 | 3️⃣ **启用开发者模式** | 打开右上角「开发者模式」开关，刷新页面 |
 | 4️⃣ **加载插件** | 将下载的 ZIP 包拖入扩展页面，确认安装 |
