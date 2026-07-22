@@ -14,11 +14,8 @@
         "package": "plasmo package"
     },
     "dependencies": {
-        "@ant-design/charts": "^2.6.7",
-        "@ant-design/icons": "^6.2.5",
         "@plasmohq/storage": "^1.15.0",
         "@zumer/snapdom": "^2.12.2",
-        "antd": "^6.4.3",
         "chart.js": "^4.5.1",
         "chartjs-plugin-annotation": "^3.1.0",
         "decimal.js": "^10.6.0",
