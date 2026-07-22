@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { checkVersion, UpdateCheckResult } from "~/script/utils"
-import { getSetting } from "~/script/config"
-import { DARK_COLORS, LIGHT_COLORS, isDarkModeEffective, mixWithWhite, normalizeDarkMode } from "~features/beautify/palette"
+import { getSetting, saveSetting } from "~/script/config"
+import { DARK_COLORS, LIGHT_COLORS, isDarkModeEffective, mixWithWhite, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette"
 import packagejson from "package.json"
 import "style.css"
 
@@ -23,14 +23,24 @@ const normalizeAccent = (color: string | undefined | null): string =>
 
 function IndexPopup() {
   const [accent, setAccent] = useState(DEFAULT_ACCENT)
-  const [dark, setDark] = useState(false)
+  const [darkMode, setDarkMode] = useState<DarkModeSetting>("auto")
+  const dark = isDarkModeEffective(darkMode)
 
   useEffect(() => {
     getSetting().then((s) => {
       setAccent(normalizeAccent(s.beautifyColor))
-      setDark(isDarkModeEffective(normalizeDarkMode(s.beautifyDarkMode)))
+      setDarkMode(normalizeDarkMode(s.beautifyDarkMode))
     })
   }, [])
+
+  /** 快捷切换深色模式：立即持久化，教务页面经 storage watch 实时生效 */
+  const changeDarkMode = (mode: DarkModeSetting) => {
+    setDarkMode(mode)
+    getSetting().then((s) => {
+      s.beautifyDarkMode = mode
+      saveSetting(s)
+    })
+  }
 
   /* 杂志风调色板 —— 与 features/beautify/theme.ts 保持一致，按深色模式切换 */
   const palette = dark ? DARK_COLORS : LIGHT_COLORS
@@ -125,6 +135,34 @@ function IndexPopup() {
     .scu-popup .btn-row .btn {
       margin: 6px 0;
     }
+    .scu-popup .seg {
+      display: flex;
+      margin: 6px 0;
+      border: 1px solid ${palette.ink};
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .scu-popup .seg button {
+      flex: 1;
+      padding: 7px 0;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border: none;
+      background: ${palette.surface};
+      color: ${palette.inkSoft};
+      transition: background .15s ease, color .15s ease;
+    }
+    .scu-popup .seg button + button {
+      border-left: 1px solid ${palette.line};
+    }
+    .scu-popup .seg button:hover {
+      color: ${palette.ink};
+    }
+    .scu-popup .seg button.active {
+      background: ${fillAccent};
+      color: #fff;
+    }
     .scu-popup .footer {
       display: flex;
       justify-content: space-between;
@@ -164,6 +202,16 @@ function IndexPopup() {
         </button>
 
         <div className="section-label">设置</div>
+        <div className="seg">
+          {([["auto", "跟随系统"], ["light", "浅色"], ["dark", "深色"]] as [DarkModeSetting, string][]).map(([mode, label]) => (
+            <button
+              key={mode}
+              className={darkMode === mode ? "active" : ""}
+              onClick={() => changeDarkMode(mode)}>
+              {label}
+            </button>
+          ))}
+        </div>
         <div className="btn-row">
           <button className="btn" onClick={gotoSettingPage}>插件设置</button>
           <MainButton accent={textAccent} dark={dark} inkSoft={palette.inkSoft} />

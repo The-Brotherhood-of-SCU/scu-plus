@@ -201,9 +201,14 @@ a:hover, a:focus { color: var(--scu-accent); text-decoration: none; }
   box-shadow: none !important;
 }
 
-/* 用户头像区 */
+/* 用户头像区 —— flex 垂直居中，避免欢迎语+姓名整体下沉超出导航栏 */
 #navbar .ace-nav > li.light-blue > a,
 #navbar .ace-nav > li.light-blue > a > span { color: var(--scu-ink) !important; }
+#navbar .ace-nav > li.light-blue > a {
+  display: flex !important;
+  align-items: center !important;
+  line-height: 1.2 !important;
+}
 #navbar .ace-nav img.nav-user-photo {
   border: 1px solid var(--scu-line-strong) !important;
   border-radius: 50% !important;
@@ -751,6 +756,15 @@ body .label, body .badge {
 }
 body .label-success, body .badge-success { background: var(--scu-label-success-bg) !important; color: var(--scu-c2) !important; border-color: var(--scu-label-success-border) !important; }
 body .label-danger, body .label-pink, body .badge-danger { background: var(--scu-accent-soft) !important; color: var(--scu-accent) !important; border-color: var(--scu-accent-line) !important; }
+/* 站点在部分标签上写死行内 background-color: pink !important（如方案成绩页），
+   行内 !important 无法被样式表覆盖 —— 深色模式下文字随全局变成浅色后会
+   浅字粉底不可读，这里强制改回深色文字。
+   注意标签内部常嵌 <font style="color:black">，会被下方 font[color:black]
+   兜底规则直接命中（直接命中优先于继承），因此需要更高特定性的规则压住它 */
+:root[data-scu-theme="dark"] .label[style*="background-color: pink"],
+:root[data-scu-theme="dark"] .label[style*="background-color:pink"] { color: #4a2430 !important; }
+:root[data-scu-theme="dark"] .label[style*="background-color: pink"] font,
+:root[data-scu-theme="dark"] .label[style*="background-color:pink"] font { color: #4a2430 !important; }
 body .label-warning, body .badge-warning, body .label-yellow { background: var(--scu-label-warning-bg) !important; color: var(--scu-c4) !important; border-color: var(--scu-label-warning-border) !important; }
 body .label-info, body .badge-info { background: var(--scu-label-info-bg) !important; color: var(--scu-c3) !important; border-color: var(--scu-label-info-border) !important; }
 body .label-default { background: var(--scu-label-default-bg) !important; color: var(--scu-ink-soft) !important; border-color: var(--scu-line) !important; }
