@@ -1,6 +1,6 @@
 export enum UpdateCheckResult {
   NEW_VERSION_AVAILABLE,
-  UP_TP_DATE,
+  UP_TO_DATE,
   NETWORK_ERROR,
   UNKNOWN,
   CHECKING

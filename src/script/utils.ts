@@ -23,7 +23,7 @@ async function checkVersion () : Promise<UpdateCheckInfo>{
         const release = JSON.parse(response.data);
         const latestVersion = (release.tag_name ?? "").replace(/^v/i, "");
         if (!latestVersion || latestVersion === pkgMessage.version) {
-            return { result: UpdateCheckResult.UP_TP_DATE };
+            return { result: UpdateCheckResult.UP_TO_DATE };
         }
         // 从 release 附件中找对应浏览器的 zip 包，下载链接加 gh-proxy 前缀加速；找不到附件则回退到 release 页面
         const assets: { name?: string; browser_download_url?: string }[] = Array.isArray(release.assets) ? release.assets : [];
@@ -46,7 +46,7 @@ async function checkVersion () : Promise<UpdateCheckInfo>{
  * @param callback 对匹配元素执行的回调函数
  */
 const $ = (selector: string, callback = (element: HTMLElement) => { }) => {
-    let e = document.querySelector(selector);;
+    let e = document.querySelector(selector);
     if (e) {
         const he = e as HTMLElement;
         try {
@@ -117,7 +117,7 @@ async function downloadCanvas(canvas:HTMLElement,name:string,scale:number) {
    * 延迟指定毫秒数
    * @param ms 延迟时间（毫秒）
    */
-  function sleep(ms) {
+  function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 

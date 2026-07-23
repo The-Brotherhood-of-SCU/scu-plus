@@ -249,7 +249,7 @@ function MainButton({ accent, dark, inkSoft }: { accent: string; dark: boolean; 
   //根据updateCheckState状态决定显示的文本
   const updateCheckStateText: { [key in UpdateCheckResult]: string } = {
     [UpdateCheckResult.NEW_VERSION_AVAILABLE]: "新版本可用",
-    [UpdateCheckResult.UP_TP_DATE]: "已是最新",
+    [UpdateCheckResult.UP_TO_DATE]: "已是最新",
     [UpdateCheckResult.UNKNOWN]: "检查更新",
     [UpdateCheckResult.CHECKING]: "正在检查…",
     [UpdateCheckResult.NETWORK_ERROR]: "检查失败"
@@ -257,7 +257,7 @@ function MainButton({ accent, dark, inkSoft }: { accent: string; dark: boolean; 
   // 状态语义色：新版本用主题点缀色，其余沿用杂志配色盘（深色模式用调亮版）
   const updateCheckStateColor: { [key in UpdateCheckResult]: string } = {
     [UpdateCheckResult.NEW_VERSION_AVAILABLE]: accent,
-    [UpdateCheckResult.UP_TP_DATE]: dark ? "#71a382" : "#3f6b4f",
+    [UpdateCheckResult.UP_TO_DATE]: dark ? "#71a382" : "#3f6b4f",
     [UpdateCheckResult.UNKNOWN]: inkSoft,
     [UpdateCheckResult.CHECKING]: dark ? "#cf9261" : "#a5673f",
     [UpdateCheckResult.NETWORK_ERROR]: dark ? accent : "#9e1b32"

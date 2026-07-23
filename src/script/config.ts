@@ -8,12 +8,12 @@ export {
 }
 
 const storage = new Storage();
-var cache:SettingItem=null;
+let cache:SettingItem=null;
 async function getSetting(): Promise<SettingItem> {
     if(cache!=null){
      return cache;
     }
-    var config:SettingItem=await storage.get("setting");
+    let config:SettingItem=await storage.get("setting");
     if(config==null){
       config=new SettingItem();
       storage.set("setting",config);

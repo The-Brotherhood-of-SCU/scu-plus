@@ -138,7 +138,7 @@ function createSettingsMenuItem(): HTMLElement {
           cancelText: "取消",
           onOk: () => window.open(info.downloadUrl ?? package_config.download)
         });
-      } else if (info.result === UpdateCheckResult.UP_TP_DATE) {
+      } else if (info.result === UpdateCheckResult.UP_TO_DATE) {
         message.info("已经是最新版本了");
       } else if (info.result === UpdateCheckResult.NETWORK_ERROR) {
         message.error("网络错误连接，请检查网络是否正常");
