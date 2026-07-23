@@ -1,19 +1,10 @@
-import { checkVersion, UpdateCheckResult } from "../../common"
+import { checkVersion, sleep, UpdateCheckResult, xpathQuery } from "../../common"
 import { confirm, message } from "~script/notice"
 import package_config from "../../../package.json"
 import { Actions } from "../../constants/actions"
 import { MenuIds } from "../../constants/menuIds"
 
 export async function injectMenu(): Promise<void> {
-  const xpathQuery = (xpathExpression: string, resolve: (element: HTMLElement) => void) => {
-    const result = document.evaluate(xpathExpression, document).iterateNext() as HTMLElement;
-    if (result) {
-      resolve(result);
-    }
-  };
-
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
   // 本脚本会在所有 iframe 中运行，而没有侧边栏的 frame 里 #menus 永远不存在，限制重试次数避免永久轮询
   let menus: HTMLElement | null = null;
   for (let i = 0; i < 30; i++) {

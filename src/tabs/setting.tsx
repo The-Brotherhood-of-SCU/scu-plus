@@ -4,14 +4,8 @@ import { SettingItem } from "../common/types";
 import { message, notification, confirm } from "~script/notice";
 import React from "react";
 import { Actions } from "../constants/actions";
-import { LIGHT_COLORS, DARK_COLORS, mixWithWhite, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette";
+import { LIGHT_COLORS, DARK_COLORS, DEFAULT_ACCENT, mixWithWhite, normalizeAccent, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette";
 import packagejson from "package.json"
-
-const DEFAULT_ACCENT = "#9e1b32"
-
-/** 校验 hex 颜色，非法值回退为锦绣红（与 beautify 主题一致） */
-const normalizeAccent = (color: string | undefined | null): string =>
-  color && /^#[0-9a-f]{6}$/i.test(color.trim()) ? color.trim() : DEFAULT_ACCENT
 
 const SERIF = LIGHT_COLORS.serif
 const SANS = LIGHT_COLORS.sans

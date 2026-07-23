@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react"
 import { checkVersion, UpdateCheckResult } from "~/script/utils"
 import { getSetting, saveSetting } from "~/script/config"
-import { DARK_COLORS, LIGHT_COLORS, isDarkModeEffective, mixWithWhite, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette"
+import { DARK_COLORS, LIGHT_COLORS, DEFAULT_ACCENT, isDarkModeEffective, mixWithWhite, normalizeAccent, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette"
 import packagejson from "package.json"
 import "style.css"
 
 const login_link = "https://id.scu.edu.cn/enduser/sp/sso/scdxplugin_jwt23?enterpriseId=scdx&target_url=index"
 const project_link = packagejson.projectLink
-const DEFAULT_ACCENT = "#9e1b32"
-
 const gotoSettingPage = () => {
   const url = chrome.runtime.getURL("options.html");
   openLink(url)
@@ -16,10 +14,6 @@ const gotoSettingPage = () => {
 const openLink = (link: string) => {
   window.open(link)
 }
-
-/** 校验 hex 颜色，非法值回退为锦绣红（与 beautify 主题一致） */
-const normalizeAccent = (color: string | undefined | null): string =>
-  color && /^#[0-9a-f]{6}$/i.test(color.trim()) ? color.trim() : DEFAULT_ACCENT
 
 function IndexPopup() {
   const [accent, setAccent] = useState(DEFAULT_ACCENT)

@@ -1,4 +1,4 @@
-import { $, downloadCanvas } from "~script/utils";
+import { $, downloadCanvas, sleep } from "~script/utils";
 import { message } from "~script/notice";
 import { exportScheduleIcs, parsePlanCode, COURSE_SCHEDULE_API } from "./ics";
 
@@ -16,10 +16,6 @@ function extractData(): { attribute: string; credit: number }[] {
         }
     });
     return data;
-}
-
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // 屏蔽选课页面原生的浮动时间筛选器容器（id 或 class）并监听动态插入

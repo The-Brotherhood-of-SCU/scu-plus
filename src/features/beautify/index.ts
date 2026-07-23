@@ -2,16 +2,15 @@ import { MAGAZINE_THEME_CSS } from "./theme";
 import {
   DARK_COLORS,
   LIGHT_COLORS,
+  DEFAULT_ACCENT,
   isDarkModeEffective,
   mixWithWhite,
+  normalizeAccent,
   normalizeDarkMode,
   type DarkModeSetting
 } from "./palette";
 
 const THEME_STYLE_ID = "scu-plus-magazine-theme";
-
-/** 默认点缀色（锦绣红） */
-export const DEFAULT_ACCENT_COLOR = "#9e1b32";
 
 /**
  * 将 #rrggbb 颜色转换为 rgba() 字符串
@@ -24,16 +23,6 @@ function hexToRgba(hex: string, alpha: number): string {
   const g = (num >> 8) & 0xff;
   const b = num & 0xff;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-/**
- * 校验用户配置的颜色值，非法值回退为默认锦绣红
- */
-function normalizeAccent(color: string | undefined | null): string {
-  if (color && /^#[0-9a-f]{6}$/i.test(color.trim())) {
-    return color.trim();
-  }
-  return DEFAULT_ACCENT_COLOR;
 }
 
 /**
@@ -84,7 +73,7 @@ function keepStyleLast(style: HTMLStyleElement): void {
 }
 
 /** 当前注入参数 —— 系统主题变化时按相同参数重算深浅色 */
-let currentAccent: string = DEFAULT_ACCENT_COLOR;
+let currentAccent: string = DEFAULT_ACCENT;
 let currentMode: DarkModeSetting = "auto";
 
 let mediaQuery: MediaQueryList | null = null;

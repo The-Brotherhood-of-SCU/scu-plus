@@ -7,6 +7,14 @@
  * - tabs/setting.tsx（设置页）
  */
 
+/** 默认点缀色（锦绣红），与 beautify 主题一致 */
+export const DEFAULT_ACCENT = "#9e1b32"
+
+/** 校验 hex 颜色，非法值回退为锦绣红（与 beautify 主题一致） */
+export function normalizeAccent(color: string | undefined | null): string {
+  return color && /^#[0-9a-f]{6}$/i.test(color.trim()) ? color.trim() : DEFAULT_ACCENT
+}
+
 /** 深色模式设置值："auto" 跟随系统 | "light" 浅色 | "dark" 深色 */
 export type DarkModeSetting = "auto" | "light" | "dark"
 

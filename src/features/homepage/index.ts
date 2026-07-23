@@ -1,23 +1,12 @@
 import { notification } from "~script/notice";
 import { getSetting, SettingItem } from "../../script/config";
-import { checkVersion, UpdateCheckResult } from "../../script/utils";
+import { $, checkVersion, UpdateCheckResult } from "../../script/utils";
 import { injectNavbar } from "../navbar";
 import { injectMenu } from "../menu";
 import { injectSchoolSchedule } from "../schedule";
 
 export function hideFailCourse(enabled: boolean): void {
   if (!enabled) return;
-
-  const $ = (selector: string, callback: (element: HTMLElement) => void) => {
-    const e = document.querySelector(selector) as HTMLElement;
-    if (e) {
-      try {
-        callback(e);
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
 
   try {
     $("#coursePas", (notpass) => {
@@ -43,17 +32,6 @@ export function hideFailCourse(enabled: boolean): void {
 }
 
 export function customText(id: string, text: string): void {
-  const $ = (selector: string, callback: (element: HTMLElement) => void) => {
-    const e = document.querySelector(selector) as HTMLElement;
-    if (e) {
-      try {
-        callback(e);
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-
   $(id, (e) => {
     e.innerText = text;
     e.setAttribute("id", id + "_changed");
@@ -62,17 +40,6 @@ export function customText(id: string, text: string): void {
 }
 
 export function removePasswordPopup(): void {
-  const $ = (selector: string, callback: (element: HTMLElement) => void) => {
-    const e = document.querySelector(selector) as HTMLElement;
-    if (e) {
-      try {
-        callback(e);
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-
   $("#view-table > div > div > div > h4 > span > button.btn.btn-default.btn-xs.btn-round", (e) => e.click());
 
   // 兼容新版修改密码弹窗：提取 helper，检测并移除包含“修改密码/更改密码”或密码字段的 .modal-dialog
