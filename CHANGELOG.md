@@ -10,8 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- 添加本地验证码OCR服务，去掉在线OCR，减少配置成本
+
 ### Changed
 
+- 去掉失效功能
 - 设置页面全新改版，界面与交互体验升级
 - 深色模式增强：内容不足一屏时背景色保持一致，设置页修改即时生效
 - 去掉antd以及相关依赖改为自实现，大幅减少热重载和构建时间，以及打包大小
