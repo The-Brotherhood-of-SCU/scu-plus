@@ -6,7 +6,6 @@ import { initCourseTable } from "~features/course-table"
 import { initCourseEvaluation } from "~features/course-evaluation"
 import { initScoresPerSemester } from "~features/scores-per-semester"
 import { initEnhanceQuitCourse } from "~features/enhance-quit-course"
-import { initGetHiddenScore } from "~features/get-hidden-score"
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -53,11 +52,6 @@ const main = async () => {
   if (url.includes("/student/integratedQuery/scoreQuery/allPassingScores/")) {
     // 全部及格成绩
     safeInit("scoresPerSemester", initScoresPerSemester);
-  }
-
-  if (url.includes("/student/integratedQuery/scoreQuery/thisTermScores/")) {
-    // 本学期成绩 (含隐藏成绩)
-    safeInit("getHiddenScore", initGetHiddenScore);
   }
 
   if (url.includes("/student/teachingEvaluation/newEvaluation/")) {
