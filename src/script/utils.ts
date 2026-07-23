@@ -110,7 +110,7 @@ function createSecondPageElement(innerHTML:string=""):HTMLElement | null {
  */
 async function downloadCanvas(canvas:HTMLElement,name:string,scale:number) {
     const result = await snapdom(canvas, { scale: scale, embedFonts: false });
-    await result.download({ format: 'png', filename: name });
+    await result.download({ type: 'png', filename: name });
 }
 
   /**
