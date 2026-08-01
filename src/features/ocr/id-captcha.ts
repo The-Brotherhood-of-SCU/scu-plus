@@ -14,6 +14,15 @@ export async function initIdCaptchaOcr(): Promise<void> {
   let lastRecognizedSrc = "";
   let retryCount = 0;
 
+  // 登录页随浏览器语言切换中/英文，文案匹配必须双语覆盖。
+  // 英文文案来自 id.scu.edu.cn 的 en-US 语言包：
+  // Account / SMS / Password / Captcha code / SMS code
+  const ACCOUNT_TAB_RE = /账号登录|account/i;
+  const SMS_TAB_RE = /短信登录|sms/i;
+  const PASSWORD_PLACEHOLDER_RE = /请输入密码|password/i;
+  const SMS_CODE_PLACEHOLDER_RE = /短信验证码|sms\s*code/i;
+  const CAPTCHA_PLACEHOLDER_RE = /请输入验证码|captcha/i;
+
   const isVisible = (el: Element | null): el is HTMLElement => {
     if (!(el instanceof HTMLElement)) return false;
     const style = window.getComputedStyle(el);
@@ -32,17 +41,17 @@ export async function initIdCaptchaOcr(): Promise<void> {
 
     if (!forms.length) return null;
 
-    if (activeTab.includes("账号登录")) {
+    if (ACCOUNT_TAB_RE.test(activeTab)) {
       return forms.find((form) =>
         Array.from(form.querySelectorAll<HTMLInputElement>("input"))
-          .some((i) => /请输入密码/.test(i.placeholder || ""))
+          .some((i) => PASSWORD_PLACEHOLDER_RE.test(i.placeholder || ""))
       ) || null;
     }
 
-    if (activeTab.includes("短信登录")) {
+    if (SMS_TAB_RE.test(activeTab)) {
       return forms.find((form) =>
         Array.from(form.querySelectorAll<HTMLInputElement>("input"))
-          .some((i) => /短信验证码/.test(i.placeholder || ""))
+          .some((i) => SMS_CODE_PLACEHOLDER_RE.test(i.placeholder || ""))
       ) || null;
     }
 
@@ -53,7 +62,7 @@ export async function initIdCaptchaOcr(): Promise<void> {
     const inputs = Array.from(form.querySelectorAll<HTMLInputElement>("input"));
     return inputs.find((i) => {
       const p = i.placeholder || "";
-      return /请输入验证码/.test(p) && !/短信验证码/.test(p);
+      return CAPTCHA_PLACEHOLDER_RE.test(p) && !SMS_CODE_PLACEHOLDER_RE.test(p);
     }) || null;
   };
 
@@ -91,7 +100,7 @@ export async function initIdCaptchaOcr(): Promise<void> {
     running = true;
     try {
       const activeTab = getActiveTabText();
-      if (!(activeTab.includes("账号登录") || activeTab.includes("短信登录"))) return;
+      if (!(ACCOUNT_TAB_RE.test(activeTab) || SMS_TAB_RE.test(activeTab))) return;
 
       const form = getCurrentLoginForm();
       if (!form) return;

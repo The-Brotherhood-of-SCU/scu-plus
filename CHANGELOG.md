@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 注意：本页的更新日志应当存放一些通俗显著的更新内容，而非技术更新或者内部优化，请勿搬运git log记录。
 
 
+## Unreleased
+
+### Fixed
+
+- 修复英文语言下无法识别验证码的问题
+
 ## [2.2.0] - 2026-07-24
 
 ### Added
