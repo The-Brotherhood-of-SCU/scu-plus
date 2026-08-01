@@ -10,9 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.2.1] - 2026-08-01
+
 ### Fixed
 
 - 修复英文语言下无法识别验证码的问题
+
+### Changed
+
+- 修改OCR识别模型
 
 ## [2.2.0] - 2026-07-24
 
