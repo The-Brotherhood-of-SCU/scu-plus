@@ -3,6 +3,10 @@
     "displayName": "Scu plus",
     "version": "2.2.1",
     "description": "四川大学教务系统增强插件",
+    "packageManager": "pnpm@11.18.0",
+    "engines": {
+        "node": "24.14.0"
+    },
     "author": "jeanhua",
     "download": "https://github.com/The-Brotherhood-of-SCU/scu-plus/releases",
     "projectLink": "https://github.com/The-Brotherhood-of-SCU/scu-plus",
@@ -11,11 +15,13 @@
     "scripts": {
         "dev": "plasmo dev",
         "build": "plasmo build",
-        "package": "plasmo package"
+        "package": "plasmo package",
+        "build:firefox:amo": "bash scripts/build-firefox-amo.sh",
+        "package:amo-source": "bash scripts/package-amo-source.sh"
     },
     "dependencies": {
         "@plasmohq/storage": "^1.15.0",
-        "@zumer/snapdom": "^2.12.2",
+        "@zumer/snapdom": "^2.23.1",
         "chart.js": "^4.5.1",
         "chartjs-plugin-annotation": "^3.1.0",
         "decimal.js": "^10.6.0",
@@ -28,7 +34,7 @@
         "@types/chrome": "0.1.38",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
-        "baseline-browser-mapping": "^2.10.33",
+        "baseline-browser-mapping": "^2.11.9",
         "prettier": "3.8.1",
         "typescript": "6.0.2"
     },
