@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -7,6 +6,16 @@ cd "${ROOT_DIR}"
 
 if ! command -v git >/dev/null 2>&1; then
     echo "Error: Git is required to create the AMO source archive." >&2
+    exit 1
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+    echo "Error: Node.js is required to read the version from package.json." >&2
+    exit 1
+fi
+
+if [[ ! -f "package.json" ]]; then
+    echo "Error: package.json is missing." >&2
     exit 1
 fi
 
@@ -18,7 +27,7 @@ if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
 fi
 
 VERSION="$(node -p "require('./package.json').version")"
-COMMIT_SHA="$(git rev-parse --short=12 HEAD)"
+COMMIT_SHA="$(git rev-parse --short HEAD)"
 
 mkdir -p build
 

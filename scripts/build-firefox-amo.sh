@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-EXPECTED_NODE_VERSION="v24.14.0"
+EXPECTED_NODE_MAJOR="22"
+MINIMUM_NODE_MINOR="13"
 EXPECTED_PNPM_VERSION="11.18.0"
 
 echo "SCU-Plus Firefox AMO build"
@@ -24,15 +24,17 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 ACTUAL_NODE_VERSION="$(node --version)"
-ACTUAL_PNPM_VERSION="$(pnpm --version)"
+IFS=. read -r ACTUAL_NODE_MAJOR ACTUAL_NODE_MINOR _ <<< "${ACTUAL_NODE_VERSION#v}"
 
 echo "Node.js: ${ACTUAL_NODE_VERSION}"
-echo "pnpm:    ${ACTUAL_PNPM_VERSION}"
 
-if [[ "${ACTUAL_NODE_VERSION}" != "${EXPECTED_NODE_VERSION}" ]]; then
-    echo "Error: expected Node.js ${EXPECTED_NODE_VERSION}, got ${ACTUAL_NODE_VERSION}." >&2
+if [[ "${ACTUAL_NODE_MAJOR}" != "${EXPECTED_NODE_MAJOR}" ]] || (( ACTUAL_NODE_MINOR < MINIMUM_NODE_MINOR )); then
+    echo "Error: Node.js >=22.13 <23 is required; got ${ACTUAL_NODE_VERSION}." >&2
     exit 1
 fi
+
+ACTUAL_PNPM_VERSION="$(pnpm --version)"
+echo "pnpm:    ${ACTUAL_PNPM_VERSION}"
 
 if [[ "${ACTUAL_PNPM_VERSION}" != "${EXPECTED_PNPM_VERSION}" ]]; then
     echo "Error: expected pnpm ${EXPECTED_PNPM_VERSION}, got ${ACTUAL_PNPM_VERSION}." >&2
