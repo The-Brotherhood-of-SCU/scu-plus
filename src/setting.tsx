@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react"
 import { getSetting, saveSetting } from "~script/config";
-import { SettingItem } from "../common/types";
+import { SettingItem } from "~common/types";
 import { message, notification, confirm } from "~script/notice";
 import React from "react";
-import { Actions } from "../constants/actions";
+import { Actions } from "~constants/actions";
 import { LIGHT_COLORS, DARK_COLORS, DEFAULT_ACCENT, mixWithWhite, normalizeAccent, normalizeDarkMode, type DarkModeSetting } from "~features/beautify/palette";
 import packagejson from "package.json"
 
