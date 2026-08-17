@@ -1,4 +1,3 @@
-import { useState } from "react"
-import SettingPage from "~tabs/setting"
+import SettingPage from "~setting"
 
 export default SettingPage

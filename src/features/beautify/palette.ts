@@ -4,7 +4,7 @@
  * 供三处复用：
  * - contents/zhjw-beautify.ts / features/beautify/index.ts（教务页面主题注入）
  * - popup.tsx（工具栏弹窗）
- * - tabs/setting.tsx（设置页）
+ * - setting.tsx（设置页）
  */
 
 /** 默认点缀色（锦绣红），与 beautify 主题一致 */
