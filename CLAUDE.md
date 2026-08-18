@@ -41,7 +41,7 @@ Each feature follows an `init*` or `inject*` function pattern. They are pure DOM
 - **`enhance-quit-course/`** — Shows course name in the退课 confirmation dialog.
 - **`scores-per-semester/`** — Per-semester score aggregation view.
 - **`redirect-login/`** — Redirects the old教务 login page to unified auth.
-- **`ocr/`** — Fully-local captcha OCR for the unified auth login (id-captcha). `model.ts` is a dependency-free CNN inference engine (parses the `.scuocr` binary weight format, folds BatchNorm into conv layers at load, fused ReLU, preallocated buffers); `local-ocr.ts` loads the bundled `assets/model.scuocr` (via Plasmo `url:` import) and preprocesses the captcha `<img>` through a canvas (top-left 80×26 crop, or upscale if smaller). Low-confidence results return an empty string so the caller refreshes the captcha. The model only covers the id.scu.edu.cn captcha style (4 chars, `0-9a-z`, case-insensitive).
+- **`ocr/`** — Fully-local captcha OCR. **Unified auth (id-captcha)**: `model.ts` + `local-ocr.ts` load `assets/model_centroid.json` (traditional CV / centroid template matching, no CNN) and preprocess the captcha `<img>` through a canvas (top-left 80×26 crop, or upscale if smaller); low-confidence results return an empty string so the caller refreshes the captcha. **zhjw login (zhjw-captcha-ocr)**: `zhjw-ocr-adapter.ts` wraps the external OCR package `@scu-plus/zhjw-captcha-ocr` (CNN engine + `.scuocr` weights in a separate repo, pulled via pinned GitHub dependency, still fully on-device inference); `zhjw-captcha-ocr.ts` handles the DOM integration (locate captcha img/input, auto-fill, retry on mismatch).
 - **`schedule/`** — Fetches the academic calendar (校历) from `jwc.scu.edu.cn/cdxl.htm` via background proxy and injects it into the top navbar.
 
 ### Shared Code
@@ -65,7 +65,7 @@ content script → chrome.runtime.sendMessage({action: Actions.REQUEST, url, acc
 
 Same-origin fetches (e.g., a feature fetching its own data from `zhjw.scu.edu.cn`) also use `fetch()` directly — no proxy needed.
 
-**Exception — OCR**: The captcha OCR runs fully on-device (bundled CNN weights, no network at all), so it needs neither the proxy nor extra host permissions.
+**Exception — OCR**: The captcha OCR runs fully on-device (unified-auth template matching + the external zhjw OCR package, both local inference), so it needs neither the proxy nor extra host permissions.
 
 ## Key Patterns
 

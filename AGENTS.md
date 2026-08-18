@@ -13,7 +13,7 @@
 
 - Plasmo entry points are `src/background.ts`, `src/popup.tsx`, `src/options.tsx`, and `src/contents/*`. `src/contents/zhjw.ts` is the main URL dispatcher and runs in all frames, so every added feature must retain explicit page/frame guards.
 - Most `src/features/*` modules inject vanilla DOM/CSS. Keep that pattern unless integrating with an existing React-rendered feature; React is native only in the popup/settings pages and a few established feature roots.
-- Cross-origin requests from content scripts go through `Actions.REQUEST` in `src/background.ts`; same-origin requests use `fetch` directly. Captcha OCR is intentionally fully local and must not acquire a network dependency.
+- Cross-origin requests from content scripts go through `Actions.REQUEST` in `src/background.ts`; same-origin requests use `fetch` directly. Captcha OCR is intentionally fully local and must not acquire a network dependency. The zhjw login captcha OCR comes from the external package `@scu-plus/zhjw-captcha-ocr` (a pinned GitHub dependency; inference is still fully on-device).
 - A new setting normally requires all three connections: a default/property in `src/common/types.ts`, a control in `src/setting.tsx`, and a dispatcher/injection guard. `getSetting()` is cached by `src/script/config.ts`.
 - Theme-sensitive injected UI must use `var(--scu-*, fallback)`. `src/contents/zhjw-beautify.ts` runs at `document_start` and mirrors theme settings in localStorage to avoid first-paint flashes.
 - The `~` alias resolves to `src/`.

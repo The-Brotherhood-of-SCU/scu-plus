@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 注意：本页的更新日志应当存放一些通俗显著的更新内容，而非技术更新或者内部优化，请勿搬运git log记录。
 
 
+## [2.3.0] - 2026-08-18
+
+### Added
+
+- 新增教务处登录页验证码自动识别（完全本地识别，离线可用）
+
+### Changed
+
+- 减小安装包体积
+
 ## [2.2.3] - 2026-08-06
 
 ### Fixed

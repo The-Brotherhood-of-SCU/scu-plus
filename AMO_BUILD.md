@@ -9,7 +9,7 @@ SCU-Plus is built with Plasmo, TypeScript, React, and pnpm. These instructions r
 * pnpm 11.18.0 exactly
 * Plasmo 0.90.5, as locked by `pnpm-lock.yaml`
 
-The build requires no private npm registry, API key, account, or proprietary build tool. All dependencies are available from the public npm registry.
+The build requires no private npm registry, API key, account, or proprietary build tool. Dependencies come from the public npm registry, except `@scu-plus/zhjw-captcha-ocr`, which is fetched from GitHub (pinned commit) during `pnpm install` and compiled by its `prepare` script (this needs network access to GitHub at install time).
 
 Install the required pnpm version with npm:
 
