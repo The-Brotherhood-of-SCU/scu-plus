@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 注意：本页的更新日志应当存放一些通俗显著的更新内容，而非技术更新或者内部优化，请勿搬运git log记录。
 
 
-## [2.3.0] - 2026-08-18
+## [2.3.1] - 2026-08-18
 
 ### Added
 
