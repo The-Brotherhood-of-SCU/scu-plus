@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: '要发布的版本 tag（如 v2.3.0）'
+        required: true
 
 jobs:
   build-and-release:
@@ -53,6 +57,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ inputs.tag || github.ref_name }}
           name: Release ${{ env.title }}
           body: ${{ env.release_notes }}
           # 注意：BUILD_FIREFOX 固定为 true，firefox zip 始终构建；
