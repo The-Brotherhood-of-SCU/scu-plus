@@ -49,46 +49,16 @@ jobs:
         if: env.BUILD_FIREFOX == 'true'
         run: pnpm build --zip --target=firefox-mv3
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release & Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ env.title}}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release ${{ env.title }}
           body: ${{ env.release_notes }}
+          # 注意：BUILD_FIREFOX 固定为 true，firefox zip 始终构建；
+          # 若日后改为按需构建，需相应调整此文件列表
+          files: |
+            ./build/chrome-mv3-prod.zip
+            ./build/firefox-mv3-prod.zip
           draft: false
           prerelease: false
-          
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/chrome-mv3-prod.zip
-          asset_name: chrome-mv3-prod-${{ github.ref_name}}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Firefox Release Asset
-        if: env.BUILD_FIREFOX == 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/firefox-mv3-prod.zip
-          asset_name: firefox-mv3-prod-${{ github.ref_name}}.zip
-          asset_content_type: application/zip
-
-      # 上面的版本即将废弃，以下发布release的版本存在bug，等待修复完成后替换
-      # - name: Release
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     name: Release ${{ env.title}}
-      #     body: ${{ env.release_notes }}
-      #     files: ./build/chrome-mv3-prod.zip
-      #     draft: false
-      #     prerelease: false
