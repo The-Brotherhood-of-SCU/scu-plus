@@ -506,6 +506,8 @@ h1.header, h2.header, h3.header, h4.header, h5.header, .header {
 .widget-box .widget-toolbar > a:hover { color: var(--scu-accent) !important; }
 .widget-box .widget-toolbar::before { display: none !important; }
 .widget-box .widget-body { background: transparent !important; }
+/* 独立 widget-body（不在 .widget-box 内，如方案完成情况页的树容器） */
+.widget-body { background: var(--scu-surface) !important; }
 
 /* ============================================================
    首页信息块 (infobox) —— 大数字编辑部风格
@@ -1147,9 +1149,13 @@ input:focus, select:focus, textarea:focus, .form-control:focus {
 .fc-event { background: var(--scu-accent-soft) !important; border-color: var(--scu-accent) !important; color: var(--scu-ink) !important; border-radius: 2px !important; }
 
 /* ============================================================
-   zTree 树控件（培养方案查看等）—— 节点 <a> 带行内 color:#333，
-   控件自身链接色在深色模式下同样不可读，统一强制主题色
+   zTree 树控件（培养方案查看、方案完成情况等）—— 节点 <a> 带行内
+   color:#333，控件自身链接色在深色模式下同样不可读，统一强制主题色；
+   zTreeStyle.css 默认白底，深色模式下需要覆盖。
    ============================================================ */
+.ztree {
+  background: var(--scu-surface) !important;
+}
 .ztree li a, .ztree li a:visited, .ztree li a span {
   color: var(--scu-ink) !important;
   text-shadow: none !important;
