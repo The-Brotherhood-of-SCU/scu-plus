@@ -1,6 +1,6 @@
 allowBuilds:
   '@parcel/watcher': true
-  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#f3907953d5b369a98c3cf10603704108308966d7': true
+  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a': true
   '@swc/core': true
   esbuild: true
   lmdb: true
