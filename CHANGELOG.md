@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 注意：本页的更新日志应当存放一些通俗显著的更新内容，而非技术更新或者内部优化，请勿搬运git log记录。
 
 
+## [2.3.3] - 2026-08-22
+
+### Fixed
+
+- 修复方案完成情况页面深色模式下仍显示为白色背景的问题
+
+### Changed
+
+- 优化教务处验证码识别，模型更小识别更准
+
 ## [2.3.1] - 2026-08-18
 
 ### Added

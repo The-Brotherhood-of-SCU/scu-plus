@@ -1,7 +1,7 @@
 {
   "name": "scu-plus",
   "displayName": "Scu plus",
-  "version": "2.3.1",
+  "version": "2.3.3",
   "description": "四川大学教务系统增强插件",
   "packageManager": "pnpm@11.18.0",
   "author": "jeanhua",
