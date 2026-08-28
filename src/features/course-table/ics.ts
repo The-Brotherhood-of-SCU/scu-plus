@@ -352,6 +352,71 @@ function showFirstMondayModal(currentFirstMonday: Date, prefillDate: Date | null
     });
 }
 
+// ── 弹窗：无法从页面获取周次时手动输入第一周周一日期 ──────────
+
+function showFirstMondayDateModal(): Promise<Date | null> {
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+            <div style="background:#fff;border-radius:8px;padding:24px;min-width:380px;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                <h5 style="margin:0 0 16px;font-size:16px;">无法自动获取当前周次，请选择第一周周一日期</h5>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block;padding:8px 0;">第一周周一日期</label>
+                    <input type="date" id="scu-plus-first-monday-date" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #ccc;border-radius:4px;">
+                </div>
+                <div style="text-align:right;margin-top:16px;">
+                    <button id="scu-plus-modal-cancel" style="padding:6px 16px;margin-right:8px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;">取消</button>
+                    <button id="scu-plus-modal-confirm" style="padding:6px 16px;border:none;border-radius:4px;background:#428bca;color:#fff;cursor:pointer;">确定</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const dateInput = overlay.querySelector('#scu-plus-first-monday-date') as HTMLInputElement;
+        const confirmBtn = overlay.querySelector('#scu-plus-modal-confirm') as HTMLButtonElement;
+        const cancelBtn = overlay.querySelector('#scu-plus-modal-cancel') as HTMLButtonElement;
+
+        dateInput.focus();
+
+        const cleanup = () => {
+            try { document.body.removeChild(overlay); } catch (e) { }
+        };
+
+        const submit = () => {
+            const val = dateInput.value;
+            if (!val) {
+                message.info('请选择日期');
+                return;
+            }
+            const result = new Date(val + 'T00:00:00');
+            if (isNaN(result.getTime())) {
+                message.info('日期格式无效');
+                return;
+            }
+            cleanup();
+            resolve(result);
+        };
+
+        confirmBtn.addEventListener('click', submit);
+        dateInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submit();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            cleanup();
+            resolve(null);
+        });
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve(null);
+            }
+        });
+    });
+}
+
 // ── 下载 ────────────────────────────────────────────────────────
 
 function downloadIcsFile(content: string, filename: string) {
@@ -370,12 +435,6 @@ function downloadIcsFile(content: string, filename: string) {
 
 export async function exportScheduleIcs() {
     try {
-        const currentWeek = parseCurrentWeek();
-        if (!currentWeek) {
-            message.info('无法获取当前周数，请确认页面已加载学期信息');
-            return;
-        }
-
         const { planCode, isCurrentSemester } = parsePlanCode();
 
         let res: Response;
@@ -393,14 +452,22 @@ export async function exportScheduleIcs() {
         const rawData = JSON.parse(text);
 
         let firstMonday: Date;
-        if (!isCurrentSemester) {
-            const currentFirstMonday = calcFirstMonday(currentWeek);
-            const prefillDate = planCode ? getDefaultFirstMonday(planCode) : null;
-            const chosen = await showFirstMondayModal(currentFirstMonday, prefillDate);
+        const currentWeek = parseCurrentWeek();
+        if (currentWeek) {
+            if (!isCurrentSemester) {
+                const currentFirstMonday = calcFirstMonday(currentWeek);
+                const prefillDate = planCode ? getDefaultFirstMonday(planCode) : null;
+                const chosen = await showFirstMondayModal(currentFirstMonday, prefillDate);
+                if (!chosen) return;
+                firstMonday = chosen;
+            } else {
+                firstMonday = calcFirstMonday(currentWeek);
+            }
+        } else {
+            // 无法从页面获取周次：让用户直接输入第一周周一的日期
+            const chosen = await showFirstMondayDateModal();
             if (!chosen) return;
             firstMonday = chosen;
-        } else {
-            firstMonday = calcFirstMonday(currentWeek);
         }
 
         const semesterName = getSemesterName(rawData);
