@@ -58,7 +58,7 @@ function parseCurrentWeek(): number | null {
     if (!spans?.length) return null;
     for (const span of spans) {
         const text = span.textContent || '';
-        const match = text.match(/第(\d+)周/);
+        const match = text.match(/第(-?\d+)周/);
         if (match) return parseInt(match[1], 10);
     }
     return null;
@@ -176,7 +176,9 @@ function generateIcs(rawData: any, firstMonday: Date): string {
     lines.push('BEGIN:VCALENDAR');
     lines.push('VERSION:2.0');
     lines.push('PRODID:-//SCU Plus//CN');
-    lines.push('X-WR-CALNAME:SCU Plus 课表');
+    const semesterName = getSemesterName(rawData);
+    const calendarName = semesterName === '课表' ? 'SCU Plus 课表' : `${semesterName} SCU Plus 课表`;
+    lines.push(`X-WR-CALNAME:${calendarName}`);
     lines.push('BEGIN:VTIMEZONE');
     lines.push('TZID:Asia/Shanghai');
     lines.push('BEGIN:STANDARD');
@@ -453,6 +455,10 @@ export async function exportScheduleIcs() {
 
         let firstMonday: Date;
         const currentWeek = parseCurrentWeek();
+        if (currentWeek === 0) {
+            message.info('当前周次无效（第 0 周不存在）');
+            return;
+        }
         if (currentWeek) {
             if (!isCurrentSemester) {
                 const currentFirstMonday = calcFirstMonday(currentWeek);
