@@ -67,14 +67,18 @@ function parseCurrentWeek(): number | null {
 function calcFirstMonday(currentWeek: number): Date {
     const today = new Date();
     const dayOfWeek = today.getDay();
-    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    const mondayOfThisWeek = new Date(today);
-    mondayOfThisWeek.setHours(0, 0, 0, 0);
-    mondayOfThisWeek.setDate(today.getDate() - daysSinceMonday);
+    // 校历每周第一天是周日：周日=0, 周一=1, ..., 周六=6
+    const daysSinceSunday = dayOfWeek;
+    const sundayOfThisWeek = new Date(today);
+    sundayOfThisWeek.setHours(0, 0, 0, 0);
+    sundayOfThisWeek.setDate(today.getDate() - daysSinceSunday);
     // 周次序列 -2,-1,1,2,... 无 0 周：负周次按 week 直接偏移，正周次从第 1 周起 (week - 1)
     const offset = currentWeek > 0 ? currentWeek - 1 : currentWeek;
-    const firstMonday = new Date(mondayOfThisWeek);
-    firstMonday.setDate(mondayOfThisWeek.getDate() - offset * 7);
+    const firstSunday = new Date(sundayOfThisWeek);
+    firstSunday.setDate(sundayOfThisWeek.getDate() - offset * 7);
+    // firstMonday 取第一周的周一（classDay 1=周一）
+    const firstMonday = new Date(firstSunday);
+    firstMonday.setDate(firstSunday.getDate() + 1);
     return firstMonday;
 }
 
