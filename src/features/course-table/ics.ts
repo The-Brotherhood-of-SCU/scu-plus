@@ -71,8 +71,10 @@ function calcFirstMonday(currentWeek: number): Date {
     const mondayOfThisWeek = new Date(today);
     mondayOfThisWeek.setHours(0, 0, 0, 0);
     mondayOfThisWeek.setDate(today.getDate() - daysSinceMonday);
+    // 周次序列 -2,-1,1,2,... 无 0 周：负周次按 week 直接偏移，正周次从第 1 周起 (week - 1)
+    const offset = currentWeek > 0 ? currentWeek - 1 : currentWeek;
     const firstMonday = new Date(mondayOfThisWeek);
-    firstMonday.setDate(mondayOfThisWeek.getDate() - (currentWeek - 1) * 7);
+    firstMonday.setDate(mondayOfThisWeek.getDate() - offset * 7);
     return firstMonday;
 }
 
