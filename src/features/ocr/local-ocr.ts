@@ -14,7 +14,7 @@ import {
   CHAR_W,
   FEAT_DIM,
   FEAT_DIM_WITH_AR,
-  CentroidWeights,
+  type CentroidWeights,
   parseCentroidJson,
   classifyChar,
   normalizeAspectRatio
