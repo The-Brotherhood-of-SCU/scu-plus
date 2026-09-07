@@ -922,13 +922,14 @@ export function initCourseFilter(): void {
   }
 
   // 监听页面，若有课程表则注入面板
-  function waitForTableAndInject(): void {
+  function waitForTableAndInject(attempt: number = 0): void {
     const tbody: HTMLElement | null = document.getElementById('xirxkxkbody') || document.querySelector('tbody');
     if (tbody) {
       createPanel();
       watchTableAndRefilter(tbody);
-    } else {
-      setTimeout(waitForTableAndInject, 800);
+    } else if (attempt < 30) {
+      // 与 menu / course-table 一致的重试上限，避免在没有课程表的 frame 里永久轮询
+      setTimeout(() => waitForTableAndInject(attempt + 1), 800);
     }
   }
 
