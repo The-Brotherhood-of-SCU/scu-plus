@@ -44,25 +44,35 @@ export async function injectSchoolSchedule(): Promise<void> {
     }
   }
 
-  let injectHtml = "";
-  for (const schedule of scheduleList) {
-    injectHtml += `<li><a href="${schedule.link}" target="_blank" style="color:var(--scu-ink-soft,#333);padding:8px 20px;">${schedule.name}</a></li>`;
-  }
-
-  const fullHtml = `
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-calendar"></i>
-        <span>校历查看<span style="color:var(--scu-accent,#9e1b32)">✦</span></span>
-      </a>
-      <ul class="dropdown-menu" style="min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-        ${injectHtml}
-      </ul>
-    </li>
+  // 远程页面抓来的 name/link 不可信，全部用 DOM API / textContent 构造，避免 HTML 注入
+  const dropdown = document.createElement("li");
+  dropdown.className = "dropdown";
+  dropdown.innerHTML = `
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <i class="icon-calendar"></i>
+      <span>校历查看<span style="color:var(--scu-accent,#9e1b32)">✦</span></span>
+    </a>
   `;
+  const menu = document.createElement("ul");
+  menu.className = "dropdown-menu";
+  menu.style.cssText = "min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);";
+  for (const schedule of scheduleList) {
+    const url = new URL(schedule.link);
+    if (url.protocol !== "https:" && url.protocol !== "http:") continue;
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = url.href;
+    a.target = "_blank";
+    a.style.color = "var(--scu-ink-soft,#333)";
+    a.style.padding = "8px 20px";
+    a.textContent = schedule.name;
+    li.appendChild(a);
+    menu.appendChild(li);
+  }
+  dropdown.appendChild(menu);
 
   const injectPosition = document.querySelector("#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li.green.cdsj");
   if (injectPosition) {
-    injectPosition.outerHTML = fullHtml;
+    injectPosition.replaceWith(dropdown);
   }
 }
