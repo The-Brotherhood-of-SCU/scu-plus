@@ -12,7 +12,7 @@ importers:
         specifier: ^1.15.0
         version: 1.15.0(react@18.2.0)
       '@scu-plus/zhjw-captcha-ocr':
-        specifier: git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git
+        specifier: github:meteor-liu-xinyu/zhjw-captcha-ocr
         version: git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a
       '@zumer/snapdom':
         specifier: ^2.23.1
@@ -26,9 +26,6 @@ importers:
       decimal.js:
         specifier: ^10.6.0
         version: 10.6.0
-      plasmo:
-        specifier: 0.90.5
-        version: 0.90.5(@swc/core@1.15.47(@swc/helpers@0.5.23))(@swc/helpers@0.5.23)(@types/node@25.5.0)(lodash@4.18.1)(postcss@8.5.25)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@7.2.0)(terser@5.46.1)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -43,14 +40,17 @@ importers:
         specifier: 0.1.38
         version: 0.1.38
       '@types/react':
-        specifier: 19.2.14
-        version: 19.2.14
+        specifier: ^18.3.28
+        version: 18.3.31
       '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.14)
+        specifier: ^18.3.7
+        version: 18.3.7(@types/react@18.3.31)
       baseline-browser-mapping:
         specifier: ^2.11.9
         version: 2.11.9
+      plasmo:
+        specifier: 0.90.5
+        version: 0.90.5(@swc/core@1.15.47(@swc/helpers@0.5.23))(@swc/helpers@0.5.23)(@types/node@25.5.0)(lodash@4.18.1)(postcss@8.5.25)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@7.2.0)(terser@5.46.1)
       prettier:
         specifier: 3.8.1
         version: 3.8.1
@@ -1686,13 +1686,16 @@ packages:
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
 
-  '@types/react-dom@19.2.3':
-    resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
-    peerDependencies:
-      '@types/react': ^19.2.0
+  '@types/prop-types@15.7.15':
+    resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
 
-  '@types/react@19.2.14':
-    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
+  '@types/react-dom@18.3.7':
+    resolution: {integrity: sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==}
+    peerDependencies:
+      '@types/react': ^18.0.0
+
+  '@types/react@18.3.31':
+    resolution: {integrity: sha512-vfEqpXTvwT91yhmwdfouStN2hSKwTvyRs8qpLfADyrq/kxDw0hZM7Wk9Ug1FELj8hIby+S/+kQCSRFF32nv2Qw==}
 
   '@types/relateurl@0.2.33':
     resolution: {integrity: sha512-bTQCKsVbIdzLqZhLkF5fcJQreE4y1ro4DIyVrlDNSCJRRwHhB8Z+4zXXa8jN6eDvc2HbRsEYgbvrnGvi54EpSw==}
@@ -5067,12 +5070,15 @@ snapshots:
 
   '@types/parse-json@4.0.2': {}
 
-  '@types/react-dom@19.2.3(@types/react@19.2.14)':
-    dependencies:
-      '@types/react': 19.2.14
+  '@types/prop-types@15.7.15': {}
 
-  '@types/react@19.2.14':
+  '@types/react-dom@18.3.7(@types/react@18.3.31)':
     dependencies:
+      '@types/react': 18.3.31
+
+  '@types/react@18.3.31':
+    dependencies:
+      '@types/prop-types': 15.7.15
       csstype: 3.2.3
 
   '@types/relateurl@0.2.33': {}

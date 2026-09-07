@@ -14,11 +14,11 @@ import {
   CHAR_W,
   FEAT_DIM,
   FEAT_DIM_WITH_AR,
-  CentroidWeights,
   parseCentroidJson,
   classifyChar,
   normalizeAspectRatio
 } from "~features/ocr/model"
+import type { CentroidWeights } from "~features/ocr/model"
 
 // ---------------------------------------------------------------------------
 // 预处理常量（与训练一致）
