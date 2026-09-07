@@ -9,13 +9,10 @@ interface CourseGroup {
   [key: string]: HTMLTableRowElement[];
 }
 
-interface TimeGridSelection {
-  dayIndex: number;
-  sectionIndex: number;
-  selected: boolean;
-}
-
 type TeacherMode = 'white' | 'black';
+
+// 筛选状态的 sessionStorage 键：随标签页存续，切换选课页/整页跳转后自动恢复筛选
+const FILTER_STATE_KEY = 'scuPlusCourseFilterState';
 
 // 扩展 Window 接口
 declare global {
@@ -36,6 +33,8 @@ export function initCourseFilter(): void {
     { label: '5-6', start: 5, end: 6 },
     { label: '5-7', start: 5, end: 7 },
     { label: '8-9', start: 8, end: 9 },
+    // 补充 9-10：跨块节次此前无法被任何格子完整包含，启用时间筛选后必被过滤
+    { label: '9-10', start: 9, end: 10 },
     { label: '10-11', start: 10, end: 11 },
     { label: '10-12', start: 10, end: 12 }
   ];
@@ -45,25 +44,32 @@ export function initCourseFilter(): void {
   let teacherWhiteList: string[] = [];
   let teacherBlackList: string[] = [];
   let allTeachersSet: Set<string> = new Set<string>();
-  let restrictionFilterValue: string = '';
   let allRestrictionsSet: Set<string> = new Set<string>();
   let restrictionFilters: string[] = [];
   let useFilter: boolean = false;
   // 限制筛选弹窗挂在 document 上的 click 监听，重开/关闭弹窗时需要移除，避免累积
   let restrictDocClickHandler: ((ev: MouseEvent) => void) | null = null;
 
+  function findCourseTableBody(): HTMLElement | null {
+    const byId: HTMLElement | null = document.getElementById('xirxkxkbody');
+    if (byId) return byId;
+    // 兜底按课程行特征（kcId 复选框）定位 tbody，避免误注入到无关表格
+    const checkbox: HTMLElement | null = document.querySelector('input[type="checkbox"][name="kcId"]');
+    return checkbox ? (checkbox.closest('tbody') as HTMLElement | null) : null;
+  }
+
   function groupRowsByCheckbox(): CourseGroup {
-    const tbody: HTMLElement | null = document.getElementById('xirxkxkbody') || document.querySelector('tbody');
+    const tbody: HTMLElement | null = findCourseTableBody();
     const groups: CourseGroup = {};
     if (!tbody) return groups;
-    
+
     let currentId: string | null = null;
     let currentRows: HTMLTableRowElement[] = [];
-    
+
     Array.from(tbody.children).forEach((tr: Element) => {
       const row = tr as HTMLTableRowElement;
       const checkbox = row.querySelector('input[type="checkbox"][name="kcId"]') as HTMLInputElement | null;
-      
+
       if (checkbox) {
         if (currentId && currentRows.length) {
           groups[currentId] = currentRows;
@@ -74,7 +80,7 @@ export function initCourseFilter(): void {
         currentRows.push(row);
       }
     });
-    
+
     if (currentId && currentRows.length) {
       groups[currentId] = currentRows;
     }
@@ -84,6 +90,7 @@ export function initCourseFilter(): void {
   function getCourseTimesForGroup(rows: HTMLTableRowElement[]): string[] {
     return rows.map(row => {
       const tds: NodeListOf<HTMLTableCellElement> = row.querySelectorAll('td');
+      // 倒数第二列为上课时间（最后一列是地点）
       if (tds.length >= 2) {
         return (tds[tds.length - 2].textContent || '').trim();
       }
@@ -96,12 +103,15 @@ export function initCourseFilter(): void {
     rows.forEach(row => {
       const tds: NodeListOf<HTMLTableCellElement> = row.querySelectorAll('td');
       if (tds.length > 0) {
+        // 最后一列为上课地点
         const locationText: string = (tds[tds.length - 1].textContent || '').trim();
         CAMPUS_LIST.forEach(c => {
           if (locationText.includes(c)) campusSet.add(c);
         });
       }
     });
+    // 位置文本无法识别校区时归入“其他”，避免启用校区筛选后这类课程被整体隐藏
+    if (campusSet.size === 0) campusSet.add('其他');
     return Array.from(campusSet);
   }
 
@@ -110,6 +120,7 @@ export function initCourseFilter(): void {
     rows.forEach(row => {
       const tds: NodeListOf<HTMLTableCellElement> = row.querySelectorAll('td');
       tds.forEach(td => {
+        // 教师单元格带 onmouseenter 气泡，以此识别
         if (td.getAttribute('onmouseenter')) {
           teachers.push((td.textContent || '').trim());
         }
@@ -118,13 +129,17 @@ export function initCourseFilter(): void {
     return teachers;
   }
 
+  function splitTeacherTokens(s: string): string[] {
+    return (s || '').split(/[\s*，,、]/).map(t => t.trim()).filter(Boolean);
+  }
+
   function getAllTeachersCurrentPage(): void {
     allTeachersSet.clear();
     const groups: CourseGroup = groupRowsByCheckbox();
     Object.values(groups).forEach(rows => {
       getCourseTeacherForGroup(rows).forEach(teacher => {
-        teacher.split(/[\s*，,、]/).forEach(t => {
-          if (t.trim()) allTeachersSet.add(t.trim());
+        splitTeacherTokens(teacher).forEach(t => {
+          if (t) allTeachersSet.add(t);
         });
       });
     });
@@ -222,7 +237,7 @@ export function initCourseFilter(): void {
     if (!restrictionFilters || restrictionFilters.length === 0) return true;
     const normCourse: string = normalizeRestrictionText(restrictionStr || '');
     const simpCourse: string = simplifyForCompare(normCourse);
-    
+
     for (const rf of restrictionFilters) {
       if (rf === '；' || rf === ';') {
         if (normCourse === '') return true;
@@ -244,19 +259,20 @@ export function initCourseFilter(): void {
   function isCourseTimeInGrid(courseTimeStr: string): boolean {
     const anySelected: boolean = selectedTimeGrid.some(row => row.some(cell => cell));
     if (!anySelected) return true;
-    
-    const regex: RegExp = /(?:周|星期)([一二三四五六七日])[^\d\n\r]*(\d{1,2})[^\d\n\r]*(\d{1,2})/g;
+
+    const regex: RegExp = /(?:周|星期)([一二三四五六七日天])[^\d\n\r]*(\d{1,2})[^\d\n\r]*(\d{1,2})/g;
     let m: RegExpExecArray | null;
     let foundAny: boolean = false;
-    
+
     while ((m = regex.exec(courseTimeStr)) !== null) {
       foundAny = true;
-      // gridDays 用"七"表示周日，课程文本可能写"日"，统一映射到最后一列
-      const dayIdx: number = m[1] === '日' ? gridDays.length - 1 : gridDays.indexOf(m[1]);
+      // 课程文本可能写“周日/星期天”，统一映射到最后一列（表头同样显示“周日”）
+      const dayChar: string = m[1];
+      const dayIdx: number = (dayChar === '日' || dayChar === '天') ? gridDays.length - 1 : gridDays.indexOf(dayChar);
       if (dayIdx < 0) continue;
       const sectionStart: number = parseInt(m[2]);
       const sectionEnd: number = parseInt(m[3]);
-      
+
       // check containment: selected grid cell must fully contain the course's section range
       for (let sIdx = 0; sIdx < gridSections.length; sIdx++) {
         const sect: GridSection = gridSections[sIdx];
@@ -275,11 +291,14 @@ export function initCourseFilter(): void {
   }
 
   function isCourseTeacherValid(teacherArr: string[]): boolean {
+    // 按分隔符拆成完整姓名后精确比较，避免“李伟”误伤“李伟东”这类子串误匹配
+    const tokens: string[] = [];
+    teacherArr.forEach(t => splitTeacherTokens(t).forEach(tok => tokens.push(tok)));
     if (teacherBlackList.length > 0) {
-      if (teacherArr.some(t => teacherBlackList.some(b => t.includes(b)))) return false;
+      if (tokens.some(t => teacherBlackList.includes(t))) return false;
     }
     if (teacherWhiteList.length > 0) {
-      return teacherArr.some(t => teacherWhiteList.some(w => t.includes(w)));
+      return tokens.some(t => teacherWhiteList.includes(t));
     }
     return true;
   }
@@ -287,7 +306,7 @@ export function initCourseFilter(): void {
   function filterCoursesByAllFilters(): void {
     if (!useFilter) return;
     const groups: CourseGroup = groupRowsByCheckbox();
-    
+
     Object.values(groups).forEach(rows => {
       const times: string[] = getCourseTimesForGroup(rows);
       const campusArr: string[] = getCourseCampusForGroup(rows);
@@ -300,7 +319,7 @@ export function initCourseFilter(): void {
       const restrictionFit: boolean = isCourseRestrictionValid(restrictionStr);
 
       const allFit: boolean = allTimeFit && campusFit && teacherFit && restrictionFit;
-      
+
       rows.forEach(row => {
         (row as HTMLElement).style.display = allFit ? '' : 'none';
         (row as HTMLElement).style.background = allFit ? 'var(--scu-accent-soft, #e3f7ff)' : '';
@@ -308,10 +327,70 @@ export function initCourseFilter(): void {
     });
   }
 
+  // 筛选状态持久化：sessionStorage 随标签页存续，切页/整页跳转后恢复
+  function persistState(): void {
+    try {
+      sessionStorage.setItem(FILTER_STATE_KEY, JSON.stringify({
+        time: selectedTimeGrid,
+        campus: campusFilterValue,
+        white: teacherWhiteList,
+        black: teacherBlackList,
+        restrict: restrictionFilters,
+        apply: useFilter
+      }));
+    } catch (e) {
+      // 存储不可用时静默降级为不持久化
+    }
+  }
+
+  function restoreState(): void {
+    try {
+      const raw: string | null = sessionStorage.getItem(FILTER_STATE_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw) as Record<string, unknown>;
+      if (Array.isArray(s.time) && s.time.length === 7) {
+        selectedTimeGrid = s.time.map((row: unknown) => {
+          const arr: boolean[] = Array(gridSections.length).fill(false);
+          if (Array.isArray(row)) {
+            row.forEach((v: unknown, i: number) => {
+              if (i < arr.length) arr[i] = Boolean(v);
+            });
+          }
+          return arr;
+        });
+      }
+      if (typeof s.campus === 'string') campusFilterValue = s.campus;
+      if (Array.isArray(s.white)) teacherWhiteList = s.white.filter((x): x is string => typeof x === 'string');
+      if (Array.isArray(s.black)) teacherBlackList = s.black.filter((x): x is string => typeof x === 'string');
+      if (Array.isArray(s.restrict)) restrictionFilters = s.restrict.filter((x): x is string => typeof x === 'string');
+      useFilter = Boolean(s.apply);
+    } catch (e) {
+      // 状态损坏时忽略，使用默认值
+    }
+  }
+
+  function escapeHtml(s: string): string {
+    const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return (s || '').replace(/[&<>"']/g, ch => map[ch]);
+  }
+
+  // 关闭并清理所有筛选相关弹窗（含限制筛选的 body 级选项容器与 document 监听），
+  // 避免多个弹窗堆叠与监听器泄漏
+  function closeAllFilterModals(): void {
+    ['cf-time-modal', 'cf-campus-modal', 'cf-teacher-modal', 'cf-restrict-modal', 'cf-restrict-options'].forEach(id => {
+      const el: HTMLElement | null = document.getElementById(id);
+      if (el) el.remove();
+    });
+    if (restrictDocClickHandler) {
+      document.removeEventListener('click', restrictDocClickHandler);
+      restrictDocClickHandler = null;
+    }
+  }
+
   // 创建简单面板（支持拖拽与折叠为悬浮球）
   function createPanel(): void {
     if (document.getElementById('scu-filter-panel')) return;
-    
+
     const panel: HTMLDivElement = document.createElement('div');
     panel.id = 'scu-filter-panel';
     panel.style.cssText = 'position:fixed;right:20px;top:100px;z-index:10000;border:2px solid var(--scu-accent,#9e1b32);background:var(--scu-surface,#fff);padding:0;border-radius:8px;min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,0.12);';
@@ -341,7 +420,7 @@ export function initCourseFilter(): void {
     // 悬浮球（折叠显示）
     let ball: HTMLElement | null = document.getElementById('scu-filter-ball');
     if (ball) ball.remove();
-    
+
     ball = document.createElement('div');
     ball.id = 'scu-filter-ball';
     ball.style.cssText = 'position:fixed;right:30px;bottom:30px;width:56px;height:56px;background:var(--scu-accent-fill,#9e1b32);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,0.15);cursor:pointer;color:var(--scu-paper,#fff);font-size:28px;';
@@ -353,16 +432,19 @@ export function initCourseFilter(): void {
     const campusBtn = document.getElementById('cf-campus');
     const restrictBtn = document.getElementById('cf-restrict');
     const teacherBtn = document.getElementById('cf-teacher');
-    
+
     if (timeBtn) timeBtn.addEventListener('click', showTimeGridModal);
     if (campusBtn) campusBtn.addEventListener('click', showCampusFilterModal);
     if (restrictBtn) restrictBtn.addEventListener('click', showRestrictionFilterModal);
     if (teacherBtn) teacherBtn.addEventListener('click', showTeacherFilterModal);
-    
+
     const applyCheckbox = document.getElementById('cf-apply') as HTMLInputElement | null;
     if (applyCheckbox) {
+      // 恢复持久化的应用状态
+      applyCheckbox.checked = useFilter;
       applyCheckbox.addEventListener('change', function(this: HTMLInputElement) {
         useFilter = this.checked;
+        persistState();
         if (useFilter) {
           filterCoursesByAllFilters();
         } else {
@@ -380,7 +462,7 @@ export function initCourseFilter(): void {
     // 折叠为球
     const toggleBtn = document.getElementById('scu-filter-toggle') as HTMLElement | null;
     let collapsed: boolean = false;
-    
+
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         if (!collapsed) {
@@ -390,7 +472,7 @@ export function initCourseFilter(): void {
         collapsed = true;
       });
     }
-    
+
     if (ball) {
       ball.addEventListener('click', () => {
         panel.style.display = 'block';
@@ -406,19 +488,19 @@ export function initCourseFilter(): void {
     // 拖拽功能
     const header = document.getElementById('scu-filter-header') as HTMLElement | null;
     if (!header) return;
-    
+
     let dragging: boolean = false;
     let offset: { x: number; y: number } = { x: 0, y: 0 };
-    
+
     header.addEventListener('mousedown', (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.id === 'scu-filter-toggle') return;
-      
+
       dragging = true;
       const rect: DOMRect = panel.getBoundingClientRect();
       offset.x = e.clientX - rect.left;
       offset.y = e.clientY - rect.top;
-      
+
       document.addEventListener('mousemove', onDrag);
       document.addEventListener('mouseup', stopDrag);
       panel.style.userSelect = 'none';
@@ -430,7 +512,7 @@ export function initCourseFilter(): void {
       panel.style.top = (e.clientY - offset.y) + 'px';
       panel.style.right = 'auto';
     }
-    
+
     function stopDrag(): void {
       dragging = false;
       document.removeEventListener('mousemove', onDrag);
@@ -440,14 +522,14 @@ export function initCourseFilter(): void {
   }
 
   function showTimeGridModal(): void {
-    let modal: HTMLElement | null = document.getElementById('cf-time-modal');
-    if (modal) modal.remove();
-    
-    modal = document.createElement('div');
+    closeAllFilterModals();
+
+    let modal: HTMLElement = document.createElement('div');
     modal.id = 'cf-time-modal';
     modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:14px;border-radius:8px;border:1px solid var(--scu-line,#ddd);';
 
-    const gridDaysHeader: string = gridDays.map(d => `<th>周${d}</th>`).join('');
+    // 周日列：课程文本写“日/天”，表头同样显示“周日”而非“周七”
+    const gridDaysHeader: string = gridDays.map(d => `<th>周${d === '七' ? '日' : d}</th>`).join('');
     const rowsHtml: string = gridSections.map((sec, sIdx) => `
       <tr>
         <td>${sec.label}</td>
@@ -468,9 +550,9 @@ export function initCourseFilter(): void {
         <button id="cf-time-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;">关闭</button>
       </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     modal.querySelectorAll('.cf-cell').forEach(c => {
       c.addEventListener('click', function(this: HTMLElement) {
         const day: number = parseInt(this.getAttribute('data-day')!);
@@ -480,34 +562,36 @@ export function initCourseFilter(): void {
         this.innerHTML = selectedTimeGrid[day][sec] ? '✔️' : '';
       });
     });
-    
+
     const okBtn = document.getElementById('cf-time-ok') as HTMLButtonElement | null;
     if (okBtn) {
-      okBtn.onclick = () => { 
+      okBtn.onclick = () => {
         // 自动启用并应用筛选
         const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-        if (apply) { 
-          apply.checked = true; 
-          useFilter = true; 
+        if (apply) {
+          apply.checked = true;
+          useFilter = true;
         }
-        filterCoursesByAllFilters(); 
-        modal!.remove();
+        filterCoursesByAllFilters();
+        persistState();
+        modal.remove();
       };
     }
-    
+
     const cancelBtn = document.getElementById('cf-time-cancel') as HTMLButtonElement | null;
     if (cancelBtn) {
-      cancelBtn.onclick = () => modal!.remove();
+      cancelBtn.onclick = () => modal.remove();
     }
-    
+
     const clearBtn = document.getElementById('cf-time-clear') as HTMLButtonElement | null;
     if (clearBtn) {
       clearBtn.onclick = () => {
         selectedTimeGrid = Array(7).fill(null).map(() => Array(gridSections.length).fill(false));
-        modal!.querySelectorAll('.cf-cell').forEach(cell => {
+        modal.querySelectorAll('.cf-cell').forEach(cell => {
           (cell as HTMLElement).style.background = 'var(--scu-label-default-bg,#f0f0f0)';
           cell.innerHTML = '';
         });
+        persistState();
         if (useFilter) {
           filterCoursesByAllFilters();
         }
@@ -516,10 +600,9 @@ export function initCourseFilter(): void {
   }
 
   function showCampusFilterModal(): void {
-    let modal: HTMLElement | null = document.getElementById('cf-campus-modal');
-    if (modal) modal.remove();
-    
-    modal = document.createElement('div');
+    closeAllFilterModals();
+
+    const modal: HTMLElement = document.createElement('div');
     modal.id = 'cf-campus-modal';
     modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:220px;';
 
@@ -528,9 +611,9 @@ export function initCourseFilter(): void {
       <select id="cf-campus-select" style="width:100%;padding:6px;border:1px solid var(--scu-line,#ddd);border-radius:4px;">${['<option value="">全部校区</option>'].concat(CAMPUS_LIST.map(c => `<option value="${c}" ${campusFilterValue === c ? 'selected' : ''}>${c}</option>`)).join('')}</select>
       <div style="text-align:right;margin-top:8px;"><button id="cf-campus-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-campus-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     const okBtn = document.getElementById('cf-campus-ok') as HTMLButtonElement | null;
     if (okBtn) {
       okBtn.onclick = () => {
@@ -539,33 +622,32 @@ export function initCourseFilter(): void {
           campusFilterValue = sel.value;
           // 自动启用并应用筛选
           const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-          if (apply) { 
-            apply.checked = true; 
-            useFilter = true; 
+          if (apply) {
+            apply.checked = true;
+            useFilter = true;
           }
           filterCoursesByAllFilters();
+          persistState();
         }
-        modal!.remove();
+        modal.remove();
       };
     }
-    
+
     const cancelBtn = document.getElementById('cf-campus-cancel') as HTMLButtonElement | null;
     if (cancelBtn) {
-      cancelBtn.onclick = () => modal!.remove();
+      cancelBtn.onclick = () => modal.remove();
     }
   }
 
   function showTeacherFilterModal(): void {
+    closeAllFilterModals();
     getAllTeachersCurrentPage();
-    
-    let modal: HTMLElement | null = document.getElementById('cf-teacher-modal');
-    if (modal) modal.remove();
-    
-    modal = document.createElement('div');
+
+    const modal: HTMLElement = document.createElement('div');
     modal.id = 'cf-teacher-modal';
     modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:320px;max-width:90vw;width:min(720px,90vw);max-height:80vh;overflow:auto;box-sizing:border-box;';
 
-    const teacherOptions: string = Array.from(allTeachersSet).map(t => `<option value="${t}">${t}</option>`).join('');
+    const teacherOptions: string = Array.from(allTeachersSet).map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
 
     modal.innerHTML = `
       <div style="font-weight:bold;margin-bottom:8px;">教师筛选（黑/白名单）</div>
@@ -574,24 +656,24 @@ export function initCourseFilter(): void {
       <div id="cf-teacher-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;"></div>
       <div style="text-align:right;"><button id="cf-teacher-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-teacher-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     let mode: TeacherMode = 'white';
     let whiteCopy: string[] = [...teacherWhiteList];
     let blackCopy: string[] = [...teacherBlackList];
-    
+
     const listDiv = document.getElementById('cf-teacher-list')!;
-    
+
     function renderList(): void {
       const arr: string[] = mode === 'white' ? whiteCopy : blackCopy;
       listDiv.innerHTML = arr.length === 0 ? '<span style="color:var(--scu-ink-faint,#999)">暂无名单</span>' : arr.map((t, idx) => `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span>${t}</span>
+          <span>${escapeHtml(t)}</span>
           <button data-idx="${idx}" class="cf-t-rem" style="background:#f44336;color:#fff;border:none;border-radius:3px;padding:2px 8px;">移除</button>
         </div>
       `).join('');
-      
+
       (listDiv.querySelectorAll('.cf-t-rem') || []).forEach(b => {
         b.addEventListener('click', () => {
           const i: number = parseInt((b as HTMLElement).getAttribute('data-idx')!);
@@ -604,14 +686,14 @@ export function initCourseFilter(): void {
         });
       });
     }
-    
+
     (modal.querySelectorAll('input[name="cf-t-mode"]') || []).forEach(r => {
       r.addEventListener('change', function(this: HTMLInputElement) {
         mode = this.value as TeacherMode;
         renderList();
       });
     });
-    
+
     const addBtn = document.getElementById('cf-teacher-add') as HTMLButtonElement | null;
     if (addBtn) {
       addBtn.onclick = () => {
@@ -626,7 +708,7 @@ export function initCourseFilter(): void {
         renderList();
       };
     }
-    
+
     const okBtn = document.getElementById('cf-teacher-ok') as HTMLButtonElement | null;
     if (okBtn) {
       okBtn.onclick = () => {
@@ -634,30 +716,29 @@ export function initCourseFilter(): void {
         teacherBlackList = blackCopy;
         // 自动启用并应用筛选
         const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-        if (apply) { 
-          apply.checked = true; 
-          useFilter = true; 
+        if (apply) {
+          apply.checked = true;
+          useFilter = true;
         }
         filterCoursesByAllFilters();
-        modal!.remove();
+        persistState();
+        modal.remove();
       };
     }
-    
+
     const cancelBtn = document.getElementById('cf-teacher-cancel') as HTMLButtonElement | null;
     if (cancelBtn) {
-      cancelBtn.onclick = () => modal!.remove();
+      cancelBtn.onclick = () => modal.remove();
     }
-    
+
     renderList();
   }
 
   function showRestrictionFilterModal(): void {
+    closeAllFilterModals();
     getAllRestrictionsCurrentPage();
-    
-    let modal: HTMLElement | null = document.getElementById('cf-restrict-modal');
-    if (modal) modal.remove();
-    
-    modal = document.createElement('div');
+
+    const modal: HTMLElement = document.createElement('div');
     modal.id = 'cf-restrict-modal';
     modal.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20000;background:var(--scu-surface,#fff);color:var(--scu-ink,#333);padding:12px;border-radius:8px;border:1px solid var(--scu-line,#ddd);min-width:280px;max-width:92vw;width:min(920px,92vw);max-height:86vh;overflow:auto;box-sizing:border-box;';
 
@@ -666,28 +747,28 @@ export function initCourseFilter(): void {
     optionsArr.push('全部');
     const raw: string[] = Array.from(allRestrictionsSet)
       .map(r => (r || '').toString().trim());
-    
+
     // normalize: treat standalone '；' as marker, otherwise remove trailing semicolons
     const normalized: string[] = raw.map(r => {
       if (r === '；' || r === ';') return '；';
       return r.replace(/[；;]+$/g, '').trim();
     }).filter(Boolean);
-    
+
     // dedupe/fuzzy-merge on simplified forms
     const merged: string[] = [];
     for (const r of normalized) {
-      if (r === '；') { 
-        if (!merged.includes('；')) merged.push('；'); 
-        continue; 
+      if (r === '；') {
+        if (!merged.includes('；')) merged.push('；');
+        continue;
       }
       const simpR: string = simplifyForCompare(r);
       let found: boolean = false;
       for (const m of merged) {
         if (m === '；') continue;
         const sim: number = diceCoefficient(simpR, simplifyForCompare(m));
-        if (sim >= 0.88) { 
-          found = true; 
-          break; 
+        if (sim >= 0.88) {
+          found = true;
+          break;
         }
       }
       if (!found) merged.push(r);
@@ -707,7 +788,7 @@ export function initCourseFilter(): void {
       <div id="cf-restrict-list" style="background:var(--scu-surface-dim,#f5f5f5);padding:8px;border-radius:4px;min-height:40px;margin-bottom:6px;white-space:normal;word-break:break-word;overflow-wrap:break-word;max-height:40vh;overflow:auto;"></div>
       <div style="text-align:right;"><button id="cf-restrict-ok" style="background:var(--scu-accent-fill,#9e1b32);color:#fff;border:none;padding:6px 12px;border-radius:4px;">确定</button> <button id="cf-restrict-cancel" style="background:var(--scu-line,#eee);color:var(--scu-ink-soft,#666);border:none;padding:6px 12px;border-radius:4px;margin-left:6px;">取消</button></div>
     `;
-    
+
     document.body.appendChild(modal);
 
     // create options container on body (fixed) to avoid being clipped by modal overflow
@@ -727,19 +808,21 @@ export function initCourseFilter(): void {
         return;
       }
       listDiv.innerHTML = localRestrictions.map((t, idx) => {
-        let disp: string = (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        if (disp === '；' || disp === ';') {
-          disp = '无';
+        let text: string = t || '';
+        if (text === '；' || text === ';') {
+          text = '无';
         } else {
-          disp = disp.replace(/[；;]+$/g, '');
+          text = text.replace(/[；;]+$/g, '');
         }
+        // 先去尾分号再转义，避免 HTML 实体尾部的分号被误删
+        const disp: string = escapeHtml(text);
         return `
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;">
             <div style="flex:1;white-space:normal;word-break:break-word;overflow-wrap:break-word;">${disp}</div>
             <button data-idx="${idx}" class="cf-r-rem" style="background:#f44336;color:#fff;border:none;border-radius:3px;padding:2px 8px;">移除</button>
           </div>`;
       }).join('');
-      
+
       (listDiv.querySelectorAll('.cf-r-rem') || []).forEach(b => {
         b.addEventListener('click', () => {
           const i: number = parseInt((b as HTMLElement).getAttribute('data-idx')!);
@@ -748,11 +831,12 @@ export function initCourseFilter(): void {
           // auto apply
           restrictionFilters = [...localRestrictions];
           const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-          if (apply) { 
-            apply.checked = true; 
-            useFilter = true; 
+          if (apply) {
+            apply.checked = true;
+            useFilter = true;
           }
           filterCoursesByAllFilters();
+          persistState();
         });
       });
     }
@@ -789,9 +873,9 @@ export function initCourseFilter(): void {
       display.onclick = (ev: MouseEvent) => {
         ev.stopPropagation();
         if (!optionsDiv) return;
-        if (optionsDiv.style.display === 'block') { 
-          optionsDiv.style.display = 'none'; 
-          return; 
+        if (optionsDiv.style.display === 'block') {
+          optionsDiv.style.display = 'none';
+          return;
         }
         // position the optionsDiv near the display element and set maxHeight based on available space
         const rect: DOMRect = display.getBoundingClientRect();
@@ -802,7 +886,7 @@ export function initCourseFilter(): void {
         let openAbove: boolean = false;
         let maxH: number = Math.max(120, Math.floor(window.innerHeight * 0.6));
         let top: number = rect.bottom + 6;
-        
+
         if (spaceBelow < 200 && spaceAbove > spaceBelow) {
           openAbove = true;
         }
@@ -822,9 +906,6 @@ export function initCourseFilter(): void {
     }
 
     // click outside to close the options container（具名注册，弹窗关闭时移除，避免泄漏）
-    if (restrictDocClickHandler) {
-      document.removeEventListener('click', restrictDocClickHandler);
-    }
     restrictDocClickHandler = (ev: MouseEvent) => {
       const t = ev.target as Node;
       if (modal && !modal.contains(t) && !optionsDiv.contains(t)) {
@@ -845,17 +926,18 @@ export function initCourseFilter(): void {
         if (!display) return;
         const v: string = display.getAttribute('data-value') || '';
         if (!v) return;
-        if (v === '全部') { 
-          localRestrictions = []; 
-          restrictionFilters = []; 
-          renderList(); 
+        if (v === '全部') {
+          localRestrictions = [];
+          restrictionFilters = [];
+          renderList();
           const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-          if (apply) { 
-            apply.checked = true; 
-            useFilter = true; 
+          if (apply) {
+            apply.checked = true;
+            useFilter = true;
           }
-          filterCoursesByAllFilters(); 
-          return; 
+          filterCoursesByAllFilters();
+          persistState();
+          return;
         }
         if (v === '；') {
           if (!localRestrictions.includes('；')) localRestrictions.push('；');
@@ -866,17 +948,18 @@ export function initCourseFilter(): void {
         renderList();
         // 自动启用并应用筛选
         const apply = document.getElementById('cf-apply') as HTMLInputElement | null;
-        if (apply) { 
-          apply.checked = true; 
-          useFilter = true; 
+        if (apply) {
+          apply.checked = true;
+          useFilter = true;
         }
         filterCoursesByAllFilters();
+        persistState();
       };
     }
 
     populateOptions();
     renderList();
-    
+
     const okBtn = document.getElementById('cf-restrict-ok') as HTMLButtonElement | null;
     if (okBtn) {
       okBtn.onclick = () => {
@@ -888,9 +971,10 @@ export function initCourseFilter(): void {
           useFilter = true;
         }
         filterCoursesByAllFilters();
+        persistState();
         if (optionsDiv && optionsDiv.parentNode) optionsDiv.remove();
         removeDocClickHandler();
-        modal!.remove();
+        modal.remove();
       };
     }
 
@@ -899,38 +983,50 @@ export function initCourseFilter(): void {
       cancelBtn.onclick = () => {
         if (optionsDiv && optionsDiv.parentNode) optionsDiv.remove();
         removeDocClickHandler();
-        modal!.remove();
+        modal.remove();
       };
     }
   }
 
-  // 监听课程表内容变化：选课列表是 AJAX 分页的，翻页后新行需要重新应用筛选
-  function watchTableAndRefilter(tbody: HTMLElement): void {
+  // 监听课程表内容变化：选课列表是 AJAX 分页/重新查询的，行增删或容器整体被替换后都要重新应用筛选
+  function watchTableAndRefilter(): void {
     let debounceTimer: number | null = null;
     const observer = new MutationObserver((mutations) => {
       if (!useFilter) return;
-      // 只响应行增删（翻页/重新加载），display 等样式变更不算
+      // 只响应行增删（翻页/重新查询/容器替换），display 等样式变更不算
       const rowsChanged = mutations.some(m => m.addedNodes.length > 0 || m.removedNodes.length > 0);
       if (!rowsChanged) return;
       if (debounceTimer !== null) window.clearTimeout(debounceTimer);
       debounceTimer = window.setTimeout(() => {
+        debounceTimer = null;
         if (useFilter) filterCoursesByAllFilters();
       }, 300);
     });
-    // 观察 tbody 的父节点，兼容 tbody 整棵被替换的情况
-    observer.observe(tbody.parentElement || tbody, { childList: true, subtree: true });
+    // 挂在 body 上而不是 tbody 父节点：列表容器整体被替换（重新查询/切换页签）后观察器依然有效；
+    // 只监听 childList，筛选自身改 style 不会触发，无死循环风险
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // 监听页面，若有课程表则注入面板
+  // 监听页面，若出现课程表则注入面板
   function waitForTableAndInject(): void {
-    const tbody: HTMLElement | null = document.getElementById('xirxkxkbody') || document.querySelector('tbody');
-    if (tbody) {
-      createPanel();
-      watchTableAndRefilter(tbody);
-    } else {
-      setTimeout(waitForTableAndInject, 800);
-    }
+    let attempts: number = 0;
+    const tryInject = (): void => {
+      const tbody: HTMLElement | null = findCourseTableBody();
+      if (tbody) {
+        createPanel();
+        // 恢复的筛选立即生效（表格可能在 init 后才由 AJAX 渲染）
+        if (useFilter) filterCoursesByAllFilters();
+        return;
+      }
+      // 表格由 AJAX 延迟渲染时轮询等待；约 48s 后放弃，避免无表格页面（如 iframe）无限轮询
+      if (++attempts >= 60) return;
+      setTimeout(tryInject, 800);
+    };
+    tryInject();
   }
 
+  restoreState();
+  // 先挂全局观察器：无论课程表何时出现、整体被替换还是局部翻页，useFilter 开启时都能自动重筛
+  watchTableAndRefilter();
   waitForTableAndInject();
 }

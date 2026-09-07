@@ -36,7 +36,8 @@ const main = async () => {
   if (url.includes("/student/courseSelect/")) {
     // 选课相关
     safeInit("courseTable", initCourseTable);
-    if (url.includes("/index?")) {
+    // 筛选面板是否注入由页面是否存在课程表（kcId 复选框）决定，退课页除外
+    if (!url.includes("/quitCourse/")) {
         safeInit("courseFilter", initCourseFilter);
     }
     if (url.includes("/quitCourse/")) {
