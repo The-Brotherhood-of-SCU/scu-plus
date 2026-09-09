@@ -51,6 +51,7 @@ if __name__ == "__main__":
         "请下载 chrome-mv3-prod.zip 文件\n\n"
         "目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"
         f"macOS Safari：[下载对应版本](https://github.com/Visio-Vanitas/scu-plus/releases/tag/{quote('v' + version, safe='')})，由独立分发仓库签名和公证。上游发布后需要等待构建完成；若对应版本尚未生成，请查看[构建状态](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。\n\n"
+        "**不建议任何不了解 IPA 的同学下载或尝试安装。** iOS/iPadOS：上述分发页提供未签名 IPA，需自行重签主应用及 Safari 扩展后安装，仅供技术测试；原生断点调试请从源码构建。也可通过 [TestFlight](https://testflight.apple.com/join/VfB4puVJ) 邀测，安装取决于审核和当前测试状态。\n\n"
         + get_release_notes(version)
     )
     print(release_notes)
