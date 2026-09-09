@@ -35,13 +35,16 @@ export async function injectSchoolSchedule(): Promise<void> {
   for (const li of lis) {
     const a = li.querySelector("a");
     const href = a?.getAttribute("href");
-    if (a && href) {
-      scheduleList.push({
-        name: a.innerText,
-        // href 可能是绝对地址或相对路径，用 URL 正确拼接
-        link: new URL(href, "https://jwc.scu.edu.cn/").href
-      });
+    if (!a || !href) continue;
+    let link: string;
+    try {
+      // href 可能是绝对地址或相对路径，用 URL 正确拼接；
+      // 远程内容可能带非法字符（未转义空格/% 等），解析失败的单条直接跳过
+      link = new URL(href, "https://jwc.scu.edu.cn/").href;
+    } catch {
+      continue;
     }
+    scheduleList.push({ name: a.innerText, link });
   }
 
   // 远程页面抓来的 name/link 不可信，全部用 DOM API / textContent 构造，避免 HTML 注入
@@ -57,7 +60,12 @@ export async function injectSchoolSchedule(): Promise<void> {
   menu.className = "dropdown-menu";
   menu.style.cssText = "min-width:200px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1);";
   for (const schedule of scheduleList) {
-    const url = new URL(schedule.link);
+    let url: URL;
+    try {
+      url = new URL(schedule.link);
+    } catch {
+      continue;
+    }
     if (url.protocol !== "https:" && url.protocol !== "http:") continue;
     const li = document.createElement("li");
     const a = document.createElement("a");
