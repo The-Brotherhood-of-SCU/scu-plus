@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 提供 Safari 安装入口，发布说明链接到独立分发仓库的对应版本：macOS 签名安装包、供自行重签测试的 iOS/iPadOS 未签名 IPA，以及 TestFlight 邀测入口。
+- 提供 Safari 安装入口，发布说明链接到独立分发仓库的对应版本：macOS 签名安装包和 iOS/iPadOS TestFlight 发布链接；另为开发者提供需自行重签的 IPA 测试产物。
 
 ## [2.3.3] - 2026-08-22
 

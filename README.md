@@ -31,9 +31,11 @@
 
 Safari 安装包由 [Visio-Vanitas/scu-plus 分发仓库](https://github.com/Visio-Vanitas/scu-plus/releases)提供，跟随本仓库发布的版本 tag 构建，使用 Developer ID 签名并经 Apple 公证。下载对应版本的 DMG，将 SCU Plus 拖到“应用程序”，再在 Safari 设置 → 扩展中启用并授予所需网站权限。
 
-> **不建议任何不了解 IPA 的同学下载或尝试安装。** 普通测试者请使用下方 TestFlight 入口。
+iOS/iPadOS：[通过 TestFlight 安装](https://testflight.apple.com/join/VfB4puVJ)。安装后在 Safari 设置中启用 SCU Plus 并授予所需网站权限；可安装版本以 Apple 审核和当前测试状态为准。
 
-iOS/iPadOS：同一 Release 提供 `scu-plus-safari-ios-unsigned.ipa`，供有技术背景的同学自行重签后测试。它不能直接安装；必须使用自己的签名身份和匹配的描述文件同时重签主 App 与 Safari 扩展，再安装并在 Safari 设置中启用。该包是 Release 构建，原生断点调试需从源码使用 Xcode 构建。普通测试者可使用 [TestFlight 邀请链接](https://testflight.apple.com/join/VfB4puVJ)，能否安装取决于 Apple 审核和当前测试状态。
+开发者测试与调试产物：分发仓库的 Release 附件另提供 `scu-plus-safari-ios-unsigned.ipa`，需要使用自己的签名身份和匹配的描述文件同时重签主 App 与 Safari 扩展后安装。它是 Release 构建，原生断点调试需从源码使用 Xcode 构建。
+
+> **不建议任何不了解 IPA 的同学下载或尝试安装。** iOS/iPadOS 用户请使用上述 TestFlight 发布链接。
 
 上游新版本发布后，Safari 安装包需要等待构建、公证完成；进度见[分发构建](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。本仓库不保存 Apple 签名凭据，也不需要配置跨仓库 Secret。
 
