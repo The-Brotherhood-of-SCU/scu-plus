@@ -50,9 +50,9 @@ if __name__ == "__main__":
     release_notes = (
         "请下载 chrome-mv3-prod.zip 文件\n\n"
         "目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"
-        f"macOS Safari：[签名 DMG](https://github.com/Visio-Vanitas/scu-plus/releases/download/{quote('v' + version, safe='')}/scu-plus-safari-macos.dmg)，由独立分发仓库签名和公证。上游发布后需要等待构建完成；若对应版本尚未生成，请查看[构建状态](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。\n\n"
-        "iOS/iPadOS：[通过 TestFlight 安装](https://testflight.apple.com/join/VfB4puVJ)，可安装版本以 Apple 审核和当前测试状态为准。\n\n"
-        f"开发者测试与调试：[未签名 IPA](https://github.com/Visio-Vanitas/scu-plus/releases/download/{quote('v' + version, safe='')}/scu-plus-safari-ios-unsigned.ipa)，需要自行重签主应用及 Safari 扩展。**不建议任何不了解 IPA 的同学下载或尝试安装。** 原生断点调试请从源码构建。\n\n"
+        f"macOS Safari：[dmg](https://github.com/Visio-Vanitas/scu-plus/releases/download/{quote('v' + version, safe='')}/scu-plus-safari-macos.dmg)。若对应版本尚未生成，请联系维护者检查[构建状态](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。\n\n"
+        "iOS/iPadOS：[通过 TestFlight 安装](https://testflight.apple.com/join/VfB4puVJ)，可安装版本以 Apple 审核和当前测试状态为准，不保证同步更新。\n\n"
+        f"另提供：[未签名 IPA](https://github.com/Visio-Vanitas/scu-plus/releases/download/{quote('v' + version, safe='')}/scu-plus-safari-ios-unsigned.ipa)，需自行重签主应用及 Safari 扩展。不建议任何不了解 IPA 的同学下载或尝试安装，不接受相关错误报告。\n\n"
         + get_release_notes(version)
     )
     print(release_notes)
