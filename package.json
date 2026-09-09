@@ -14,6 +14,7 @@
     "build": "plasmo build",
     "build:safari": "plasmo build --target=safari-mv3 --zip",
     "package": "plasmo package",
+    "typecheck": "tsc --noEmit",
     "build:firefox:amo": "bash scripts/build-firefox-amo.sh",
     "package:amo-source": "bash scripts/package-amo-source.sh"
   },
@@ -24,16 +25,16 @@
     "chart.js": "^4.5.1",
     "chartjs-plugin-annotation": "^3.1.0",
     "decimal.js": "^10.6.0",
-    "plasmo": "0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "@types/chrome": "0.1.38",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
     "baseline-browser-mapping": "^2.11.9",
+    "plasmo": "0.90.5",
     "prettier": "3.8.1",
     "typescript": "6.0.2"
   },

@@ -34,7 +34,8 @@ const TIME_TABLE_HUAXI: Record<number, [string, string]> = {
 
 // ── 课表 API 与 planCode 解析 ───────────────────────────────────
 
-export const COURSE_SCHEDULE_API = 'http://zhjw.scu.edu.cn/student/courseSelect/thisSemesterCurriculum/ajaxStudentSchedule/callback';
+// 相对路径：跟随页面协议，避免 https 化后 mixed-content 失败
+export const COURSE_SCHEDULE_API = '/student/courseSelect/thisSemesterCurriculum/ajaxStudentSchedule/callback';
 
 export function parsePlanCode(): { planCode: string | null; isCurrentSemester: boolean } {
     if (!window.location.href.includes('calendarSemesterCurriculum')) {
@@ -292,22 +293,22 @@ function showFirstMondayModal(currentFirstMonday: Date, prefillDate: Date | null
         const pd = String(prefill.getDate()).padStart(2, '0');
         const prefillDateStr = `${py}-${pm}-${pd}`;
         overlay.innerHTML = `
-            <div style="background:#fff;border-radius:8px;padding:24px;min-width:380px;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="background:var(--scu-surface,#fffdf8);color:var(--scu-ink,#1d1c1a);border-radius:8px;padding:24px;min-width:380px;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
                 <h5 style="margin:0 0 16px;font-size:16px;">非当前学期，请选择第一周周一日期</h5>
                 <div style="margin-bottom:12px;">
                     <label style="display:flex;align-items:center;cursor:pointer;padding:8px 0;">
                         <input type="radio" name="firstMonday" value="manual" checked style="margin-right:8px;">
                         手动选择第一周周一
                     </label>
-                    <input type="date" id="scu-plus-manual-date" value="${prefillDateStr}" style="margin-left:24px;margin-top:4px;margin-bottom:4px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;">
+                    <input type="date" id="scu-plus-manual-date" value="${prefillDateStr}" style="margin-left:24px;margin-top:4px;margin-bottom:4px;padding:4px 8px;border:1px solid var(--scu-line,#e4e0d4);border-radius:4px;background:var(--scu-paper,#f4f2ec);color:inherit;">
                     <label style="display:flex;align-items:center;cursor:pointer;padding:8px 0;">
                         <input type="radio" name="firstMonday" value="default" style="margin-right:8px;">
                         使用当前学期第一周周一 (${currentDateStr})
                     </label>
                 </div>
                 <div style="text-align:right;margin-top:16px;">
-                    <button id="scu-plus-modal-cancel" style="padding:6px 16px;margin-right:8px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;">取消</button>
-                    <button id="scu-plus-modal-confirm" style="padding:6px 16px;border:none;border-radius:4px;background:#428bca;color:#fff;cursor:pointer;">确定</button>
+                    <button id="scu-plus-modal-cancel" style="padding:6px 16px;margin-right:8px;border:1px solid var(--scu-line,#e4e0d4);border-radius:4px;background:var(--scu-surface,#fffdf8);color:inherit;cursor:pointer;">取消</button>
+                    <button id="scu-plus-modal-confirm" style="padding:6px 16px;border:none;border-radius:4px;background:var(--scu-accent-fill,var(--scu-accent,#9e1b32));color:#fff;cursor:pointer;">确定</button>
                 </div>
             </div>
         `;

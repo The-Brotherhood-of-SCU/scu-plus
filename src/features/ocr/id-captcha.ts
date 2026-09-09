@@ -1,18 +1,10 @@
 import { ocrLocal, warmupLocalOcr } from "~features/ocr/local-ocr";
+import { createCaptchaAutoFill } from "~features/ocr/captcha-autofill";
 import { getSetting } from "~script/config";
 
 export async function initIdCaptchaOcr(): Promise<void> {
   const savedSettings = await getSetting();
   if (!savedSettings.ocrSwitch) return;
-
-  // 后台预加载本地模型，消除首次识别的加载延迟
-  warmupLocalOcr();
-
-  let running = false;
-  let timer: number | null = null;
-  let lastCaptchaSrc = "";
-  let lastRecognizedSrc = "";
-  let retryCount = 0;
 
   // 登录页随浏览器语言切换中/英文，文案匹配必须双语覆盖。
   // 英文文案来自 id.scu.edu.cn 的 en-US 语言包：
@@ -79,107 +71,32 @@ export async function initIdCaptchaOcr(): Promise<void> {
     return form.querySelector<HTMLImageElement>("img");
   };
 
-  const scheduleRun = (delay = 120) => {
-    if (timer) {
-      window.clearTimeout(timer);
-    }
-    timer = window.setTimeout(() => {
-      void runOcrForCurrentTab();
-    }, delay);
-  };
-
-  const bindCaptchaLoadListener = (img: HTMLImageElement) => {
-    const marker = "__scuOcrLoadBound";
-    if ((img as any)[marker]) return;
-    (img as any)[marker] = true;
-    img.addEventListener("load", () => scheduleRun(60));
-  };
-
-  const runOcrForCurrentTab = async (): Promise<void> => {
-    if (running) return;
-    running = true;
-    try {
+  createCaptchaAutoFill({
+    recognize: ocrLocal,
+    warmup: warmupLocalOcr,
+    locate: () => {
+      // 只处理账号登录 / 短信登录页签，其他页签没有验证码
       const activeTab = getActiveTabText();
-      if (!(ACCOUNT_TAB_RE.test(activeTab) || SMS_TAB_RE.test(activeTab))) return;
+      if (!(ACCOUNT_TAB_RE.test(activeTab) || SMS_TAB_RE.test(activeTab))) return null;
 
       const form = getCurrentLoginForm();
-      if (!form) return;
+      if (!form) return null;
 
       const input = getCaptchaInput(form);
-      if (!input || !isVisible(input)) return;
+      if (!input || !isVisible(input)) return null;
 
       const img = getCaptchaImage(form, input);
-      if (!img || !isVisible(img)) return;
+      if (!img || !isVisible(img)) return null;
 
-      bindCaptchaLoadListener(img);
-
-      if (!img.complete || !(img.naturalWidth || img.width) || !(img.naturalHeight || img.height)) {
-        return;
-      }
-
-      const src = img.currentSrc || img.src || "";
-      if (src !== lastCaptchaSrc) {
-        // 验证码已刷新：若输入框里是上次自动填入的结果，先清空再重新识别
-        if (lastRecognizedSrc && input.value.trim().length === 4) {
-          input.value = "";
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          input.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-        lastCaptchaSrc = src;
-        lastRecognizedSrc = "";
-        retryCount = 0;
-      }
-      // 输入框已有内容且并非本插件填入（用户手动输入）→ 不打扰
-      if (input.value.trim().length > 0 && !lastRecognizedSrc) return;
-      // 当前验证码已识别且结果仍在输入框 → 跳过
-      if (src === lastRecognizedSrc && input.value.trim().length === 4) return;
-
-      const resultRaw = await ocrLocal(img);
-      const result = String(resultRaw || "").replace(/\s+/g, "");
-
-      if (result.length !== 4) {
-        // 识别置信度过低：稍作延迟再换一张，给新验证码的加载留出时间，
-        // 避免在新图就位前把重试次数烧在旧图上（本地 OCR 几乎是瞬时返回）
-        if (retryCount < 3) {
-          retryCount++;
-          window.setTimeout(() => img.click(), 350);
-        }
-        return;
-      }
-
-      retryCount = 0;
-      input.value = result;
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-      lastRecognizedSrc = src;
-    } catch (e) {
-      // 本地 OCR 偶发失败（如图片未加载完成），保持静默等待下次触发。
-    } finally {
-      running = false;
-    }
-  };
-
-  document.addEventListener("click", (e) => {
-    const target = e.target as Element | null;
-    if (!target) return;
-    if (target.closest(".login-tab .login-tab-item")) {
-      scheduleRun(160);
-      return;
-    }
-    if (target instanceof HTMLImageElement && target.closest(".captcha-box")) {
-      scheduleRun(120);
-    }
-  }, true);
-
-  try {
-    const mo = new MutationObserver(() => scheduleRun(120));
-    mo.observe(document.body || document.documentElement, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ["class", "style", "src"]
-    });
-  } catch (e) {}
-
-  scheduleRun(50);
+      return { img, input };
+    },
+    onClickCapture: (target) => {
+      // 切换登录页签后表单整体更换，需要重新定位
+      if (target.closest(".login-tab .login-tab-item")) return 160;
+      // 点击验证码图（刷新验证码）后立即重新识别
+      if (target instanceof HTMLImageElement && target.closest(".captcha-box")) return 120;
+      return null;
+    },
+    initialDelay: 50
+  });
 }
