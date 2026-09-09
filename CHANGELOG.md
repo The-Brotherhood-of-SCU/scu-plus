@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 注意：本页的更新日志应当存放一些通俗显著的更新内容，而非技术更新或者内部优化，请勿搬运git log记录。
 
 
+## [Unreleased]
+
+### Added
+
+- 提供 macOS Safari 安装入口，发布说明链接到独立签名分发仓库的对应版本。
+
 ## [2.3.3] - 2026-08-22
 
 ### Fixed

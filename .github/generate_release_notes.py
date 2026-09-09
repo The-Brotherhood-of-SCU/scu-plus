@@ -1,6 +1,7 @@
 import os
 import re
 import json
+from urllib.parse import quote
 
 
 def get_version() -> str:
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     release_notes = (
         "请下载 chrome-mv3-prod.zip 文件\n\n"
         "目前FireFox扩展正在测试中，稳定性未知，建议在测试环境中使用。\n\n"
+        f"macOS Safari：[下载对应版本](https://github.com/Visio-Vanitas/scu-plus/releases/tag/{quote('v' + version, safe='')})，由独立分发仓库签名和公证。上游发布后需要等待构建完成；若对应版本尚未生成，请查看[构建状态](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。\n\n"
         + get_release_notes(version)
     )
     print(release_notes)

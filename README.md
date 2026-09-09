@@ -27,6 +27,14 @@
 
 </div>
 
+## Safari（macOS）
+
+Safari 安装包由 [Visio-Vanitas/scu-plus 分发仓库](https://github.com/Visio-Vanitas/scu-plus/releases)提供，跟随本仓库发布的版本 tag 构建，使用 Developer ID 签名并经 Apple 公证。下载对应版本的 DMG，将 SCU Plus 拖到“应用程序”，再在 Safari 设置 → 扩展中启用并授予所需网站权限。iOS/iPadOS 暂不包含在此分发流程中。
+
+上游新版本发布后，Safari 安装包需要等待构建、公证完成；进度见[分发构建](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。本仓库不保存 Apple 签名凭据，也不需要配置跨仓库 Secret。
+
+开发者可使用 `pnpm build:safari` 生成未签名的 `build/safari-mv3-prod.zip`；该 ZIP 用于开发测试，不能替代上述 macOS 安装包。开发运行方式见 [Apple 官方说明](https://developer.apple.com/documentation/safariservices/running-your-safari-web-extension)。
+
 ## ✨ 核心功能
 
 ### 🛡️ 隐私与安全

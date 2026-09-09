@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
+    "build:safari": "plasmo build --target=safari-mv3 --zip",
     "package": "plasmo package",
     "build:firefox:amo": "bash scripts/build-firefox-amo.sh",
     "package:amo-source": "bash scripts/package-amo-source.sh"
