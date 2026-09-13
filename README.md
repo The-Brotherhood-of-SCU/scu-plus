@@ -27,6 +27,20 @@
 
 </div>
 
+## Safari（macOS / iOS / iPadOS）
+
+Safari 安装包由 [Visio-Vanitas/scu-plus 分发仓库](https://github.com/Visio-Vanitas/scu-plus/releases)提供，跟随本仓库发布的版本 tag 构建，使用 Developer ID 签名并经 Apple 公证。下载[签名 DMG](https://github.com/Visio-Vanitas/scu-plus/releases/latest/download/scu-plus-safari-macos.dmg)，将 SCU Plus 拖到“应用程序”，再在 Safari 设置 → 扩展中启用并授予所需网站权限。
+
+iOS/iPadOS：[通过 TestFlight 安装](https://testflight.apple.com/join/VfB4puVJ)。安装后在 Safari 设置中启用 SCU Plus 并授予所需网站权限；可安装版本以 Apple 审核和当前测试状态为准。
+
+开发者测试与调试产物：分发仓库另提供[未签名 IPA](https://github.com/Visio-Vanitas/scu-plus/releases/latest/download/scu-plus-safari-ios-unsigned.ipa)，需要使用自己的签名身份和匹配的描述文件同时重签主 App 与 Safari 扩展后安装。它是 Release 构建，原生断点调试需从源码使用 Xcode 构建。
+
+> **不建议任何不了解 IPA 的同学下载或尝试安装。** iOS/iPadOS 用户请使用上述 TestFlight 发布链接。
+
+上游新版本发布后，Safari 安装包需要等待构建、公证完成；进度见[分发构建](https://github.com/Visio-Vanitas/scu-plus/actions/workflows/safari-release-sync.yml)。本仓库不保存 Apple 签名凭据，也不需要配置跨仓库 Secret。
+
+开发者可使用 `pnpm build:safari` 生成未签名的 `build/safari-mv3-prod.zip`；该 ZIP 用于开发测试，不能替代上述 macOS 安装包。开发运行方式见 [Apple 官方说明](https://developer.apple.com/documentation/safariservices/running-your-safari-web-extension)。
+
 ## ✨ 核心功能
 
 ### 🛡️ 隐私与安全
@@ -80,7 +94,7 @@
 | 2️⃣ **访问扩展页面** | 地址栏输入 `about:debugging#/runtime/this-firefox` |
 | 3️⃣ **加载插件** | 点击「临时载入附加组件」，选择 ZIP 文件 |
 
-> 💡 **提示**：支持 Chrome、Edge 等 Chromium 系浏览器及 Firefox，暂不支持 Safari。
+> 💡 **提示**：支持 Chrome、Edge 等 Chromium 系浏览器及 Firefox，Safari 安装方式见上方专节。
 > 📘 详细图文版请参考 [小白安装教程](https://github.com/The-Brotherhood-of-SCU/scu-plus/wiki/安装)。
 
 ---

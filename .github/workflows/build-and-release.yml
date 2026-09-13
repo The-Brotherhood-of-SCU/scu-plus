@@ -10,20 +10,22 @@ on:
         description: '要发布的版本 tag（如 v2.3.0）'
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-24.04
-    env:
-      BUILD_FIREFOX: true # whether to build firefox plugin
-    
+
     steps:
+      # workflow_dispatch 时必须检出 inputs.tag 指定的提交，而不是触发分支的 HEAD
       - name: Checkout code
-        run: git clone --branch=${{ github.ref_name }} https://github.com/${{ github.repository }}.git .
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+
       - name: Set up Python 3
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -40,7 +42,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22.13"
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -50,7 +52,6 @@ jobs:
         run: pnpm build --zip
 
       - name: Build firefox plugin
-        if: env.BUILD_FIREFOX == 'true'
         run: pnpm build --zip --target=firefox-mv3
 
       - name: Create Release & Upload Assets
@@ -60,8 +61,7 @@ jobs:
           tag_name: ${{ inputs.tag || github.ref_name }}
           name: Release ${{ env.title }}
           body: ${{ env.release_notes }}
-          # 注意：BUILD_FIREFOX 固定为 true，firefox zip 始终构建；
-          # 若日后改为按需构建，需相应调整此文件列表
+          # chrome 与 firefox 的 zip 始终构建并上传
           files: |
             ./build/chrome-mv3-prod.zip
             ./build/firefox-mv3-prod.zip

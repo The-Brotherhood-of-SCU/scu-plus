@@ -1018,8 +1018,9 @@ export function initCourseFilter(): void {
         if (useFilter) filterCoursesByAllFilters();
         return;
       }
-      // 表格由 AJAX 延迟渲染时轮询等待；约 48s 后放弃，避免无表格页面（如 iframe）无限轮询
-      if (++attempts >= 60) return;
+      // 表格由 AJAX 延迟渲染时轮询等待；采用与 menu / course-table 一致的 30 次重试上限，
+      // 避免无课程表页面（如 iframe）永久轮询
+      if (++attempts >= 30) return;
       setTimeout(tryInject, 800);
     };
     tryInject();

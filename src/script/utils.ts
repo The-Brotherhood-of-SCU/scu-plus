@@ -16,7 +16,7 @@ declare const process: { env: { PLASMO_BROWSER?: string } };
  */
 async function checkVersion () : Promise<UpdateCheckInfo>{
     try {
-        let response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: pkgMessage.checkForUpdateLink, accept: 'application/vnd.github+json' });
+        let response = await chrome.runtime.sendMessage({ action: Actions.REQUEST, url: process.env.PLASMO_BROWSER === 'safari' ? 'https://api.github.com/repos/Visio-Vanitas/scu-plus/releases/latest' : pkgMessage.checkForUpdateLink, accept: 'application/vnd.github+json' });
         if (!response?.success) {
             return { result: UpdateCheckResult.NETWORK_ERROR };
         }
@@ -24,6 +24,14 @@ async function checkVersion () : Promise<UpdateCheckInfo>{
         const latestVersion = (release.tag_name ?? "").replace(/^v/i, "");
         if (!latestVersion || latestVersion === pkgMessage.version) {
             return { result: UpdateCheckResult.UP_TO_DATE };
+        }
+        // Safari 的正式安装包由独立仓库签名和公证；不下载其他浏览器的 ZIP。
+        if (process.env.PLASMO_BROWSER === 'safari') {
+            return {
+                result: UpdateCheckResult.NEW_VERSION_AVAILABLE,
+                latestVersion,
+                downloadUrl: release.html_url ?? 'https://github.com/Visio-Vanitas/scu-plus/releases'
+            };
         }
         // 从 release 附件中找对应浏览器的 zip 包，下载链接加 gh-proxy 前缀加速；找不到附件则回退到 release 页面
         const assets: { name?: string; browser_download_url?: string }[] = Array.isArray(release.assets) ? release.assets : [];

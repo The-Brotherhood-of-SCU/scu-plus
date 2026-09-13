@@ -58,6 +58,26 @@ export class SettingItem {
   }
 }
 
+/**
+ * 从不可信来源（storage 旧数据回填 / 配置文件导入）提取合法设置：
+ * 只接受已知键且类型正确的字段，其余一律落回默认值，
+ * 防止错误类型的值或垃圾键被持久化。
+ */
+export function sanitizeSettings(raw: unknown): SettingItem {
+  const result = new SettingItem();
+  if (raw == null || typeof raw !== "object") return result;
+  const defaults = new SettingItem();
+  const source = raw as Record<string, unknown>;
+  const target = result as unknown as Record<string, unknown>;
+  for (const key of Object.keys(defaults)) {
+    const value = source[key];
+    if (typeof value === typeof (defaults as unknown as Record<string, unknown>)[key]) {
+      target[key] = value;
+    }
+  }
+  return result;
+}
+
 export interface CourseData {
   attribute: string;
   credit: number;

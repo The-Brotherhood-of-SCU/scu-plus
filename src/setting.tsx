@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { getSetting, saveSetting } from "~script/config";
-import { SettingItem } from "~common/types";
+import { sanitizeSettings, SettingItem } from "~common/types";
+import { resolveAvatarRedirectUrl } from "~common/avatar";
 import { message, notification, confirm } from "~script/notice";
 import React from "react";
 import { Actions } from "~constants/actions";
@@ -358,15 +359,12 @@ function saveSettingWithUpdates(data: SettingItem) {
   UpdateRedirect(data);
 }
 function UpdateRedirect(newConfig: SettingItem) {
-  if (newConfig.avatarSwitch) {
-    if (newConfig.avatarSource === 'qq') {
-      chrome.runtime.sendMessage({ action: Actions.UPDATE_AVATAR, url: `https://q1.qlogo.cn/g?b=qq&nk=${newConfig.avatarInfo}&src_uin=www.jlwz.cn&s=0` });
-    }
-    else {
-      chrome.runtime.sendMessage({ action: Actions.UPDATE_AVATAR, url: newConfig.avatarInfo });
-    }
+  const url = resolveAvatarRedirectUrl(newConfig.avatarSource, newConfig.avatarInfo);
+  if (newConfig.avatarSwitch && url) {
+    chrome.runtime.sendMessage({ action: Actions.UPDATE_AVATAR, url });
   }
   else {
+    // 开关关闭、或 avatarInfo 非法时，一并清掉可能残留的重定向规则
     chrome.runtime.sendMessage({ action: Actions.REMOVE_AVATAR_REDIRECTION })
   }
 }
@@ -521,7 +519,8 @@ function DataSettingFragment({ isDirty, setIsDirty, setAccent, setDarkMode }: { 
                 if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) {
                   throw new Error('not a settings object');
                 }
-                const jsonData = { ...setting, ...parsed };
+                // 只接受已知键且类型正确的字段，防止导入文件注入垃圾数据
+                const jsonData = sanitizeSettings({ ...setting, ...parsed });
                 saveSettingWithUpdates(jsonData);
                 setSetting(jsonData);
                 setAccent(normalizeAccent(jsonData.beautifyColor));
