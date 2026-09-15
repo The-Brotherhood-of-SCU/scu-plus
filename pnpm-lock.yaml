@@ -13,7 +13,7 @@ importers:
         version: 1.15.0(react@18.2.0)
       '@scu-plus/zhjw-captcha-ocr':
         specifier: github:meteor-liu-xinyu/zhjw-captcha-ocr
-        version: git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a
+        version: git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#95f06b50a5c3b450a7c075d5312a90d1ab471956
       '@zumer/snapdom':
         specifier: ^2.23.1
         version: 2.23.1
@@ -1400,9 +1400,9 @@ packages:
     resolution: {integrity: sha512-//0sR/cow/s4ICQaYoAobOl4aU8cjU6x/V24V7XkKotb9+O+3zySIYp146vpaobYHnxa4pZX8NkV54Z5AwbDKA==}
     engines: {node: '>=12'}
 
-  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a':
-    resolution: {commit: bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a, repo: https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git, type: git}
-    version: 1.1.0
+  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#95f06b50a5c3b450a7c075d5312a90d1ab471956':
+    resolution: {commit: 95f06b50a5c3b450a7c075d5312a90d1ab471956, repo: https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git, type: git}
+    version: 1.2.0
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -4846,7 +4846,7 @@ snapshots:
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
 
-  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#bcddfde6a4a9d5edf8ebd3881bbdbc51417d338a': {}
+  '@scu-plus/zhjw-captcha-ocr@git+https://github.com/meteor-liu-xinyu/zhjw-captcha-ocr.git#95f06b50a5c3b450a7c075d5312a90d1ab471956': {}
 
   '@sec-ant/readable-stream@0.4.1': {}
 
